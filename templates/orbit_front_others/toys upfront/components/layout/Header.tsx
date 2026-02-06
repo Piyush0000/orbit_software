@@ -5,10 +5,12 @@ import { Search, ShoppingCart, Heart, User, Menu, X } from "lucide-react";
 import { useState } from "react";
 import AnnouncementBar from "./AnnouncementBar";
 import { useWishlist } from "@/context/WishlistContext";
+import { useStore } from "@/contexts/StoreContext";
 
 export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { wishlist } = useWishlist();
+    const { store } = useStore();
 
     return (
         <div className="sticky top-0 z-50 bg-white shadow-sm">
@@ -28,7 +30,7 @@ export default function Header() {
                     {/* Logo */}
                     <Link href="/" className="flex-shrink-0">
                         <span className="text-3xl font-extrabold text-primary font-display tracking-tight">
-                            Toy<span className="text-secondary">Store</span>
+                            {store?.name || "ToyStore"}
                             <span className="text-accent">.</span>
                         </span>
                     </Link>

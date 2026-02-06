@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, ShieldCheck, Heart, Share2, Truck, RefreshCcw, Package, User, HelpCircle } from "lucide-react";
 import ProductCard from "@/components/ui/ProductCard";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
-import { products } from "@/lib/data";
+import { getProducts } from "@/lib/products-api";
+import { mapApiProducts, type ToyProduct } from "@/lib/product-adapter";
 import { useParams } from "next/navigation";
 import confetti from "canvas-confetti";
 
@@ -13,6 +14,8 @@ export default function ProductPage() {
     const params = useParams();
     const slug = params?.slug as string;
 
+    const [products, setProducts] = useState<ToyProduct[]>([]);
+    const [loading, setLoading] = useState(true);
     const product = products.find(p => p.id === slug) || products[0];
 
     const [selectedImage, setSelectedImage] = useState(0);
@@ -56,29 +59,40 @@ export default function ProductPage() {
         });
     };
 
-    const reviews = [
-        {
-            id: 1,
-            user: "Priya S.",
-            rating: 5,
-            date: "Jan 12, 2024",
-            comment: "My son absolutely loves this! He's been building different robots for days. The quality is great."
-        },
-        {
-            id: 2,
-            user: "Rahul M.",
-            rating: 4,
-            date: "Dec 28, 2023",
-            comment: "Good kit, instructions are clear. Delivery was a bit slow but worth the wait."
-        },
-        {
-            id: 3,
-            user: "Anita K.",
-            rating: 5,
-            date: "Feb 02, 2024",
-            comment: "Best gift for my nephew. He is learning so much about gears and mechanics."
-        }
-    ];
+    const reviews: Array<{ id: number; user: string; rating: number; date: string; comment: string }> = [];
+
+    useEffect(() => {
+        const loadProducts = async () => {
+            try {
+                setLoading(true);
+                const apiProducts = await getProducts();
+                setProducts(mapApiProducts(apiProducts));
+            } catch (error) {
+                console.error("Failed to load products:", error);
+                setProducts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadProducts();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+                <p className="text-gray-500">Loading product...</p>
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+                <p className="text-gray-500">Product not found.</p>
+            </div>
+        );
+    }
 
     const qna = [
         {

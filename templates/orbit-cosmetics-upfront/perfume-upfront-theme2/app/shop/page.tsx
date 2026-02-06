@@ -1,22 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FilterSidebar from "@/components/shop/FilterSidebar";
 import ProductFilters from "@/components/shop/ProductFilters";
 import ProductCard from "@/components/ProductCard";
 import QuickViewModal from "@/components/shop/QuickViewModal";
-import { products, Product } from "@/lib/data";
+import { Product } from "@/lib/data";
+import { getProducts } from "@/lib/products-api";
+import { mapApiProducts } from "@/lib/product-adapter";
 import { Filter } from "lucide-react";
 
 export default function ShopPage() {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+    useEffect(() => {
+        const loadProducts = async () => {
+            try {
+                setLoading(true);
+                const apiProducts = await getProducts();
+                const mappedProducts = mapApiProducts(apiProducts.filter(p => p.isActive));
+                setProducts(mappedProducts);
+            } catch (error) {
+                console.error('Failed to load products:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadProducts();
+    }, []);
 
     const handleQuickView = (product: Product) => {
         setSelectedProduct(product);
         setIsQuickViewOpen(true);
     };
+
+    if (loading) {
+        return (
+            <div className="bg-white min-h-screen pt-24 pb-16">
+                <div className="container mx-auto px-4">
+                    <div className="text-center py-12">
+                        <p className="text-gray-500">Loading products...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white min-h-screen pt-24 pb-16">
@@ -69,12 +101,20 @@ export default function ShopPage() {
                             ))}
                         </div>
 
+                        {products.length === 0 && !loading && (
+                            <div className="text-center py-12">
+                                <p className="text-gray-500">No products found.</p>
+                            </div>
+                        )}
+
                         {/* Load More */}
-                        <div className="mt-16 text-center">
-                            <button className="border-b-2 border-black text-black pb-1 uppercase text-sm font-bold tracking-widest hover:text-gold-600 hover:border-gold-600 transition-colors">
-                                Load More Products
-                            </button>
-                        </div>
+                        {products.length > 0 && (
+                            <div className="mt-16 text-center">
+                                <button className="border-b-2 border-black text-black pb-1 uppercase text-sm font-bold tracking-widest hover:text-gold-600 hover:border-gold-600 transition-colors">
+                                    Load More Products
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

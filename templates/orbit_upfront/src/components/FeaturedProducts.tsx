@@ -1,25 +1,55 @@
 'use client';
 
-interface FeaturedProduct {
-  id: number;
-  name: string;
-  price: string;
-  originalPrice?: string;
-  image: string;
-  badge?: string;
-}
-
-// Convert USD to INR (approximate rate: 1 USD = 83 INR)
-const usdToInr = (usd: number) => Math.round(usd * 83);
-const formatINR = (amount: number) => `₹${amount.toLocaleString('en-IN')}`;
-
-const featuredProducts: FeaturedProduct[] = [
-  { id: 1, name: 'Premium Wireless Earbuds', price: formatINR(usdToInr(179.99)), originalPrice: formatINR(usdToInr(249.99)), image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=600&fit=crop', badge: 'Best Seller' },
-  { id: 2, name: '4K Ultra HD Monitor', price: formatINR(usdToInr(399.99)), originalPrice: formatINR(usdToInr(499.99)), image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&h=600&fit=crop', badge: 'New' },
-  { id: 3, name: 'Ergonomic Office Chair', price: formatINR(usdToInr(349.99)), originalPrice: formatINR(usdToInr(449.99)), image: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&h=600&fit=crop', badge: 'Sale' },
-];
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { getProducts, type Product } from '@/lib/products-api';
 
 export default function FeaturedProducts() {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadFeaturedProducts = async () => {
+      try {
+        setLoading(true);
+        const products = await getProducts();
+        const featured = products.filter(p => p.isFeatured && p.isActive).slice(0, 3);
+        if (featured.length === 0) {
+          setFeaturedProducts(products.filter(p => p.isActive).slice(0, 3));
+        } else {
+          setFeaturedProducts(featured);
+        }
+      } catch (error) {
+        console.error('Failed to load featured products:', error);
+        setFeaturedProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFeaturedProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <section
+        id="featured"
+        className="py-16 transition-colors duration-300"
+        style={{ backgroundColor: 'var(--card-bg)' }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-12">
+            <p style={{ color: 'var(--text-muted)' }}>Loading featured products...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (featuredProducts.length === 0) {
+    return null;
+  }
+
   return (
     <section
       id="featured"
@@ -38,25 +68,30 @@ export default function FeaturedProducts() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {featuredProducts.map((product) => (
-            <div
+            <Link
               key={product.id}
+              href={`/products/${product.slug}`}
               className="relative rounded-lg overflow-hidden hover:shadow-xl transition-shadow border group"
               style={{ backgroundColor: 'var(--section-alt)', borderColor: 'var(--card-border)' }}
             >
-              {product.badge && (
+              {product.isFeatured && (
                 <span className="absolute top-4 left-4 z-10 px-3 py-1 bg-red-500 text-white text-sm font-semibold rounded-full">
-                  {product.badge}
+                  Featured
                 </span>
               )}
               <div className="aspect-square bg-gray-200 overflow-hidden">
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <img 
+                  src={product.images[0] || '/placeholder.jpg'} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text)' }}>{product.name}</h3>
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="text-2xl font-bold" style={{ color: 'var(--text)' }}>{product.price}</span>
-                  {product.originalPrice && (
-                    <span className="text-lg line-through" style={{ color: 'var(--text-muted)' }}>{product.originalPrice}</span>
+                  <span className="text-2xl font-bold" style={{ color: 'var(--text)' }}>₹{product.price.toFixed(2)}</span>
+                  {product.compareAtPrice && product.compareAtPrice > product.price && (
+                    <span className="text-lg line-through" style={{ color: 'var(--text-muted)' }}>₹{product.compareAtPrice.toFixed(2)}</span>
                   )}
                 </div>
                 <button
@@ -66,7 +101,7 @@ export default function FeaturedProducts() {
                   Shop Now
                 </button>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

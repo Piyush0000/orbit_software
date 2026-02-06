@@ -1,7 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { useStore } from "@/contexts/StoreContext";
 
 export default function Footer() {
+    const { store } = useStore();
+    const storeName = store?.name || "ToyStore";
+
     return (
         <footer className="bg-[#4A403A] text-[#F3E9E2] pt-12 lg:pt-20 pb-10 rounded-t-[2rem] lg:rounded-t-[3rem] mt-12">
             <div className="container mx-auto px-4">
@@ -9,7 +15,7 @@ export default function Footer() {
                     {/* Brand Info */}
                     <div className="space-y-6">
                         <h3 className="text-3xl font-extrabold text-white font-display">
-                            Toy<span className="text-primary">Store</span><span className="text-accent">.</span>
+                            {storeName}<span className="text-accent">.</span>
                         </h3>
                         <p className="text-sm leading-relaxed text-gray-300 max-w-xs">
                             Creating happy memories with safe, sustainable, and educational toys.

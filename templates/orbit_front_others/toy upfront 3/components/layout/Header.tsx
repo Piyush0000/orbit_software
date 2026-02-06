@@ -6,11 +6,13 @@ import { useState } from "react";
 import AnnouncementBar from "./AnnouncementBar";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useStore } from "@/contexts/StoreContext";
 
 export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { wishlist } = useWishlist();
     const { cartCount } = useCart();
+    const { store } = useStore();
 
 
     return (
@@ -33,7 +35,7 @@ export default function Header() {
                             <span className="text-2xl">🧸</span>
                         </div>
                         <span className="text-3xl font-extrabold text-foreground font-display tracking-tight leading-none">
-                            Toy<span className="text-primary">Store</span>
+                            {store?.name || "ToyStore"}
                             <span className="text-secondary animate-pulse text-4xl leading-none">.</span>
                         </span>
                     </Link>

@@ -1,10 +1,33 @@
-import { useState } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/store/cartStore';
-import { products } from '@/data/products';
+import { getProducts } from '@/lib/products-api';
+import { mapApiProducts } from '@/lib/product-adapter';
 import ProductReviews from '@/components/ProductReviews';
 
 export default function ProductDetail({ productId }: { productId: number }) {
+  const [products, setProducts] = useState<ReturnType<typeof mapApiProducts>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const apiProducts = await getProducts();
+        setProducts(mapApiProducts(apiProducts));
+      } catch (error) {
+        console.error('Failed to load products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
   const product = products.find(p => p.id === productId);
 
   // Move hooks before the early return to comply with Rules of Hooks
@@ -14,6 +37,17 @@ export default function ProductDetail({ productId }: { productId: number }) {
   const [showCartMessage, setShowCartMessage] = useState(false);
 
   // Safety check
+  if (loading) {
+    return (
+      <div className="py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)' }}>Loading product...</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Fetching product details.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="py-8 px-4 sm:px-6 lg:px-8">

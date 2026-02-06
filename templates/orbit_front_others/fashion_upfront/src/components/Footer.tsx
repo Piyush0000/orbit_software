@@ -1,6 +1,11 @@
 'use client';
 
+import { useStore } from '@/contexts/StoreContext';
+
 export default function Footer() {
+  const { store } = useStore();
+  const storeName = store?.name || 'Store';
+
   return (
     <footer
       className="transition-colors duration-300 bg-[#FAFAFA]"
@@ -10,7 +15,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand Column */}
           <div className="space-y-4">
-            <h3 className="text-3xl font-extrabold tracking-tight">Upfront</h3>
+            <h3 className="text-3xl font-extrabold tracking-tight">{storeName}</h3>
             <p className="text-gray-600 max-w-xs">
               Your daily destination for the latest fashion trends. Premium style, exceptional quality.
             </p>
@@ -71,7 +76,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-200 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} Upfront. All rights reserved.</p>
+          <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} {storeName}. All rights reserved.</p>
           <div className="flex gap-6">
             <span className="w-10 h-6 bg-gray-200 rounded"></span>
             <span className="w-10 h-6 bg-gray-200 rounded"></span>

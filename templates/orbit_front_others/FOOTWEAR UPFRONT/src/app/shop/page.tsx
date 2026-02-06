@@ -1,9 +1,13 @@
 import { Filters } from '@/components/shop/Filters';
 import { ProductCard } from '@/components/shop/ProductCard';
 import styles from './page.module.css';
-import { products } from '@/data/products';
+import { getProducts } from '@/lib/products-api';
+import { mapApiProducts } from '@/lib/product-adapter';
 
-export default function ShopPage() {
+export default async function ShopPage() {
+    const apiProducts = await getProducts();
+    const products = mapApiProducts(apiProducts);
+
     return (
         <div className={styles.container}>
             <Filters />

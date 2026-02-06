@@ -7,6 +7,7 @@ import MegaMenu from './MegaMenu';
 import ProfileDropdown from './ProfileDropdown';
 import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
+import { useStore } from '@/contexts/StoreContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,6 +18,7 @@ export default function Header() {
   const productsRef = useRef<HTMLDivElement>(null);
   const { getTotalItems } = useCart();
   const { wishlist } = useWishlist();
+  const { store } = useStore();
   const cartItemCount = getTotalItems();
   const wishlistCount = wishlist.length;
 
@@ -75,7 +77,7 @@ export default function Header() {
             {/* Logo */}
             <div className="flex-shrink-0 mr-12 flex items-center">
               <Link href="/" className="text-4xl font-heading font-medium tracking-tighter text-black uppercase">
-                Upfront
+                {store?.name || "Store"}
               </Link>
             </div>
 

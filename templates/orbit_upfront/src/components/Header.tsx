@@ -5,6 +5,7 @@ import Link from 'next/link';
 import ProductsDropdown from './ProductsDropdown';
 import ProfileDropdown from './ProfileDropdown';
 import { useCart } from '@/store/cartStore';
+import { useStore } from '@/contexts/StoreContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,6 +14,8 @@ export default function Header() {
   const productsRef = useRef<HTMLDivElement>(null);
   const { getTotalItems } = useCart();
   const cartItemCount = getTotalItems();
+  const { store } = useStore();
+  const storeName = store?.name || "Store";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -46,7 +49,7 @@ export default function Header() {
     <div className="flex flex-col w-full">
       {/* Top Banner */}
       <div className="bg-[#E7F874] text-black text-xs sm:text-sm font-semibold py-2.5 text-center px-4 tracking-wide relative z-[51]">
-        Tell a friend about Upfront & get a ₹500 coupon for next order!
+        Tell a friend about {storeName} & get a ₹500 coupon for next order!
       </div>
 
       <header
@@ -60,7 +63,7 @@ export default function Header() {
             {/* Logo */}
             <div className="flex-shrink-0 mr-8 flex items-center">
               <Link href="/" className="text-3xl font-extrabold tracking-tight" style={{ color: 'var(--header-text)' }}>
-                Upfront
+                {storeName}
               </Link>
             </div>
 

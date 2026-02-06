@@ -8,7 +8,8 @@ import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
 import { Product } from '@/types/product';
 import { usdToInr, parseINRToNumber } from '@/lib/utils';
-import { products as allProducts } from '@/data/products';
+import { getProducts } from '@/lib/products-api';
+import { mapApiProducts } from '@/lib/product-adapter';
 
 // Define filter state locally
 interface FilterState {
@@ -21,6 +22,8 @@ interface FilterState {
 
 export default function ProductGrid() {
   const searchParams = useSearchParams();
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     category: [],
@@ -40,6 +43,23 @@ export default function ProductGrid() {
       }));
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoadingProducts(true);
+        const apiProducts = await getProducts();
+        setAllProducts(mapApiProducts(apiProducts));
+      } catch (error) {
+        console.error('Failed to load products:', error);
+        setAllProducts([]);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('popular');
@@ -166,7 +186,7 @@ export default function ProductGrid() {
     });
 
     return filtered;
-  }, [activeFilters, searchQuery, sortBy, searchParams]);
+  }, [activeFilters, searchQuery, sortBy, searchParams, allProducts]);
 
   return (
     <section id="products" className="py-20 bg-white">
@@ -259,7 +279,12 @@ export default function ProductGrid() {
 
         {/* Product Grid */}
         <div className="min-h-[400px]">
-          {displayedProducts.length === 0 ? (
+          {loadingProducts ? (
+            <div className="text-center py-32 bg-zinc-50">
+              <h3 className="text-2xl font-heading uppercase mb-2">Loading products...</h3>
+              <p className="text-zinc-500 mb-6 font-light">Fetching the latest catalog.</p>
+            </div>
+          ) : displayedProducts.length === 0 ? (
             <div className="text-center py-32 bg-zinc-50">
               <h3 className="text-2xl font-heading uppercase mb-2">No items match your search</h3>
               <p className="text-zinc-500 mb-6 font-light">Try adjusting your filters or search terms.</p>

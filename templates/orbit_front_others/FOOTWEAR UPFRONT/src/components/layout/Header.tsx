@@ -1,12 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import { HeaderActions } from './HeaderActions';
 import styles from './Header.module.css';
+import { useStore } from '@/contexts/StoreContext';
 
 export function Header() {
+    const { store } = useStore();
+
     return (
         <header className={styles.header}>
             <Link href="/" className={styles.logo}>
-                Upfront
+                {store?.name || 'Store'}
             </Link>
 
             <nav className={styles.nav}>

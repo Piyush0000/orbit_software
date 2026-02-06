@@ -8,7 +8,8 @@ import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
 import { Product } from '@/types/product';
 import { usdToInr, parseINRToNumber } from '@/lib/utils';
-import { products as allProducts } from '@/data/products';
+import { getProducts } from '@/lib/products-api';
+import { mapApiProducts } from '@/lib/product-adapter';
 
 // Define filter state locally
 interface FilterState {
@@ -21,6 +22,8 @@ interface FilterState {
 
 export default function ProductGrid() {
   const searchParams = useSearchParams(); // Hook to read URL params
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     category: [],
@@ -40,6 +43,23 @@ export default function ProductGrid() {
       }));
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoadingProducts(true);
+        const apiProducts = await getProducts();
+        setAllProducts(mapApiProducts(apiProducts));
+      } catch (error) {
+        console.error('Failed to load products:', error);
+        setAllProducts([]);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('popular');
   const [showFilters, setShowFilters] = useState(false);
@@ -180,7 +200,7 @@ export default function ProductGrid() {
     });
 
     return filtered;
-  }, [activeFilters, searchQuery, sortBy]);
+  }, [activeFilters, searchQuery, sortBy, allProducts, searchParams]);
 
   return (
     <section
@@ -388,7 +408,14 @@ export default function ProductGrid() {
 
         {/* Product Grid - Full Width */}
         <div className="w-full">
-          {displayedProducts.length === 0 ? (
+          {loadingProducts ? (
+            <div className="text-center py-20 rounded-lg border border-dashed" style={{ borderColor: 'var(--card-border)' }}>
+              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text)' }}>Loading products...</h3>
+              <p className="text-lg" style={{ color: 'var(--text-muted)' }}>
+                Fetching the latest catalog.
+              </p>
+            </div>
+          ) : displayedProducts.length === 0 ? (
             <div className="text-center py-20 rounded-lg border border-dashed" style={{ borderColor: 'var(--card-border)' }}>
               <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
