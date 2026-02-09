@@ -1,0 +1,56 @@
+{
+  "toys": {
+    "name": "Toys Store",
+    "templatePath": "../orbit_front_others/toy upfront 2",
+    "entryComponent": "src/app/page.tsx",
+    "layoutComponent": "src/app/layout.tsx"
+  },
+  "electronics-upfront": {
+    "name": "Electronics Store", 
+    "templatePath": "../../electronics-upfront-theme-2",
+    "entryComponent": "src/app/page.tsx",
+    "layoutComponent": "src/app/layout.tsx"
+  },
+  "electronics-3": {
+    "name": "Electronics Store 3", 
+    "templatePath": "../../electronics_upfront_3",
+    "entryComponent": "src/app/page.tsx",
+    "layoutComponent": "src/app/layout.tsx"
+  },
+  "fashion-upfront": {
+    "name": "Fashion Store",
+    "templatePath": "../orbit_front_others/fashion_upfront",
+    "entryComponent": "src/app/page.tsx",
+    "layoutComponent": "src/app/layout.tsx"
+  },
+  "fashion-upfront-2": {
+    "name": "Fashion Store 2",
+    "templatePath": "../orbit_front_others/fashion_upfront_2",
+    "entryComponent": "src/app/page.tsx",
+    "layoutComponent": "src/app/layout.tsx"
+  },
+  "fashion-upfront-3": {
+    "name": "Fashion Store 3",
+    "templatePath": "../orbit_front_others/fashion upfront 3",
+    "entryComponent": "src/app/page.tsx",
+    "layoutComponent": "src/app/layout.tsx"
+  },
+  "perfume-theme-2": {
+    "name": "Perfume Store",
+    "templatePath": "../orbit-cosmetics-upfront/perfume-upfront-theme2",
+    "entryComponent": "src/app/page.tsx",
+    "layoutComponent": "src/app/layout.tsx"
+  },
+  "beauty-personal-care-upfront": {
+    "name": "Beauty Personal Care",
+    "templatePath": "../orbit-cosmetics-upfront/beauty-personal-care-upfront",
+    "entryComponent": "src/app/page.tsx",
+    "layoutComponent": "src/app/layout.tsx"
+  },
+  "food-beverage": {
+    "name": "Food Beverage",
+    "templatePath": "../food_beverage/theme-1",
+    "entryComponent": "src/app/page.tsx",
+    "layoutComponent": "src/app/layout.tsx"
+  }
+}

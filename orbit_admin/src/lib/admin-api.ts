@@ -39,16 +39,14 @@ async function adminRequest<T>(path: string, options: ApiOptions = {}) {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    cache: "no-store",
   });
 
   if (!res.ok) {
     if (res.status === 401) {
       setAdminToken(null);
       if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
-         // Optionally redirect, but might be better to let the consuming component handle it 
-         // or force a reload to trigger auth guard.
-         // For now, simple token clear is good.
-         // We could also dispatch a custom event if we want components to react immediately.
+        window.location.href = "/login?expired=true";
       }
     }
     let message = "Request failed";
@@ -183,6 +181,52 @@ export type PlatformMetrics = {
   orders: number;
   revenue: number;
   averageOrderValue: number;
+};
+
+export type OrderItem = {
+  id: string;
+  productId: string;
+  name: string;
+  quantity: number;
+  price: string | number;
+  variantInfo?: Record<string, unknown> | null;
+};
+
+export type Order = {
+  id: string;
+  orderNumber: string;
+  storeId: string;
+  customerEmail: string;
+  customerName: string;
+  subtotal: string | number;
+  tax: string | number;
+  shipping: string | number;
+  total: string | number;
+  status: string;
+  paymentStatus: string;
+  fulfillmentStatus: string;
+  createdAt: string;
+  store?: { id: string; name: string; subdomain: string };
+  items?: OrderItem[];
+};
+
+export type ProductVariant = {
+  id: string;
+  name: string;
+  sku?: string | null;
+  price?: string | number | null;
+  stock: number;
+  options?: Record<string, unknown>;
+};
+
+export type ProductItem = {
+  id: string;
+  storeId: string;
+  name: string;
+  price: string | number;
+  stock: number;
+  isActive: boolean;
+  variants?: ProductVariant[];
 };
 
 export type OnboardingFunnelMetrics = {
@@ -373,7 +417,7 @@ export const getProvisioningDetails = (storeId: string) =>
 
 export const provisionMerchant = (
   storeId: string,
-  payload: { themeId: string; planId?: string }
+  payload: { themeId: string; planId?: string; categoryConfig?: Record<string, unknown> }
 ) =>
   adminRequest<{
     success: boolean;
@@ -407,4 +451,166 @@ export const updateMerchantDomain = (
   }>(`/api/admin/provisioning/${storeId}/domain`, {
     method: "PUT",
     body: payload,
+  });
+
+// New Merchant Provisioning APIs
+export type MerchantCredential = {
+  id: string;
+  merchantName: string;
+  email: string;
+  password: string;
+  userId: string;
+  storeId: string;
+  storeName: string;
+  subdomain: string;
+  customDomain?: string | null;
+  theme: string;
+  category: string;
+  isActive: boolean;
+  provisioningStatus: string;
+  onboardingStatus: string;
+  mustChangePassword: boolean;
+  dashboardUrl: string;
+  storefrontUrl: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const createMerchant = (payload: {
+  merchantName: string;
+  email: string;
+  password: string;
+  category: string;
+  theme: string;
+  subdomain: string;
+  customDomain?: string;
+  planId?: string;
+  categoryConfig?: Record<string, unknown>;
+}) =>
+  adminRequest<{
+    success: boolean;
+    message: string;
+    merchant: {
+      id: string;
+      name: string;
+      email: string;
+      password: string;
+      storeId: string;
+      storeName: string;
+      subdomain: string;
+      customDomain?: string | null;
+      theme: string;
+      category: string;
+      dashboardUrl: string;
+      storefrontUrl: string;
+      createdAt: string;
+    };
+  }>("/api/admin/provision", {
+    method: "POST",
+    body: payload,
+  });
+
+export const getCategoryConfigs = () =>
+  adminRequest<{
+    success: boolean;
+    configs: Array<Record<string, unknown>>;
+  }>("/api/admin/category-configs");
+
+export const getStoreCategoryConfig = (storeId: string) =>
+  adminRequest<{
+    success: boolean;
+    category: string;
+    config: Record<string, unknown>;
+  }>(`/api/admin/stores/${storeId}/category-config`);
+
+export const updateStoreCategoryConfig = (
+  storeId: string,
+  payload: { category: string; config: Record<string, unknown> }
+) =>
+  adminRequest<{
+    success: boolean;
+    category: string;
+    config: Record<string, unknown>;
+  }>(`/api/admin/stores/${storeId}/category-config`, {
+    method: "PUT",
+    body: payload,
+  });
+
+export const getMerchantCredentials = () =>
+  adminRequest<{
+    success: boolean;
+    credentials: MerchantCredential[];
+    total: number;
+  }>("/api/admin/merchant-credentials");
+
+export const getMerchantCredential = (id: string) =>
+  adminRequest<{
+    success: boolean;
+    credentials: MerchantCredential;
+  }>(`/api/admin/merchant-credentials/${id}`);
+
+export const updateMerchantPassword = (id: string, newPassword: string) =>
+  adminRequest<{
+    success: boolean;
+    message: string;
+  }>(`/api/admin/merchant-credentials/${id}/password`, {
+    method: "PUT",
+    body: { newPassword },
+  });
+
+export const getAdminOrders = (params?: {
+  storeId?: string;
+  status?: string;
+  paymentStatus?: string;
+  fulfillmentStatus?: string;
+  limit?: number;
+  offset?: number;
+}) => {
+  const search = new URLSearchParams();
+  if (params?.storeId) search.set("storeId", params.storeId);
+  if (params?.status) search.set("status", params.status);
+  if (params?.paymentStatus) search.set("paymentStatus", params.paymentStatus);
+  if (params?.fulfillmentStatus) search.set("fulfillmentStatus", params.fulfillmentStatus);
+  if (typeof params?.limit === "number") search.set("limit", String(params.limit));
+  if (typeof params?.offset === "number") search.set("offset", String(params.offset));
+  const query = search.toString();
+  return adminRequest<{ orders: Order[]; pagination: Record<string, unknown> }>(
+    `/api/admin/orders${query ? `?${query}` : ""}`
+  );
+};
+
+export const getAdminOrder = (orderId: string) =>
+  adminRequest<{ order: Order }>(`/api/admin/orders/${orderId}`);
+
+export const updateAdminOrderStatus = (orderId: string, status: string) =>
+  adminRequest<{ order: Order }>(`/api/admin/orders/${orderId}/status`, {
+    method: "PUT",
+    body: { status }
+  });
+
+export const updateAdminOrderFulfillment = (orderId: string, fulfillmentStatus: string) =>
+  adminRequest<{ order: Order }>(`/api/admin/orders/${orderId}/fulfillment`, {
+    method: "PUT",
+    body: { fulfillmentStatus }
+  });
+
+export const updateAdminPaymentStatus = (orderId: string, paymentStatus: string) =>
+  adminRequest<{ order: Order }>(`/api/admin/orders/${orderId}/payment`, {
+    method: "PUT",
+    body: { paymentStatus }
+  });
+
+export const getAdminProducts = (storeId: string) =>
+  adminRequest<{ products: ProductItem[] }>(`/api/admin/products?storeId=${storeId}`);
+
+export const updateAdminProductStock = (productId: string, stock: number) =>
+  adminRequest<{ product: ProductItem }>(`/api/admin/products/${productId}/stock`, {
+    method: "PUT",
+    body: { stock }
+  });
+
+export const updateAdminVariantStock = (variantId: string, stock: number) =>
+  adminRequest<{ variant: ProductVariant }>(`/api/admin/variants/${variantId}/stock`, {
+    method: "PUT",
+    body: { stock }
   });

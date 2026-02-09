@@ -10,7 +10,7 @@ const seed = async () => {
     await connectMongo();
 
     // Admin user
-    const adminEmail = env.admin.email;
+    const adminEmail = env.admin.email ? env.admin.email.trim().toLowerCase() : null;
     if (adminEmail) {
       const existing = await prisma.admin.findUnique({ where: { email: adminEmail } });
       if (!existing) {

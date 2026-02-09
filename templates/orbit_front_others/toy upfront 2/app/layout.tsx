@@ -5,8 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
-import { StoreProvider } from "@/context/StoreContext";
-import { getStoreData } from "@/lib/storefront-api";
+import { StorefrontProvider } from "@/context/StorefrontContext";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -18,16 +17,10 @@ const fredoka = Fredoka({
   subsets: ["latin"],
 });
 
-// Generate metadata dynamically based on store data
-export async function generateMetadata(): Promise<Metadata> {
-  const storeData = await getStoreData();
-  
-  return {
-    title: storeData?.customization?.metaTitle || storeData?.name || "Online Store",
-    description: storeData?.customization?.metaDescription || "Welcome to our online store",
-    keywords: storeData?.customization?.keywords || [],
-  };
-}
+export const metadata: Metadata = {
+  title: "Toy Store | Safe & Fun Toys for Kids",
+  description: "Discover the best educational and fun toys for children of all ages.",
+};
 
 export default function RootLayout({
   children,
@@ -39,7 +32,7 @@ export default function RootLayout({
       <body
         className={`${nunito.variable} ${fredoka.variable} antialiased min-h-screen flex flex-col`}
       >
-        <StoreProvider>
+        <StorefrontProvider>
           <WishlistProvider>
             <CartProvider>
               <Header />
@@ -47,7 +40,7 @@ export default function RootLayout({
               <Footer />
             </CartProvider>
           </WishlistProvider>
-        </StoreProvider>
+        </StorefrontProvider>
       </body>
     </html>
   );

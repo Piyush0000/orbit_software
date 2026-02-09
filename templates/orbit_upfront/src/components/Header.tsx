@@ -1,21 +1,29 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import ProductsDropdown from './ProductsDropdown';
 import ProfileDropdown from './ProfileDropdown';
 import { useCart } from '@/store/cartStore';
-import { useStore } from '@/contexts/StoreContext';
+import { useStorefront } from '@/contexts/StorefrontContext';
 
 export default function Header() {
+  const { store, customization } = useStorefront();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
   const productsRef = useRef<HTMLDivElement>(null);
   const { getTotalItems } = useCart();
   const cartItemCount = getTotalItems();
-  const { store } = useStore();
-  const storeName = store?.name || "Store";
+  const announcement = (customization?.announcementBar || {}) as Record<string, string>;
+  const logoUrl = customization?.logo || store?.logo || '';
+  const storeName = store?.name || 'Upfront';
+  const navLinks = customization?.navLinks?.length
+    ? customization.navLinks
+    : [
+        { label: 'Featured', href: '#featured' },
+        { label: 'About', href: '/about' }
+      ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -46,10 +54,16 @@ export default function Header() {
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <>
       {/* Top Banner */}
-      <div className="bg-[#E7F874] text-black text-xs sm:text-sm font-semibold py-2.5 text-center px-4 tracking-wide relative z-[51]">
-        Tell a friend about {storeName} & get a ₹500 coupon for next order!
+      <div
+        className="text-xs sm:text-sm font-semibold py-2.5 text-center px-4 tracking-wide relative z-[51]"
+        style={{
+          backgroundColor: announcement.backgroundColor || '#E7F874',
+          color: announcement.textColor || '#000000'
+        }}
+      >
+        {announcement.text || 'Tell a friend about Upfront & get a ₹500 coupon for next order!'}
       </div>
 
       <header
@@ -62,8 +76,11 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <div className="flex-shrink-0 mr-8 flex items-center">
-              <Link href="/" className="text-3xl font-extrabold tracking-tight" style={{ color: 'var(--header-text)' }}>
-                {storeName}
+              <Link href="/" className="text-3xl font-extrabold tracking-tight flex items-center gap-2" style={{ color: 'var(--header-text)' }}>
+                {logoUrl ? (
+                  <img src={logoUrl} alt={storeName} className="h-9 w-9 rounded object-cover" />
+                ) : null}
+                <span>{storeName}</span>
               </Link>
             </div>
 
@@ -86,12 +103,16 @@ export default function Header() {
                   </svg>
                 </button>
               </div>
-              <a href="#featured" className="font-medium transition-colors hover:text-black" style={{ color: 'var(--header-text-muted)' }}>
-                Featured
-              </a>
-              <Link href="/about" className="font-medium transition-colors hover:text-black" style={{ color: 'var(--header-text-muted)' }}>
-                About
-              </Link>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="font-medium transition-colors hover:text-black"
+                  style={{ color: 'var(--header-text-muted)' }}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </nav>
 
             {/* Search Bar */}
@@ -187,8 +208,11 @@ export default function Header() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              <a href="#featured" className="block px-2 font-medium text-gray-600">Featured</a>
-              <Link href="/about" className="block px-2 font-medium text-gray-600">About</Link>
+              {navLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="block px-2 font-medium text-gray-600">
+                  {link.label}
+                </Link>
+              ))}
               <div className="pt-4 border-t border-gray-100 space-y-3 px-2">
                 <Link
                   href="/cart"
@@ -232,6 +256,6 @@ export default function Header() {
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }

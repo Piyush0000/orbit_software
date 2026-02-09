@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-playfair);
+}
+
+/* Luxury High-Fashion Theme */
+:root,
+[data-theme="dark"] {
+  /* Backgrounds */
+  --page-bg: #0B0B0B;
+  /* Jet Black */
+  --section-alt: #151515;
+  /* Charcoal */
+  --card-bg: #151515;
+  --header-bg: #0B0B0B;
+
+  /* Borders */
+  --header-border: #262626;
+  --card-border: #333333;
+
+  /* Text */
+  --text-primary: #F5F3EF;
+  /* Soft Ivory */
+  --text-secondary: #9B9B9B;
+  /* Warm Grey */
+  --text-muted: #666666;
+
+  /* Accents */
+  --accent-color: #C6A45E;
+  /* Champagne Gold */
+  --highlight: #C6A45E;
+  /* Champagne Gold (replaces Volt Green) */
+  --highlight-hover: #E0C97A;
+  /* Metallic Gold */
+
+  /* Status */
+  --error: #ef4444;
+  --success: #22c55e;
+}
+
+body {
+  font-family: var(--font-inter), sans-serif;
+  color: var(--text-primary);
+  background-color: var(--page-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
+  font-family: var(--font-playfair), serif;
+  font-weight: 600;
+  /* SemiBold to Bold */
+  letter-spacing: -0.02em;
+}
+
+/* Custom Utilities */
+.text-gold {
+  color: var(--accent-color);
+}
+
+.border-gold {
+  border-color: var(--accent-color);
+}
+
+.bg-gold {
+  background-color: var(--accent-color);
+  color: #000;
+}
+
+/* Stroke Text Utility */
+.stroke-text {
+  -webkit-text-stroke: 1px rgba(245, 243, 239, 0.2);
+  color: transparent;
+}

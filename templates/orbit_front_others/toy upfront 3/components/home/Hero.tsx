@@ -3,8 +3,18 @@
 import Link from "next/link";
 import { ArrowRight, Star, Cloud, Sparkles, Heart } from "lucide-react";
 import { motion } from "framer-motion";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Hero() {
+    const { customization } = useStorefront();
+    const hero = customization?.heroSection || {};
+    const heroBadge = hero.badge || "Making childhood magical";
+    const heroTitle = hero.title || "Play, Learn, &";
+    const heroSubtitle = hero.subtitle || "Grow Together";
+    const heroDescription =
+        hero.description ||
+        "Discover the safest, most engaging toys designed to spark creativity and joy in every child.";
+    const heroImage = hero.image || hero.imageUrl || "/hero-image.jpg";
     return (
         <section className="relative overflow-hidden bg-gradient-to-b from-amber-50/40 via-white to-white pt-12 pb-24 lg:pt-24 lg:pb-48">
             {/* Background Doodles/Shapes */}
@@ -34,20 +44,19 @@ export default function Hero() {
                         {/* Playful Badge */}
                         <div className="inline-flex items-center gap-2 px-5 py-2 mb-6 rounded-full bg-white border-2 border-primary/20 text-secondary font-bold text-xs lg:text-sm shadow-sm hover:scale-105 transition-transform cursor-default">
                             <span className="text-xl animate-pulse">✨</span>
-                            <span className="tracking-wide uppercase">Making childhood magical</span>
+                            <span className="tracking-wide uppercase">{heroBadge}</span>
                         </div>
 
                         <h1 className="text-5xl lg:text-7xl font-extrabold text-foreground mb-6 font-display leading-[1.1] tracking-tight relative">
-                            Play, Learn, & <br />
+                            {heroTitle} <br />
                             <span className="relative inline-block">
-                                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">Grow Together</span>
+                                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">{heroSubtitle}</span>
                                 <span className="absolute -bottom-2 left-0 w-full h-3 bg-secondary/20 -skew-x-6 rounded-full z-0"></span>
                             </span>
                         </h1>
 
                         <p className="text-lg lg:text-xl text-foreground/70 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-                            Discover the safest, most engaging toys designed to spark creativity
-                            and joy in every child.
+                            {heroDescription}
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -55,14 +64,14 @@ export default function Hero() {
                                 href="/category/educational"
                                 className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-gray-900 bg-primary rounded-full hover:bg-amber-300 transition-all shadow-[0_4px_0_rgb(180,83,9)] hover:shadow-[0_2px_0_rgb(180,83,9)] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px]"
                             >
-                                Start Playing
+                                {hero.ctaText || "Start Playing"}
                                 <ArrowRight className="ml-2 w-5 h-5" />
                             </Link>
                             <Link
                                 href="/category/new-arrivals"
                                 className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-foreground/80 bg-white border-2 border-gray-100 shadow-sm rounded-full hover:border-secondary/30 hover:text-secondary transition-all hover:-translate-y-1"
                             >
-                                New Arrivals 🎁
+                                {hero.secondaryCtaText || "New Arrivals 🎁"}
                             </Link>
                         </div>
                     </div>
@@ -78,8 +87,8 @@ export default function Hero() {
                             >
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
-                                    src="/hero-image.jpg"
-                                    alt="Happy kids playing"
+                                    src={heroImage}
+                                    alt={heroTitle}
                                     className="w-full h-auto object-cover scale-110 hover:scale-105 transition-transform duration-700"
                                 />
                             </motion.div>

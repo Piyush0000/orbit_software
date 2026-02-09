@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { Product } from "@/lib/data";
+import { Product } from "@/types/product";
 import Toast from "@/components/Toast";
 
 export interface CartItem extends Product {
@@ -85,7 +85,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     };
 
     const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-    const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    const cartTotal = cartItems.reduce((total, item) => total + (item.priceNum || 0) * item.quantity, 0);
 
     return (
         <CartContext.Provider

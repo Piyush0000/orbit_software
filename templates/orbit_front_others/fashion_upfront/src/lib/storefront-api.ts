@@ -1,191 +1,199 @@
-/**
- * Storefront API - Connects template to Orbit backend
- * Fetches merchant-specific data (branding, products, content)
- */
+import { formatINR } from '@/lib/utils';
+import { Product } from '@/types/product';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-const STORE_SUBDOMAIN = process.env.NEXT_PUBLIC_STORE_SUBDOMAIN || 'new-business';
-
-export interface StoreData {
+export interface StoreInfo {
   id: string;
   name: string;
-  subdomain: string;
-  category: string;
-  theme?: {
-    name: string;
-    category: string;
-    primaryColor?: string;
-  };
-  customization?: WebsiteCustomization;
+  subdomain?: string;
+  customDomain?: string | null;
+  description?: string | null;
+  logo?: string | null;
+  category?: string | null;
+  categoryConfig?: Record<string, unknown> | null;
+  theme?: string | null;
+  customization?: WebsiteCustomization | null;
 }
 
 export interface WebsiteCustomization {
   logo?: string | null;
   favicon?: string | null;
-  brandColors?: {
-    primary?: string;
-    secondary?: string;
-    accent?: string;
-  };
-  typography?: {
-    headingFont?: string;
-    bodyFont?: string;
-  };
-  heroSection?: {
-    title?: string;
-    subtitle?: string;
-    image?: string;
-    cta?: string;
-  };
-  aboutSection?: {
-    title?: string;
-    content?: string;
-  };
-  contactInfo?: {
-    email?: string;
-    phone?: string;
-    address?: string;
-    city?: string;
-    country?: string;
-  };
-  headerStyle?: string;
-  footerContent?: {
-    copyright?: string;
-    links?: Array<{ label: string; url: string }>;
-  };
-  metaTitle?: string;
-  metaDescription?: string;
-  keywords?: string[];
-  socialLinks?: {
-    facebook?: string | null;
-    instagram?: string | null;
-    twitter?: string | null;
-    linkedin?: string | null;
-  };
+  brandColors?: Record<string, string> | null;
+  heroSection?: Record<string, string> | null;
+  footerContent?: Record<string, string> | null;
+  contactInfo?: Record<string, string> | null;
+  navLinks?: Array<{ label: string; href: string }> | null;
+  announcementBar?: Record<string, string> | null;
+  newsletter?: Record<string, string> | null;
+  socialLinks?: Array<{ label: string; href: string }> | null;
 }
 
-export interface Product {
+interface ApiProduct {
   id: string;
   name: string;
-  slug: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
-  inStock: boolean;
+  description?: string | null;
+  price: number | string;
+  compareAtPrice?: number | string | null;
+  stock?: number | null;
+  images?: string[];
+  image?: string | null;
+  category?: string | null;
+  tags?: string[];
+  customFields?: Record<string, unknown> | null;
+  isFeatured?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
 }
 
-/**
- * Fetch store data and customization
- */
-export async function getStoreData(): Promise<StoreData | null> {
-  try {
-    const response = await fetch(
-      `${API_URL}/api/public/stores/${STORE_SUBDOMAIN}`,
-      {
-        cache: 'no-store', // Always fetch fresh data
-      }
-    );
+const DEFAULT_API_BASE = 'http://localhost:5000';
 
-    if (!response.ok) {
-      console.error('Failed to fetch store data:', response.statusText);
+const toNumber = (value: number | string | null | undefined) => {
+  if (value === null || value === undefined) return 0;
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getApiBase = () => process.env.NEXT_PUBLIC_ORBIT_API_URL || DEFAULT_API_BASE;
+
+const getDomainFromRuntime = () => {
+  if (typeof window === 'undefined') return null;
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return process.env.NEXT_PUBLIC_STORE_DOMAIN || process.env.NEXT_PUBLIC_STORE_SUBDOMAIN || null;
+  }
+  return hostname;
+};
+
+const getSubdomainFromDomain = (domain: string | null) => {
+  if (!domain) return null;
+  if (domain === 'localhost' || domain === '127.0.0.1') {
+    return process.env.NEXT_PUBLIC_STORE_SUBDOMAIN || null;
+  }
+  return domain.split('.')[0];
+};
+
+const fetchJson = async <T,>(url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Request failed: ${res.status}`);
+  }
+  return (await res.json()) as T;
+};
+
+export const resolveStore = async () => {
+  const domain = getDomainFromRuntime();
+  if (!domain) return null;
+  const apiBase = getApiBase();
+
+  try {
+    const resolved = await fetchJson<{ store: StoreInfo }>(
+      `${apiBase}/api/storefront/resolve?domain=${encodeURIComponent(domain)}`
+    );
+    return resolved.store;
+  } catch (err) {
+    const subdomain = getSubdomainFromDomain(domain);
+    if (!subdomain) return null;
+    try {
+      const info = await fetchJson<{ store: StoreInfo }>(
+        `${apiBase}/api/storefront/public/${encodeURIComponent(subdomain)}/info`
+      );
+      return info.store;
+    } catch {
       return null;
     }
-
-    const data = await response.json();
-    return data.store || null;
-  } catch (error) {
-    console.error('Error fetching store data:', error);
-    return null;
   }
-}
+};
 
-/**
- * Fetch store customization only
- */
-export async function getStoreCustomization(): Promise<WebsiteCustomization | null> {
-  try {
-    const storeData = await getStoreData();
-    return storeData?.customization || null;
-  } catch (error) {
-    console.error('Error fetching customization:', error);
-    return null;
-  }
-}
+export const fetchCustomization = async (subdomain: string) => {
+  const apiBase = getApiBase();
+  const data = await fetchJson<{ customization: WebsiteCustomization }>(
+    `${apiBase}/api/storefront/public/${encodeURIComponent(subdomain)}/customization`
+  );
+  return data.customization;
+};
 
-/**
- * Fetch store products
- */
-export async function getStoreProducts(): Promise<Product[]> {
-  try {
-    const response = await fetch(
-      `${API_URL}/api/public/stores/${STORE_SUBDOMAIN}/products`,
-      {
-        cache: 'no-store',
-      }
-    );
+export const fetchProducts = async (subdomain: string) => {
+  const apiBase = getApiBase();
+  const data = await fetchJson<{ products: ApiProduct[] }>(
+    `${apiBase}/api/storefront/public/${encodeURIComponent(subdomain)}/products`
+  );
+  return data.products.map(normalizeProduct);
+};
 
-    if (!response.ok) {
-      console.error('Failed to fetch products:', response.statusText);
-      return [];
+export const fetchProductById = async (subdomain: string, productId: string) => {
+  const apiBase = getApiBase();
+  const data = await fetchJson<{ product: ApiProduct }>(
+    `${apiBase}/api/storefront/public/${encodeURIComponent(subdomain)}/products/${encodeURIComponent(productId)}`
+  );
+  return normalizeProduct(data.product);
+};
+
+export const createOrder = async (payload: {
+  storeId: string;
+  customerName: string;
+  customerEmail: string;
+  shippingAddress: Record<string, unknown>;
+  billingAddress: Record<string, unknown>;
+  tax?: number;
+  shipping?: number;
+  items: Array<{
+    productId: string;
+    name?: string;
+    quantity: number;
+    price?: number;
+    variantId?: string;
+    variantInfo?: Record<string, unknown>;
+  }>;
+}) => {
+  const apiBase = getApiBase();
+  const res = await fetch(`${apiBase}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    let message = 'Failed to place order';
+    try {
+      const data = await res.json();
+      message = data?.message || message;
+    } catch (_) {
+      // ignore parse errors
     }
-
-    const data = await response.json();
-    return data.products || [];
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    return [];
+    throw new Error(message);
   }
-}
+  return (await res.json()) as { order: Record<string, unknown> };
+};
 
-/**
- * Apply branding colors to CSS variables
- */
-export function applyBrandingColors(customization: WebsiteCustomization | null) {
-  if (typeof window === 'undefined') return;
+export const normalizeProduct = (product: ApiProduct): Product => {
+  const priceNum = toNumber(product.price);
+  const compareAt = toNumber(product.compareAtPrice);
+  const images = product.images?.length ? product.images : product.image ? [product.image] : [];
+  const customFields = product.customFields || {};
+  const brand = typeof customFields.brand === 'string' ? customFields.brand : '';
+  const features = Array.isArray(customFields.features) ? (customFields.features as string[]) : undefined;
+  const rating = typeof customFields.rating === 'number' ? customFields.rating : undefined;
+  const reviewCount = typeof customFields.reviewCount === 'number' ? customFields.reviewCount : undefined;
+  const popularity = typeof customFields.popularity === 'number' ? customFields.popularity : undefined;
 
-  const colors = customization?.brandColors;
-  if (!colors) return;
-
-  const root = document.documentElement;
-
-  if (colors.primary) {
-    root.style.setProperty('--color-primary', colors.primary);
-  }
-
-  if (colors.secondary) {
-    root.style.setProperty('--color-secondary', colors.secondary);
-  }
-
-  if (colors.accent) {
-    root.style.setProperty('--color-accent', colors.accent);
-  }
-}
-
-/**
- * Apply typography to document
- */
-export function applyTypography(customization: WebsiteCustomization | null) {
-  if (typeof window === 'undefined') return;
-
-  const typography = customization?.typography;
-  if (!typography) return;
-
-  const root = document.documentElement;
-
-  if (typography.headingFont) {
-    root.style.setProperty('--font-heading', typography.headingFont);
-  }
-
-  if (typography.bodyFont) {
-    root.style.setProperty('--font-body', typography.bodyFont);
-  }
-}
-
-/**
- * Get store configuration for easy access
- */
-export const storeConfig = {
-  apiUrl: API_URL,
-  subdomain: STORE_SUBDOMAIN,
+  return {
+    id: product.id,
+    name: product.name,
+    price: formatINR(priceNum),
+    priceNum,
+    image: images[0] || '',
+    images,
+    description: product.description || '',
+    shortDescription: product.description || '',
+    category: product.category || 'General',
+    brand,
+    tags: product.tags || [],
+    stock: (product.stock || 0) > 0,
+    rating,
+    reviewCount,
+    popularity,
+    createdAt: product.createdAt ? new Date(product.createdAt) : undefined,
+    originalPrice: compareAt > 0 ? formatINR(compareAt) : undefined,
+    discount: compareAt > 0 ? Math.max(0, Math.round((1 - priceNum / compareAt) * 100)) : undefined,
+    features,
+    isFeatured: product.isFeatured
+  };
 };

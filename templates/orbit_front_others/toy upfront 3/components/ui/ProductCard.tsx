@@ -10,10 +10,10 @@ interface Product {
     id: number | string;
     name: string;
     price: number;
-    rating: number;
-    reviews: number;
+    rating?: number;
+    reviews?: number;
     image?: string;
-    age: string;
+    age?: string;
     badge?: string | null;
     originalPrice?: number;
 }
@@ -90,19 +90,25 @@ export default function ProductCard({ product }: { product: Product }) {
 
             {/* Content */}
             <div className="p-4 pt-2 flex-1 flex flex-col">
-                <div className="text-[10px] text-primary font-extrabold mb-1 uppercase tracking-wider bg-primary/10 w-fit px-2 py-0.5 rounded-full">Age {product.age} Years</div>
+                {product.age ? (
+                    <div className="text-[10px] text-primary font-extrabold mb-1 uppercase tracking-wider bg-primary/10 w-fit px-2 py-0.5 rounded-full">Age {product.age} Years</div>
+                ) : null}
                 <h3 className="font-bold text-gray-800 text-base mb-1.5 group-hover:text-secondary transition-colors line-clamp-2 leading-tight">
                     <Link href={`/product/${product.id}`}>{product.name}</Link>
                 </h3>
 
-                <div className="flex items-center mb-3 gap-1">
-                    <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`w-3 h-3 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-200"}`} />
-                        ))}
+                {product.rating !== undefined && (
+                    <div className="flex items-center mb-3 gap-1">
+                        <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                                <Star key={i} className={`w-3 h-3 ${i < Math.floor(product.rating || 0) ? "text-yellow-400 fill-yellow-400" : "text-gray-200"}`} />
+                            ))}
+                        </div>
+                        {product.reviews !== undefined ? (
+                            <span className="text-xs text-gray-400 font-medium ml-1">({product.reviews})</span>
+                        ) : null}
                     </div>
-                    <span className="text-xs text-gray-400 font-medium ml-1">({product.reviews})</span>
-                </div>
+                )}
 
                 <div className="mt-auto flex items-center justify-between pt-3 border-t border-dashed border-gray-100">
                     <div className="flex flex-col">

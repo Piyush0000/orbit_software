@@ -1,15 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Filter, X } from "lucide-react";
+import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { filters } from "@/lib/data";
+
+export interface SelectedFilters {
+    genders: string[];
+    brands: string[];
+    priceRanges: string[];
+    concentrations: string[];
+}
 
 interface FilterSidebarProps {
     className?: string;
+    selectedFilters: SelectedFilters;
+    onFilterChange: (type: keyof SelectedFilters, value: string) => void;
+    onClearAll: () => void;
+    availableOptions: {
+        brands: string[];
+        concentrations: string[];
+    };
 }
 
-export default function FilterSidebar({ className = "" }: FilterSidebarProps) {
+export default function FilterSidebar({ 
+    className = "", 
+    selectedFilters, 
+    onFilterChange, 
+    onClearAll,
+    availableOptions 
+}: FilterSidebarProps) {
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({
         genders: true,
         brands: true,
@@ -21,136 +40,160 @@ export default function FilterSidebar({ className = "" }: FilterSidebarProps) {
         setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
     };
 
+    const priceRanges = [
+        { label: "Under ₹3,000", value: "under-3000" },
+        { label: "₹3,000 - ₹5,000", value: "3000-5000" },
+        { label: "Over ₹5,000", value: "over-5000" },
+    ];
+
+    const genders = ["Men", "Women", "Unisex"];
+
     return (
-        <aside className={`w-full ${className}`}>
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-                <h3 className="font-serif text-lg text-gray-900">Filters</h3>
-                <button className="text-xs text-gray-500 hover:text-black uppercase tracking-wide">Clear All</button>
+        <aside className={cn("w-full", className)}>
+            <div className="flex items-center justify-between mb-10 pb-6 border-b border-gray-100">
+                <h3 className="font-serif text-2xl text-gray-900 italic">Filters</h3>
+                <button 
+                    onClick={onClearAll}
+                    className="text-[10px] text-gray-400 hover:text-gold-600 uppercase tracking-[0.2em] font-bold transition-colors"
+                >
+                    Clear All
+                </button>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-10">
                 {/* Gender */}
-                <div className="border-b border-gray-100 pb-6">
-                    <button
-                        onClick={() => toggleSection('genders')}
-                        className="flex items-center justify-between w-full mb-4 group"
-                    >
-                        <span className="text-sm font-medium uppercase tracking-wide text-gray-900 group-hover:text-gold-600 transition-colors">Gender</span>
-                        {openSections.genders ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
-                    <AnimatePresence>
-                        {openSections.genders && (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="overflow-hidden"
-                            >
-                                <div className="space-y-2">
-                                    {filters.genders.map(gender => (
-                                        <label key={gender} className="flex items-center gap-3 cursor-pointer group">
-                                            <div className="relative flex items-center">
-                                                <input type="checkbox" className="peer w-4 h-4 border-gray-300 rounded-sm checked:bg-black checked:border-black focus:ring-0 transition-colors" />
-                                            </div>
-                                            <span className="text-sm text-gray-600 group-hover:text-black transition-colors">{gender}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                <FilterSection 
+                    title="Gender" 
+                    isOpen={openSections.genders} 
+                    onToggle={() => toggleSection('genders')}
+                >
+                    <div className="space-y-3">
+                        {genders.map(gender => (
+                            <FilterCheckbox 
+                                key={gender}
+                                label={gender}
+                                isChecked={selectedFilters.genders.includes(gender)}
+                                onChange={() => onFilterChange('genders', gender)}
+                            />
+                        ))}
+                    </div>
+                </FilterSection>
 
                 {/* Price */}
-                <div className="border-b border-gray-100 pb-6">
-                    <button
-                        onClick={() => toggleSection('priceRanges')}
-                        className="flex items-center justify-between w-full mb-4 group"
-                    >
-                        <span className="text-sm font-medium uppercase tracking-wide text-gray-900 group-hover:text-gold-600 transition-colors">Price</span>
-                        {openSections.priceRanges ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
-                    <AnimatePresence>
-                        {openSections.priceRanges && (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="overflow-hidden"
-                            >
-                                <div className="space-y-2">
-                                    {filters.priceRanges.map((range, idx) => (
-                                        <label key={idx} className="flex items-center gap-3 cursor-pointer group">
-                                            <input type="checkbox" className="w-4 h-4 border-gray-300 rounded-sm checked:bg-black checked:border-black focus:ring-0 transition-colors" />
-                                            <span className="text-sm text-gray-600 group-hover:text-black transition-colors">{range.label}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                <FilterSection 
+                    title="Price Range" 
+                    isOpen={openSections.priceRanges} 
+                    onToggle={() => toggleSection('priceRanges')}
+                >
+                    <div className="space-y-3">
+                        {priceRanges.map((range) => (
+                            <FilterCheckbox 
+                                key={range.value}
+                                label={range.label}
+                                isChecked={selectedFilters.priceRanges.includes(range.value)}
+                                onChange={() => onFilterChange('priceRanges', range.value)}
+                            />
+                        ))}
+                    </div>
+                </FilterSection>
 
                 {/* Brands */}
-                <div className="border-b border-gray-100 pb-6">
-                    <button
-                        onClick={() => toggleSection('brands')}
-                        className="flex items-center justify-between w-full mb-4 group"
-                    >
-                        <span className="text-sm font-medium uppercase tracking-wide text-gray-900 group-hover:text-gold-600 transition-colors">Brand</span>
-                        {openSections.brands ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
-                    <AnimatePresence>
-                        {openSections.brands && (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="overflow-hidden"
-                            >
-                                <div className="space-y-2">
-                                    {filters.brands.map(brand => (
-                                        <label key={brand} className="flex items-center gap-3 cursor-pointer group">
-                                            <input type="checkbox" className="w-4 h-4 border-gray-300 rounded-sm checked:bg-black checked:border-black focus:ring-0 transition-colors" />
-                                            <span className="text-sm text-gray-600 group-hover:text-black transition-colors">{brand}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                <FilterSection 
+                    title="Designers" 
+                    isOpen={openSections.brands} 
+                    onToggle={() => toggleSection('brands')}
+                >
+                    <div className="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                        {availableOptions.brands.map(brand => (
+                            <FilterCheckbox 
+                                key={brand}
+                                label={brand}
+                                isChecked={selectedFilters.brands.includes(brand)}
+                                onChange={() => onFilterChange('brands', brand)}
+                            />
+                        ))}
+                    </div>
+                </FilterSection>
 
                 {/* Concentration */}
-                <div className="pb-6">
-                    <button
-                        onClick={() => toggleSection('concentrations')}
-                        className="flex items-center justify-between w-full mb-4 group"
-                    >
-                        <span className="text-sm font-medium uppercase tracking-wide text-gray-900 group-hover:text-gold-600 transition-colors">Concentration</span>
-                        {openSections.concentrations ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
-                    <AnimatePresence>
-                        {openSections.concentrations && (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="overflow-hidden"
-                            >
-                                <div className="space-y-2">
-                                    {filters.concentrations.map(conc => (
-                                        <label key={conc} className="flex items-center gap-3 cursor-pointer group">
-                                            <input type="checkbox" className="w-4 h-4 border-gray-300 rounded-sm checked:bg-black checked:border-black focus:ring-0 transition-colors" />
-                                            <span className="text-sm text-gray-600 group-hover:text-black transition-colors">{conc}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                <FilterSection 
+                    title="Concentration" 
+                    isOpen={openSections.concentrations} 
+                    onToggle={() => toggleSection('concentrations')}
+                >
+                    <div className="space-y-3">
+                        {availableOptions.concentrations.map(conc => (
+                            <FilterCheckbox 
+                                key={conc}
+                                label={conc}
+                                isChecked={selectedFilters.concentrations.includes(conc)}
+                                onChange={() => onFilterChange('concentrations', conc)}
+                            />
+                        ))}
+                    </div>
+                </FilterSection>
             </div>
         </aside>
     );
+}
+
+function FilterSection({ title, isOpen, onToggle, children }: { title: string, isOpen: boolean, onToggle: () => void, children: React.ReactNode }) {
+    return (
+        <div className="border-b border-gray-50 pb-8 last:border-0">
+            <button
+                onClick={onToggle}
+                className="flex items-center justify-between w-full mb-6 group"
+            >
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-900 group-hover:text-gold-600 transition-colors">{title}</span>
+                {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
+            </button>
+            <AnimatePresence initial={false}>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+                        className="overflow-hidden"
+                    >
+                        {children}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+function FilterCheckbox({ label, isChecked, onChange }: { label: string, isChecked: boolean, onChange: () => void }) {
+    return (
+        <label className="flex items-center gap-4 cursor-pointer group">
+            <div className="relative flex items-center justify-center">
+                <input 
+                    type="checkbox" 
+                    checked={isChecked}
+                    onChange={onChange}
+                    className="peer appearance-none w-5 h-5 border border-gray-200 rounded-lg checked:border-gold-500 checked:bg-gold-500 transition-all duration-300" 
+                />
+                <motion.div 
+                    initial={false}
+                    animate={{ scale: isChecked ? 1 : 0 }}
+                    className="absolute text-white"
+                >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </motion.div>
+            </div>
+            <span className={cn(
+                "text-sm tracking-tight transition-colors duration-300",
+                isChecked ? "text-gray-900 font-medium" : "text-gray-500 group-hover:text-gray-900"
+            )}>
+                {label}
+            </span>
+        </label>
+    );
+}
+
+function cn(...classes: any[]) {
+    return classes.filter(Boolean).join(' ');
 }

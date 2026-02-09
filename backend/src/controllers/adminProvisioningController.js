@@ -1,4 +1,5 @@
 const { prisma } = require('../config/database');
+const { getDefaultCategoryConfig, normalizeCategory } = require('../utils/categoryConfigs');
 
 /**
  * List all pending merchants awaiting provisioning
@@ -39,12 +40,12 @@ const listPendingMerchants = async (req, res, next) => {
 /**
  * Provision a merchant: assign theme, create website customization, activate store
  * POST /api/admin/provisioning/:storeId/provision
- * Body: { themeId, planId? }
+ * Body: { themeId, planId?, categoryConfig? }
  */
 const provisionMerchant = async (req, res, next) => {
   try {
     const { storeId } = req.params;
-    const { themeId, planId } = req.body;
+    const { themeId, planId, categoryConfig } = req.body;
 
     if (!themeId) {
       return res.status(400).json({
@@ -148,7 +149,23 @@ const provisionMerchant = async (req, res, next) => {
         }
       });
 
-      // 3. Assign plan if provided
+      // 3. Create or update category config
+      const normalizedCategory = normalizeCategory(store.category || '');
+      const config = categoryConfig || getDefaultCategoryConfig(normalizedCategory || 'general');
+      await tx.storeCategoryConfig.upsert({
+        where: { storeId },
+        update: {
+          category: normalizedCategory || 'general',
+          config
+        },
+        create: {
+          storeId,
+          category: normalizedCategory || 'general',
+          config
+        }
+      });
+
+      // 4. Assign plan if provided
       if (planId) {
         await tx.store.update({
           where: { id: storeId },
@@ -156,7 +173,7 @@ const provisionMerchant = async (req, res, next) => {
         });
       }
 
-      // 4. Update onboarding status
+      // 5. Update onboarding status
       const existingOnboarding = await tx.brandOnboarding.findUnique({
         where: { storeId }
       });

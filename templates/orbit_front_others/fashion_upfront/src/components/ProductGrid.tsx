@@ -2,14 +2,12 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
 import { Product } from '@/types/product';
-import { usdToInr, parseINRToNumber } from '@/lib/utils';
-import { getProducts } from '@/lib/products-api';
-import { mapApiProducts } from '@/lib/product-adapter';
+import { parseINRToNumber } from '@/lib/utils';
+import { useStorefront } from '@/contexts/StorefrontContext';
 
 // Define filter state locally
 interface FilterState {
@@ -18,12 +16,11 @@ interface FilterState {
   price: string[];
   availability: string[];
   size: string[];
+  rating: string[];
 }
 
 export default function ProductGrid() {
   const searchParams = useSearchParams(); // Hook to read URL params
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(true);
 
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     category: [],
@@ -31,35 +28,41 @@ export default function ProductGrid() {
     price: [],
     availability: [],
     size: [],
+    rating: [],
   });
 
   // Initialize from URL params
   useEffect(() => {
     const categoryParam = searchParams.get('category');
     if (categoryParam) {
-      setActiveFilters(prev => ({
-        ...prev,
-        category: [categoryParam]
-      }));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setActiveFilters(prev => {
+        if (prev.category.includes(categoryParam)) return prev;
+        return {
+          ...prev,
+          category: [categoryParam]
+        };
+      });
     }
   }, [searchParams]);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoadingProducts(true);
-        const apiProducts = await getProducts();
-        setAllProducts(mapApiProducts(apiProducts));
-      } catch (error) {
-        console.error('Failed to load products:', error);
-        setAllProducts([]);
-      } finally {
-        setLoadingProducts(false);
+    const handleFilterChange = (event: Event) => {
+      const detail = (event as CustomEvent).detail as FilterState;
+      if (detail) {
+        setActiveFilters({
+          category: enabledFilterSet.has('category') ? detail.category || [] : [],
+          brand: enabledFilterSet.has('brand') ? detail.brand || [] : [],
+          price: enabledFilterSet.has('price') ? detail.price || [] : [],
+          availability: enabledFilterSet.has('availability') ? detail.availability || [] : [],
+          size: enabledFilterSet.has('size') ? detail.size || [] : [],
+          rating: enabledFilterSet.has('rating') ? detail.rating || [] : []
+        });
       }
     };
-
-    loadProducts();
-  }, []);
+    window.addEventListener('filterChange', handleFilterChange);
+    return () => window.removeEventListener('filterChange', handleFilterChange);
+  }, [enabledFilters]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('popular');
   const [showFilters, setShowFilters] = useState(false);
@@ -67,12 +70,13 @@ export default function ProductGrid() {
   const [showSizeModal, setShowSizeModal] = useState(false);
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-
-  const categories = ['Men', 'Women', 'Kids', 'Accessories', 'Footwear'];
-  const brands = ['H&M', 'Levi\'s', 'Zara', 'Gucci', 'Nike', 'Woodland', 'Mothercare', 'Ray-Ban'];
+  const { products: allProducts, categories, brands, loading, categoryConfig } = useStorefront();
+  const enabledFilters = (categoryConfig as { filters?: string[] } | null)?.filters || ['category', 'brand', 'price', 'availability', 'size', 'rating'];
+  const enabledFilterSet = new Set(enabledFilters);
   const prices = ['₹0 - ₹2,000', '₹2,000 - ₹5,000', '₹5,000 - ₹10,000', '₹10,000+'];
   const availability = ['In Stock', 'Out of Stock'];
-  const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  const sizeOptions = Array.from(new Set(allProducts.flatMap((product) => product.sizes || []))).filter(Boolean);
+  const sizes = sizeOptions.length ? sizeOptions : ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
   const toggleFilter = (type: keyof FilterState, value: string) => {
     setActiveFilters(prev => {
@@ -90,7 +94,8 @@ export default function ProductGrid() {
       brand: [],
       price: [],
       availability: [],
-      size: []
+      size: [],
+      rating: []
     });
   };
 
@@ -142,27 +147,27 @@ export default function ProductGrid() {
         product.name.toLowerCase().includes(query) ||
         product.description.toLowerCase().includes(query) ||
         product.category.toLowerCase().includes(query) ||
-        product.brand.toLowerCase().includes(query)
+          (product.brand || '').toLowerCase().includes(query)
       );
     }
 
     // 2. Filters
     // Category
-    if (activeFilters.category.length > 0) {
+    if (enabledFilterSet.has('category') && activeFilters.category.length > 0) {
       filtered = filtered.filter(p => activeFilters.category.includes(p.category));
     }
     // Brand
-    if (activeFilters.brand.length > 0) {
-      filtered = filtered.filter(p => activeFilters.brand.includes(p.brand));
+    if (enabledFilterSet.has('brand') && activeFilters.brand.length > 0) {
+      filtered = filtered.filter(p => p.brand && activeFilters.brand.includes(p.brand));
     }
     // Size
-    if (activeFilters.size.length > 0) {
+    if (enabledFilterSet.has('size') && activeFilters.size.length > 0) {
       filtered = filtered.filter(p =>
         p.sizes && p.sizes.some(s => activeFilters.size.includes(s))
       );
     }
     // Availability
-    if (activeFilters.availability.length > 0) {
+    if (enabledFilterSet.has('availability') && activeFilters.availability.length > 0) {
       if (activeFilters.availability.includes('In Stock')) {
         filtered = filtered.filter(p => p.stock);
       }
@@ -170,10 +175,23 @@ export default function ProductGrid() {
         filtered = filtered.filter(p => !p.stock);
       }
     }
-    // Price
-    if (activeFilters.price.length > 0) {
+    // Rating
+    if (enabledFilterSet.has('rating') && activeFilters.rating.length > 0) {
       filtered = filtered.filter(p => {
-        const priceInINR = usdToInr(p.priceNum);
+        const rating = p.rating || 0;
+        return activeFilters.rating.some((range) => {
+          if (range === '4+ Stars') return rating >= 4;
+          if (range === '3+ Stars') return rating >= 3;
+          if (range === '2+ Stars') return rating >= 2;
+          if (range === '1+ Stars') return rating >= 1;
+          return false;
+        });
+      });
+    }
+    // Price
+    if (enabledFilterSet.has('price') && activeFilters.price.length > 0) {
+      filtered = filtered.filter(p => {
+        const priceInINR = p.priceNum;
         return activeFilters.price.some(range => {
           if (range === '₹0 - ₹2,000') return priceInINR <= 2000;
           if (range === '₹2,000 - ₹5,000') return priceInINR > 2000 && priceInINR <= 5000;
@@ -200,7 +218,7 @@ export default function ProductGrid() {
     });
 
     return filtered;
-  }, [activeFilters, searchQuery, sortBy, allProducts, searchParams]);
+  }, [activeFilters, searchQuery, sortBy, searchParams, allProducts, enabledFilters]);
 
   return (
     <section
@@ -295,95 +313,100 @@ export default function ProductGrid() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                  {/* Category */}
-                  <div>
-                    <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Category</h4>
-                    <div className="space-y-2">
-                      {categories.map(cat => (
-                        <label key={cat} className="flex items-center space-x-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={activeFilters.category.includes(cat)}
-                            onChange={() => toggleFilter('category', cat)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span style={{ color: 'var(--text-muted)' }}>{cat}</span>
-                        </label>
-                      ))}
+                  {enabledFilterSet.has('category') && (
+                    <div>
+                      <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Category</h4>
+                      <div className="space-y-2">
+                        {categories.map(cat => (
+                          <label key={cat} className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.category.includes(cat)}
+                              onChange={() => toggleFilter('category', cat)}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span style={{ color: 'var(--text-muted)' }}>{cat}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Size */}
-                  <div>
-                    <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Size</h4>
-                    <div className="space-y-2">
-                      {sizes.map(size => (
-                        <label key={size} className="flex items-center space-x-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={activeFilters.size.includes(size)}
-                            onChange={() => toggleFilter('size', size)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span style={{ color: 'var(--text-muted)' }}>{size}</span>
-                        </label>
-                      ))}
+                  {enabledFilterSet.has('size') && (
+                    <div>
+                      <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Size</h4>
+                      <div className="space-y-2">
+                        {sizes.map(size => (
+                          <label key={size} className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.size.includes(size)}
+                              onChange={() => toggleFilter('size', size)}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span style={{ color: 'var(--text-muted)' }}>{size}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Price */}
-                  <div>
-                    <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Price</h4>
-                    <div className="space-y-2">
-                      {prices.map(price => (
-                        <label key={price} className="flex items-center space-x-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={activeFilters.price.includes(price)}
-                            onChange={() => toggleFilter('price', price)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span style={{ color: 'var(--text-muted)' }}>{price}</span>
-                        </label>
-                      ))}
+                  {enabledFilterSet.has('price') && (
+                    <div>
+                      <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Price</h4>
+                      <div className="space-y-2">
+                        {prices.map(price => (
+                          <label key={price} className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.price.includes(price)}
+                              onChange={() => toggleFilter('price', price)}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span style={{ color: 'var(--text-muted)' }}>{price}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Brand */}
-                  <div>
-                    <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Brand</h4>
-                    <div className="space-y-2">
-                      {brands.map(brand => (
-                        <label key={brand} className="flex items-center space-x-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={activeFilters.brand.includes(brand)}
-                            onChange={() => toggleFilter('brand', brand)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span style={{ color: 'var(--text-muted)' }}>{brand}</span>
-                        </label>
-                      ))}
+                  {enabledFilterSet.has('brand') && (
+                    <div>
+                      <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Brand</h4>
+                      <div className="space-y-2">
+                        {brands.map(brand => (
+                          <label key={brand} className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.brand.includes(brand)}
+                              onChange={() => toggleFilter('brand', brand)}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span style={{ color: 'var(--text-muted)' }}>{brand}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Availability */}
-                  <div>
-                    <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Availability</h4>
-                    <div className="space-y-2">
-                      {availability.map(status => (
-                        <label key={status} className="flex items-center space-x-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={activeFilters.availability.includes(status)}
-                            onChange={() => toggleFilter('availability', status)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span style={{ color: 'var(--text-muted)' }}>{status}</span>
-                        </label>
-                      ))}
+                  {enabledFilterSet.has('availability') && (
+                    <div>
+                      <h4 className="font-medium mb-3" style={{ color: 'var(--text)' }}>Availability</h4>
+                      <div className="space-y-2">
+                        {availability.map(status => (
+                          <label key={status} className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.availability.includes(status)}
+                              onChange={() => toggleFilter('availability', status)}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span style={{ color: 'var(--text-muted)' }}>{status}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}
@@ -408,12 +431,9 @@ export default function ProductGrid() {
 
         {/* Product Grid - Full Width */}
         <div className="w-full">
-          {loadingProducts ? (
+          {loading ? (
             <div className="text-center py-20 rounded-lg border border-dashed" style={{ borderColor: 'var(--card-border)' }}>
               <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text)' }}>Loading products...</h3>
-              <p className="text-lg" style={{ color: 'var(--text-muted)' }}>
-                Fetching the latest catalog.
-              </p>
             </div>
           ) : displayedProducts.length === 0 ? (
             <div className="text-center py-20 rounded-lg border border-dashed" style={{ borderColor: 'var(--card-border)' }}>
@@ -441,12 +461,11 @@ export default function ProductGrid() {
                 >
                   <Link href={`/products/${product.id}`}>
                     <div className="aspect-square bg-gray-200 overflow-hidden cursor-clothing relative group">
-                      <Image
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
                         src={product.image}
                         alt={product.name}
-                        fill
-                        className="object-cover hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
                       {!product.stock && (
                         <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded z-10">
@@ -489,12 +508,14 @@ export default function ProductGrid() {
                     <Link href={`/products/${product.id}`}>
                       <h3 className="text-lg font-semibold mb-1 hover:underline cursor-pointer" style={{ color: 'var(--text)' }}>{product.name}</h3>
                     </Link>
-                    <div className="flex items-center gap-1 mb-2">
-                      <div className="flex items-center text-yellow-400">
-                        <span className="text-sm">★</span>
-                        <span className="text-sm text-gray-600 ml-1" style={{ color: 'var(--text-muted)' }}>{product.rating}</span>
+                    {product.rating !== undefined && (
+                      <div className="flex items-center gap-1 mb-2">
+                        <div className="flex items-center text-yellow-400">
+                          <span className="text-sm">★</span>
+                          <span className="text-sm text-gray-600 ml-1" style={{ color: 'var(--text-muted)' }}>{product.rating}</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="flex items-center justify-between gap-2 mt-auto">
                       <div className="flex flex-col">
                         <span className="text-xl font-bold" style={{ color: 'var(--text)' }}>{product.price}</span>
@@ -545,11 +566,11 @@ export default function ProductGrid() {
 
             <div className="flex items-center gap-4 mb-6 p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
               <div className="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0 border">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={selectedProductForSize.image}
                   alt={selectedProductForSize.name}
-                  fill
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div>

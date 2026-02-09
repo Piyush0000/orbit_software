@@ -10,6 +10,7 @@ const getStoreBySubdomain = async (req, res, next) => {
         theme: true,
         plan: true,
         deployment: true,
+        categoryConfig: true,
         websiteCustomization: true, // Include customization
         user: { select: { email: true, fullName: true } }
       }
@@ -23,7 +24,8 @@ const getStoreBySubdomain = async (req, res, next) => {
     const { websiteCustomization, ...storeData } = store;
     const response = {
       ...storeData,
-      customization: websiteCustomization
+      customization: websiteCustomization,
+      categoryConfig: store.categoryConfig?.config || null
     };
 
     res.json({ store: response });
@@ -46,6 +48,7 @@ const getStoreProducts = async (req, res, next) => {
 
     const products = await prisma.product.findMany({
       where: { storeId: store.id, isActive: true },
+      include: { variants: true },
       orderBy: { createdAt: 'desc' }
     });
 

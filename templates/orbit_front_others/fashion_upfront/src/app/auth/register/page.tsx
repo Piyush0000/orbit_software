@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/store/authStore';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -21,11 +22,14 @@ export default function RegisterPage() {
         });
     };
 
+    const register = useAuth((state) => state.register);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         // Simulate register delay
         setTimeout(() => {
+            register(formData.name, formData.email);
             setIsLoading(false);
             router.push('/profile');
         }, 1000);

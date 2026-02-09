@@ -33,8 +33,9 @@ const resolveStoreByDomain = async (domain) => {
       isActive: true 
     },
     include: {
-      theme: true,
-      websiteCustomization: true
+      themeTemplate: true,
+      websiteCustomization: true,
+      categoryConfig: true
     }
   });
 
@@ -47,8 +48,9 @@ const resolveStoreByDomain = async (domain) => {
         isActive: true 
       },
       include: {
-        theme: true,
-        websiteCustomization: true
+        themeTemplate: true,
+        websiteCustomization: true,
+        categoryConfig: true
       }
     });
   }
@@ -165,8 +167,10 @@ const getStoreByDomain = async (req, res, next) => {
         customDomain: store.customDomain,
         description: store.description,
         logo: store.logo,
+        category: store.category,
         theme: store.theme,
-        customization: store.websiteCustomization
+        customization: store.websiteCustomization,
+        categoryConfig: store.categoryConfig?.config || null
       }
     });
   } catch (err) {

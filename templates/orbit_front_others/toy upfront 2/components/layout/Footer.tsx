@@ -1,38 +1,44 @@
-"use client";
-
 import Link from "next/link";
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, Linkedin } from "lucide-react";
-import { useStore } from "@/context/StoreContext";
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Footer() {
-    const { store, customization } = useStore();
-
+    const { store, customization } = useStorefront();
+    const footer = (customization?.footerContent || {}) as Record<string, string>;
+    const contact = (customization?.contactInfo || {}) as Record<string, string>;
+    const socialLinks = customization?.socialLinks || [];
+    const storeName = store?.name || "ToyStore";
+    const description =
+        footer.description ||
+        store?.description ||
+        "Creating happy memories with safe, sustainable, and educational toys. Approved by kids, trusted by parents.";
+    const email = contact.email || "support@toystore.com";
+    const phone = contact.phone || "+1 (555) 123-4567";
+    const address = contact.address || "123 Playful Street,\nToyland City, TC 90210";
     return (
         <footer className="bg-[#4A403A] text-[#F3E9E2] pt-12 lg:pt-20 pb-10 rounded-t-[2rem] lg:rounded-t-[3rem] mt-12">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                    {/* Brand Info - Dynamic */}
+                    {/* Brand Info */}
                     <div className="space-y-6">
                         <h3 className="text-3xl font-extrabold text-white font-display">
-                            {store?.name || "ToyStore"}
-                            <span className="text-accent">.</span>
+                            {storeName}<span className="text-accent">.</span>
                         </h3>
                         <p className="text-sm leading-relaxed text-gray-300 max-w-xs">
-                            {customization?.aboutSection?.content || "Creating happy memories with safe, sustainable, and educational toys. Approved by kids, trusted by parents."}
+                            {description}
                         </p>
                         <div className="flex gap-4">
-                            {customization?.socialLinks?.facebook && (
-                                <a href={customization.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all"><Facebook className="w-5 h-5" /></a>
-                            )}
-                            {customization?.socialLinks?.instagram && (
-                                <a href={customization.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all"><Instagram className="w-5 h-5" /></a>
-                            )}
-                            {customization?.socialLinks?.twitter && (
-                                <a href={customization.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all"><Twitter className="w-5 h-5" /></a>
-                            )}
-                            {customization?.socialLinks?.linkedin && (
-                                <a href={customization.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all"><Linkedin className="w-5 h-5" /></a>
-                            )}
+                            {(socialLinks.length ? socialLinks : [
+                                { label: "Facebook", href: "#" },
+                                { label: "Instagram", href: "#" },
+                                { label: "Twitter", href: "#" }
+                            ]).map((link) => (
+                                <a key={link.label} href={link.href} className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all" aria-label={link.label}>
+                                    {link.label === "Facebook" && <Facebook className="w-5 h-5" />}
+                                    {link.label === "Instagram" && <Instagram className="w-5 h-5" />}
+                                    {link.label === "Twitter" && <Twitter className="w-5 h-5" />}
+                                </a>
+                            ))}
                         </div>
                     </div>
 
@@ -58,44 +64,41 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Contact - Dynamic */}
+                    {/* Contact */}
                     <div>
                         <h4 className="text-white font-bold text-lg mb-6 font-display">Contact Us</h4>
                         <ul className="space-y-6 text-sm">
-                            {customization?.contactInfo?.address && (
-                                <li className="flex items-start gap-4">
-                                    <div className="p-2 bg-white/5 rounded-full shrink-0 text-primary">
-                                        <MapPin className="w-5 h-5" />
-                                    </div>
-                                    <span className="opacity-90">
-                                        {customization.contactInfo.address}
-                                        {customization.contactInfo.city && <><br />{customization.contactInfo.city}</>}
-                                        {customization.contactInfo.country && <>, {customization.contactInfo.country}</>}
-                                    </span>
-                                </li>
-                            )}
-                            {customization?.contactInfo?.phone && (
-                                <li className="flex items-center gap-4">
-                                    <div className="p-2 bg-white/5 rounded-full shrink-0 text-primary">
-                                        <Phone className="w-5 h-5" />
-                                    </div>
-                                    <span className="opacity-90">{customization.contactInfo.phone}</span>
-                                </li>
-                            )}
-                            {customization?.contactInfo?.email && (
-                                <li className="flex items-center gap-4">
-                                    <div className="p-2 bg-white/5 rounded-full shrink-0 text-primary">
-                                        <Mail className="w-5 h-5" />
-                                    </div>
-                                    <span className="opacity-90">{customization.contactInfo.email}</span>
-                                </li>
-                            )}
+                            <li className="flex items-start gap-4">
+                                <div className="p-2 bg-white/5 rounded-full shrink-0 text-primary">
+                                    <MapPin className="w-5 h-5" />
+                                </div>
+                                <span className="opacity-90">
+                                    {address.split("\n").map((line, index) => (
+                                        <span key={index}>
+                                            {line}
+                                            <br />
+                                        </span>
+                                    ))}
+                                </span>
+                            </li>
+                            <li className="flex items-center gap-4">
+                                <div className="p-2 bg-white/5 rounded-full shrink-0 text-primary">
+                                    <Phone className="w-5 h-5" />
+                                </div>
+                                <span className="opacity-90">{phone}</span>
+                            </li>
+                            <li className="flex items-center gap-4">
+                                <div className="p-2 bg-white/5 rounded-full shrink-0 text-primary">
+                                    <Mail className="w-5 h-5" />
+                                </div>
+                                <span className="opacity-90">{email}</span>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400 font-medium">
-                    <p>{customization?.footerContent?.copyright || `© ${new Date().getFullYear()} ${store?.name || "Store"} Inc. All rights reserved.`}</p>
+                    <p>© {new Date().getFullYear()} {storeName}. All rights reserved.</p>
                     <div className="flex gap-8">
                         <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
                         <Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>

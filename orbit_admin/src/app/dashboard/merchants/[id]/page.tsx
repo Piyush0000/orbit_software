@@ -123,7 +123,7 @@ export default function MerchantDetailPage() {
                     onboardingProgress: store.onboarding?.completionPercent || 0,
                     onboardingSteps,
                     storeDetails: {
-                        url: store.customDomain || store.subdomain,
+                        url: store.customDomain || `${store.subdomain}.localhost:3000`,
                         themeName: "Not provided",
                         themeConfig: {},
                         domainStatus: store.customDomain ? "connected" : "pending",
@@ -340,7 +340,7 @@ export default function MerchantDetailPage() {
                                             <label className="text-xs font-medium text-muted-foreground uppercase">Store URL</label>
                                             <div className="flex items-center gap-2 mt-1">
                                                 <a
-                                                    href={`https://${merchant.storeDetails.url}`}
+                                                    href={`http://${merchant.storeDetails.url}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="font-mono text-sm hover:underline flex items-center gap-1 group"

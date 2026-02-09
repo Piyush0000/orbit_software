@@ -6,6 +6,8 @@ import ProductsDropdown from './ProductsDropdown';
 import MegaMenu from './MegaMenu';
 import ProfileDropdown from './ProfileDropdown';
 import { useCart } from '@/store/cartStore';
+import { useAuth } from '@/store/authStore';
+import { useStorefront } from '@/contexts/StorefrontContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,7 +16,13 @@ export default function Header() {
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
   const productsRef = useRef<HTMLDivElement>(null);
   const { getTotalItems } = useCart();
+  const isAuthenticated = useAuth((state) => state.isAuthenticated);
   const cartItemCount = getTotalItems();
+  const { store, customization } = useStorefront();
+  const logoUrl = customization?.logo || store?.logo || '';
+  const storeName = store?.name || 'UPFRONT';
+  const announcement = customization?.announcementBar as Record<string, string> | undefined;
+  const bannerText = announcement?.text || 'FLAT ₹500 OFF ON YOUR FIRST ORDER! USE CODE: NEW500';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,8 +58,14 @@ export default function Header() {
       onMouseLeave={() => setActiveCategory(null)}
     >
       {/* Top Banner - Myntra style minimalist or soft gradient */}
-      <div className="bg-gradient-to-r from-pink-500 to-orange-400 text-white text-xs sm:text-sm font-bold py-2 text-center px-4 tracking-wide relative z-[51]">
-        FLAT ₹500 OFF ON YOUR FIRST ORDER! USE CODE: NEW500
+      <div
+        className="text-xs sm:text-sm font-bold py-2 text-center px-4 tracking-wide relative z-[51]"
+        style={{
+          background: announcement?.backgroundColor || 'linear-gradient(to right, #ec4899, #fb923c)',
+          color: announcement?.textColor || '#ffffff'
+        }}
+      >
+        {bannerText}
       </div>
 
       <header
@@ -64,8 +78,12 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <div className="flex-shrink-0 mr-8 flex items-center">
-              <Link href="/" className="text-3xl font-extrabold tracking-tight text-black">
-                UPFRONT
+              <Link href="/" className="text-3xl font-extrabold tracking-tight text-black flex items-center gap-2">
+                {logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={logoUrl} alt={storeName} className="h-8 w-8 rounded-md object-cover" />
+                ) : null}
+                {storeName}
               </Link>
             </div>
 
@@ -76,8 +94,8 @@ export default function Header() {
                   key={category}
                   href={`/products?category=${category}`}
                   className={`flex items-center h-full border-b-4 transition-all duration-200 px-2 ${activeCategory === category
-                      ? 'border-pink-500 text-black'
-                      : 'border-transparent hover:border-pink-500 hover:text-black'
+                    ? 'border-pink-500 text-black'
+                    : 'border-transparent hover:border-pink-500 hover:text-black'
                     }`}
                   onMouseEnter={() => setActiveCategory(category)}
                 >
@@ -120,22 +138,32 @@ export default function Header() {
             {/* Icons */}
             <div className="hidden md:flex items-center space-x-6">
 
-              <div
-                className="relative group h-full flex items-center"
-                onMouseEnter={() => setIsMenuOpen(false)} // Close mobile, keep specific hover logic if needed
-              >
-                <Link href="/profile" className="text-gray-600 hover:text-black transition-colors py-4" aria-label="Account">
-                  <div className="flex flex-col items-center gap-0.5">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span className="text-[10px] font-bold">Profile</span>
-                  </div>
-                </Link>
-                {/* Dropdown Container */}
-                <div className="absolute right-0 top-[100%] pt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
-                  <ProfileDropdown />
-                </div>
+              <div className="relative group h-full flex items-center">
+                {isAuthenticated ? (
+                  <>
+                    <Link href="/profile" className="text-gray-600 hover:text-black transition-colors py-4" aria-label="Account">
+                      <div className="flex flex-col items-center gap-0.5">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span className="text-[10px] font-bold">Profile</span>
+                      </div>
+                    </Link>
+                    {/* Dropdown Container */}
+                    <div className="absolute right-0 top-[100%] pt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
+                      <ProfileDropdown />
+                    </div>
+                  </>
+                ) : (
+                  <Link href="/auth/login" className="text-gray-600 hover:text-black transition-colors py-4" aria-label="Login">
+                    <div className="flex flex-col items-center gap-0.5">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                      </svg>
+                      <span className="text-[10px] font-bold">Login</span>
+                    </div>
+                  </Link>
+                )}
               </div>
               <Link
                 href="/cart"

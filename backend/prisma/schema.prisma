@@ -54,6 +54,7 @@ model Store {
   products     Product[]
   orders       Order[]
   settings     StoreSettings?
+  categoryConfig StoreCategoryConfig?
   websiteCustomization WebsiteCustomization?
   activityLogs       BrandActivityLog[]
   onboardingSteps    BrandOnboardingStep[]
@@ -63,6 +64,18 @@ model Store {
   callLogs           SupportCallLog[]
   provisioning       MerchantProvisioning?
   deployment         DeploymentMetadata?
+
+  @@index([userId])
+}
+
+model StoreCategoryConfig {
+  id        String   @id @default(uuid())
+  storeId   String   @unique
+  store     Store    @relation(fields: [storeId], references: [id])
+  category  String
+  config    Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model BrandOnboarding {
@@ -227,6 +240,12 @@ model Product {
   updatedAt      DateTime         @updatedAt
   variants       ProductVariant[]
   orderItems     OrderItem[]
+
+  @@index([storeId])
+  @@index([storeId, isActive])
+  @@index([storeId, category])
+  @@index([storeId, createdAt])
+  @@index([name])
 }
 
 model ProductVariant {
@@ -240,6 +259,8 @@ model ProductVariant {
   options   Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([productId])
 }
 
 model Order {
@@ -261,6 +282,10 @@ model Order {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   items             OrderItem[]
+
+  @@index([storeId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model OrderItem {
@@ -274,6 +299,9 @@ model OrderItem {
   price       Decimal  @db.Decimal(10, 2)
   variantInfo Json?
   createdAt   DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model StoreSettings {
@@ -410,6 +438,7 @@ enum ThemeCategory {
   COSMETICS
   PERFUME
   JEWELLERY
+  FURNITURE
 }
 
 model Theme {
@@ -501,6 +530,27 @@ model WebsiteCustomization {
   metaDescription String?
   keywords        String[]
   socialLinks     Json?
+  features        Json?
+  ctaButtons      Json?
+  navLinks        Json?
+  announcementBar Json?
+  newsletter      Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model MerchantCredentials {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  storeId           String   @unique
+  email             String
+  temporaryPassword String   // Stored for admin view only
+  mustChangePassword Boolean @default(true)
+  lastPasswordChange DateTime?
+  createdByAdminId  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([email])
+  @@index([storeId])
 }

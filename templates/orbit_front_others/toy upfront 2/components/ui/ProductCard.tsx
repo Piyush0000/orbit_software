@@ -10,10 +10,10 @@ interface Product {
     id: number | string;
     name: string;
     price: number;
-    rating: number;
-    reviews: number;
+    rating?: number;
+    reviews?: number;
     image?: string;
-    age: string;
+    age?: string;
     badge?: string | null;
     originalPrice?: number;
 }
@@ -90,19 +90,25 @@ export default function ProductCard({ product }: { product: Product }) {
 
             {/* Content */}
             <div className="p-6 flex-1 flex flex-col">
-                <div className="text-xs text-primary font-bold mb-2 uppercase tracking-wide">Age {product.age} Years</div>
+                {product.age ? (
+                    <div className="text-xs text-primary font-bold mb-2 uppercase tracking-wide">Age {product.age} Years</div>
+                ) : null}
                 <h3 className="font-bold text-foreground text-lg mb-2 group-hover:text-primary transition-colors line-clamp-2 font-display">
                     <Link href={`/product/${product.id}`}>{product.name}</Link>
                 </h3>
 
-                <div className="flex items-center mb-4 gap-1">
-                    <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`w-3.5 h-3.5 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-200"}`} />
-                        ))}
+                {product.rating !== undefined && (
+                    <div className="flex items-center mb-4 gap-1">
+                        <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                                <Star key={i} className={`w-3.5 h-3.5 ${i < Math.floor(product.rating || 0) ? "text-yellow-400 fill-yellow-400" : "text-gray-200"}`} />
+                            ))}
+                        </div>
+                        {product.reviews !== undefined ? (
+                            <span className="text-xs text-muted-foreground font-medium ml-2">({product.reviews})</span>
+                        ) : null}
                     </div>
-                    <span className="text-xs text-muted-foreground font-medium ml-2">({product.reviews})</span>
-                </div>
+                )}
 
                 <div className="mt-auto flex items-center justify-between pt-4 border-t border-muted/40">
                     <div className="flex items-baseline gap-2">

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/store/authStore';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -10,11 +11,14 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const login = useAuth((state) => state.login);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         // Simulate login delay
         setTimeout(() => {
+            login(email);
             setIsLoading(false);
             router.push('/profile');
         }, 1000);

@@ -44,6 +44,23 @@ Analyze each repository and categorize templates into:
 
 ---
 
+## 🚀 Unified Storefront Solution (NEW)
+
+To avoid running each template manually, we use the **Orbit Storefront Hub**. This is a single Next.js application that intelligently serves the correct theme for every merchant.
+
+### 🔌 The Orbit API Bridge
+Every template has been injected with a standard `lib/orbit-api.ts`. This file connects the template's UI to the merchant's real product catalog.
+
+### 🌍 The Storefront Hub
+Located at `templates/orbit_storefront_hub`, this app is the only thing you need to run. It handles routing for all 13 categories.
+
+**How to run everything at once:**
+1. Start Backend: `cd backend && npm run dev` (Port 5000)
+2. Start Admin: `cd orbit_admin && npm run dev` (Port 3001)
+3. Start Storefront Hub: `cd templates/orbit_storefront_hub && npm run dev` (Port 3000)
+
+---
+
 ## 🏗️ Implementation Phases
 
 ## PHASE 1: Repository Analysis & Setup

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCart } from '@/context/CartContext';
+import { useCart } from '../../context/CartContext';
 import styles from './cart.module.css'; // We'll need to create this or use inline styles for now
 import Image from 'next/image';
 import Link from 'next/link';

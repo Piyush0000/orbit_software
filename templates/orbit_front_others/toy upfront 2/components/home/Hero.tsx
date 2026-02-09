@@ -1,17 +1,17 @@
-"use client";
-
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { useStore } from "@/context/StoreContext";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Hero() {
-    const { store, customization } = useStore();
-    
-    const heroTitle = customization?.heroSection?.title || "Play, Learn, & Grow Together";
-    const heroSubtitle = customization?.heroSection?.subtitle || "Discover the safest, most engaging toys designed to spark creativity and joy in every child.";
-    const ctaText = customization?.heroSection?.cta || "Shop Now";
-    const heroImage = customization?.heroSection?.image || "/hero-image.jpg";
-
+    const { customization } = useStorefront();
+    const hero = customization?.heroSection || {};
+    const heroBadge = hero.badge || "Making childhood magical";
+    const heroTitle = hero.title || "Play, Learn, &";
+    const heroSubtitle = hero.subtitle || "Grow Together";
+    const heroDescription =
+        hero.description ||
+        "Discover the safest, most engaging toys designed to spark creativity and joy in every child. From educational puzzles to outdoor fun!";
+    const heroImage = hero.image || hero.imageUrl || "/hero-image.jpg";
     return (
         <section className="relative overflow-hidden bg-gradient-to-br from-[#FFF9F5] via-[#FFF0E5] to-[#E0C3FC]/20 pt-12 pb-24 lg:pt-24 lg:pb-40">
             {/* Soft decorative blob */}
@@ -19,47 +19,37 @@ export default function Hero() {
 
             <div className="container mx-auto px-4 relative z-10">
                 <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-                    {/* Text Content - Dynamic */}
+                    {/* Text Content */}
                     <div className="flex-1 text-center lg:text-left">
                         <div className="inline-flex items-center gap-2 px-4 py-2 lg:px-6 lg:py-2.5 mb-6 lg:mb-8 rounded-full bg-white/60 backdrop-blur-md border border-orange-100 text-secondary font-bold text-xs lg:text-sm shadow-[0_4px_10px_rgba(0,0,0,0.03)] animate-fade-in-up">
                             <span className="text-xl">✨</span>
-                            <span className="tracking-wide">{store?.name || "Making childhood magical"}</span>
+                            <span className="tracking-wide">{heroBadge}</span>
                         </div>
                         <h1 className="text-4xl lg:text-7xl font-extrabold text-foreground mb-6 lg:mb-8 font-display leading-[1.1] tracking-tight">
-                            {heroTitle.split('&').length > 1 ? (
-                                <>
-                                    {heroTitle.split('&')[0]} & <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                                        {heroTitle.split('&')[1]}
-                                    </span>
-                                </>
-                            ) : (
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                                    {heroTitle}
-                                </span>
-                            )}
+                            {heroTitle} <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{heroSubtitle}</span>
                         </h1>
                         <p className="text-base lg:text-xl text-foreground/70 mb-8 lg:mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-                            {heroSubtitle}
+                            {heroDescription}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                             <Link
                                 href="/category/all"
                                 className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary rounded-full hover:bg-[#7ED890] transition-all shadow-[0_10px_30px_rgba(136,212,152,0.4)] hover:shadow-[0_15px_35px_rgba(136,212,152,0.5)] transform hover:-translate-y-1 active:scale-95"
                             >
-                                {ctaText}
+                                {hero.ctaText || "Shop Now"}
                                 <ArrowRight className="ml-2 w-5 h-5" />
                             </Link>
                             <Link
                                 href="/category/new-arrivals"
                                 className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-foreground/80 bg-white border-2 border-white shadow-sm rounded-full hover:border-secondary/20 hover:bg-secondary/5 transition-all hover:-translate-y-1"
                             >
-                                New Arrivals 🎁
+                                {hero.secondaryCtaText || "New Arrivals 🎁"}
                             </Link>
                         </div>
                     </div>
 
-                    {/* Hero Image / Illustration - Dynamic */}
+                    {/* Hero Image / Illustration */}
                     <div className="flex-1 relative w-full max-w-[320px] lg:max-w-xl animate-float">
                         <div className="relative aspect-square rounded-[2rem] lg:rounded-[3rem] bg-white p-3 lg:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.05)] rotate-2 hover:rotate-0 transition-transform duration-500">
                             {/* Decorative elements */}
@@ -71,7 +61,7 @@ export default function Hero() {
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={heroImage}
-                                    alt={store?.name || "Store hero"}
+                                    alt={heroTitle}
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                                 />
                             </div>

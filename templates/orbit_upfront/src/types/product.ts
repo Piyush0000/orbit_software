@@ -1,12 +1,12 @@
 export interface Product {
-    id: number;
+    id: string | number;
     name: string;
     price: string;
     priceNum: number;
     image: string;
     description: string;
     category: string;
-    brand: string;
+    brand?: string;
     // Enhanced properties for filtering and sorting
     tags?: string[];
     rating?: number;
@@ -24,11 +24,12 @@ export interface Product {
     shortDescription?: string;
     features?: string[];
     images?: string[];
+    isFeatured?: boolean;
 }
 
 export interface Review {
     id: number;
-    productId: number;
+    productId: string | number;
     userName: string;
     rating: number; // 1-5
     title: string;
@@ -49,7 +50,7 @@ export interface Answer {
 
 export interface Question {
     id: number;
-    productId: number;
+    productId: string | number;
     user: string;
     text: string;
     date: Date;
@@ -57,7 +58,7 @@ export interface Question {
 }
 
 export interface CartItem {
-    id: number;
+    id: string | number;
     name: string;
     price: string;
     priceNum: number; // Numeric price for calculations

@@ -1,4 +1,5 @@
 const { prisma } = require('../config/database');
+const { invalidateStoreCustomization } = require('../services/cacheService');
 
 const resolveStoreId = async (req) => {
   if (req.params.storeId) return req.params.storeId;
@@ -47,14 +48,32 @@ const updateCustomization = async (req, res, next) => {
     }
 
     const updateData = req.body;
+    const createData = {
+      storeId,
+      keywords: Array.isArray(updateData.keywords) ? updateData.keywords : [],
+      ...updateData
+    };
     const customization = await prisma.websiteCustomization.upsert({
       where: { storeId },
       update: updateData,
-      create: { storeId, ...updateData }
+      create: createData
+    });
+
+    // Invalidate Cache
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { subdomain: true, userId: true }
+    });
+    
+    await invalidateStoreCustomization({
+      storeId,
+      subdomain: store?.subdomain,
+      userId: store?.userId || req.user?.id
     });
 
     res.json({ customization });
   } catch (error) {
+    console.error('Update Customization Error:', error);
     next(error);
   }
 };

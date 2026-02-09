@@ -1,17 +1,29 @@
 "use client";
-
-import Image from "next/image";
 import Link from "next/link";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Hero() {
+    const { customization } = useStorefront();
+
     return (
         <section className="relative w-full min-h-[90vh] flex items-center overflow-hidden bg-contrast-black">
             {/* Background with luxury texture overlay - Reduced Opacity for Clean Look */}
-            <div className="absolute inset-0 opacity-40">
-                {/* Abstract gradient flow */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-contrast-black to-contrast-black" />
-                <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-b from-gold-500/5 to-transparent blur-3xl rounded-full" />
-            </div>
+            {customization?.hero?.backgroundImage ? (
+                <div className="absolute inset-0 opacity-40">
+                     {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                        src={customization.hero.backgroundImage} 
+                        alt="Background" 
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+            ) : (
+                <div className="absolute inset-0 opacity-40">
+                    {/* Abstract gradient flow */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-contrast-black to-contrast-black" />
+                    <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-b from-gold-500/5 to-transparent blur-3xl rounded-full" />
+                </div>
+            )}
 
             {/* Content Container - Asymmetric Layout */}
             <div className="relative z-10 container mx-auto px-4 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
@@ -24,27 +36,30 @@ export default function Hero() {
                         </p>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white font-thin leading-[1.05] tracking-tight">
-                        Discover <span className="block italic text-gold-200 font-light opacity-90">Elegance</span>
-                        in Every Drop
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white font-thin leading-[1.05] tracking-tight uppercase">
+                        {customization?.hero?.title?.split(' ').map((word, i) => (
+                             <span key={i} className={i === 1 ? "block italic text-gold-200 font-light opacity-90" : ""}>
+                               {word}{' '}
+                             </span>
+                        )) || (<>Discover <span className="block italic text-gold-200 font-light opacity-90">Elegance</span> in Every Drop</>)}
                     </h1>
 
                     <p className="text-gray-400 max-w-lg text-lg font-light leading-relaxed border-l border-gold-500/50 pl-6 py-1">
-                        Experience the essence of sophistication with our curated collection. Find the scent that defines your presence.
+                        {customization?.hero?.subtitle || "Experience the essence of sophistication with our curated collection. Find the scent that defines your presence."}
                     </p>
 
                     <div className="flex flex-wrap gap-5 pt-2">
                         <Link
-                            href="/men"
-                            className="w-40 py-4 bg-white text-black text-xs uppercase tracking-widest font-bold hover:bg-gold-500 hover:text-white transition-all duration-500 rounded-full shadow-xl hover:shadow-gold-500/10 text-center flex items-center justify-center"
+                            href={customization?.hero?.ctaLink || "/shop"}
+                            className="w-48 py-4 bg-white text-black text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-gold-500 hover:text-white transition-all duration-500 rounded-full shadow-xl hover:shadow-gold-500/10 text-center flex items-center justify-center"
                         >
-                            Shop Men
+                            {customization?.hero?.ctaText || "Shop Collection"}
                         </Link>
                         <Link
-                            href="/women"
-                            className="w-40 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-white text-xs uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-all duration-500 rounded-full text-center flex items-center justify-center"
+                            href="/shop?category=women"
+                            className="w-48 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-white text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-white hover:text-black transition-all duration-500 rounded-full text-center flex items-center justify-center"
                         >
-                            Shop Women
+                            Explore Scents
                         </Link>
                     </div>
                 </div>
@@ -54,24 +69,23 @@ export default function Hero() {
                     {/* Glassmorphism Card Effect - Reduced Rotation for Stability */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-[3rem] border border-white/5 backdrop-blur-sm transform rotate-1 flex items-center justify-center overflow-hidden z-0">
                         <div className="absolute inset-0 bg-black/50 z-10" />
-                        <Image
-                            src="https://images.unsplash.com/photo-1594035910387-fea4779426e9?q=80&w=1000&auto=format&fit=crop"
-                            alt="Luxury Perfume"
-                            fill
-                            className="object-cover opacity-60 grayscale-[30%]"
-                            priority
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                            src="https://images.unsplash.com/photo-1594035910387-fea4779426e9?q=80&w=1000&auto=format&fit=crop" 
+                            alt="Luxury Perfume" 
+                            className="w-full h-full object-cover opacity-60 grayscale-[30%]"
                         />
                     </div>
                     <div className="absolute inset-6 bg-black/30 rounded-[2.5rem] border border-white/10 backdrop-blur-xl transform -rotate-1 flex items-center justify-center overflow-hidden shadow-2xl z-20 hover:scale-[1.02] transition-transform duration-700">
-                        <Image
-                            src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1000&auto=format&fit=crop"
-                            alt="Scent of the Year"
-                            fill
-                            className="object-cover opacity-90 transition-transform duration-700 hover:scale-105"
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                            src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1000&auto=format&fit=crop" 
+                            alt="Scent of the Year" 
+                            className="w-full h-full object-cover opacity-90 transition-transform duration-700 hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
                         <div className="relative z-10 text-center p-12 mt-auto">
-                            <p className="text-gold-200 text-xs tracking-[0.4em] uppercase mb-4 font-bold drop-shadow-md opacity-80">Collection</p>
+                            <p className="text-gold-200 text-[10px] tracking-[0.4em] uppercase mb-4 font-bold drop-shadow-md opacity-80">Collection</p>
                             <h3 className="text-5xl font-serif text-white font-medium italic drop-shadow-xl tracking-wide">Signature</h3>
                         </div>
                     </div>
@@ -79,7 +93,7 @@ export default function Hero() {
             </div>
 
             {/* Decorative gradient at bottom - Smoother transition */}
-            <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background via-background/60 to-transparent z-0" />
+            <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black via-black/60 to-transparent z-0" />
         </section>
     );
 }

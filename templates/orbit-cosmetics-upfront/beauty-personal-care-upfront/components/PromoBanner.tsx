@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function PromoBanner() {
     return (
@@ -33,9 +34,11 @@ export function PromoBanner() {
                     </div>
                 </div>
 
-                <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-6 rounded-full shadow-lg hover:shadow-primary/25">
-                    Shop the Sale
-                </Button>
+                <Link href="/shop">
+                    <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-6 rounded-full shadow-lg hover:shadow-primary/25">
+                        Shop the Sale
+                    </Button>
+                </Link>
             </div>
         </section>
     );

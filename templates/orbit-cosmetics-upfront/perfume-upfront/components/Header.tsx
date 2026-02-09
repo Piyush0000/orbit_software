@@ -1,21 +1,10 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Heart, ShoppingBag, User, Menu, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
-
-
-const NAV_LINKS = [
-    { href: "/men", label: "Men" },
-    { href: "/women", label: "Women" },
-    { href: "/unisex", label: "Unisex" },
-    { href: "/luxury", label: "Luxury Collection" },
-    { href: "/new-arrivals", label: "New Arrivals" },
-    { href: "/gift-sets", label: "Gift Sets" },
-    { href: "/sale", label: "Sale", highlight: true },
-];
+import { useStorefront } from "@/context/StorefrontContext";
 
 const ANNOUNCEMENTS = [
     "100% Authentic Perfumes",
@@ -28,7 +17,8 @@ export default function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [announcementIndex, setAnnouncementIndex] = useState(0);
-    const { cartCount } = useCart();
+    const { cartCount, setIsCartOpen } = useCart();
+    const { customization, store } = useStorefront();
 
     // Handle scroll for sticky header proper styling
     useEffect(() => {
@@ -47,6 +37,14 @@ export default function Header() {
         return () => clearInterval(interval);
     }, []);
 
+    const navLinks = customization?.navbar?.links?.length ? customization.navbar.links : [
+        { label: "Men", url: "/shop?category=men" },
+        { label: "Women", url: "/shop?category=women" },
+        { label: "Unisex", url: "/shop?category=unisex" },
+        { label: "Luxury Collection", url: "/shop?tag=luxury" },
+        { label: "New Arrivals", url: "/shop?sort=newest" },
+    ];
+
     return (
         <>
             <header
@@ -61,26 +59,29 @@ export default function Header() {
                     <div className="flex items-center justify-between">
                         {/* Logo */}
                         <div className="flex flex-col">
-                            <Link href="/" className="text-2xl lg:text-3xl font-serif font-bold tracking-tight">
-                                PERFUME UPFRONT
+                            <Link href="/" className="text-2xl lg:text-3xl font-serif font-bold tracking-tight text-white uppercase">
+                                {store?.logo ? (
+                                    /* eslint-disable-next-line @next/next/no-img-element */
+                                    <img src={store.logo} alt={store.name} style={{ height: customization?.navbar?.logoHeight || '40px' }} />
+                                ) : (
+                                    store?.name || "PERFUME UPFRONT"
+                                )}
                             </Link>
-                            <span className="text-[10px] uppercase tracking-widest text-gray-500 hidden sm:block">
-                                Signature Scents for Every Moment
-                            </span>
+                            {!store?.logo && (
+                                <span className="text-[10px] uppercase tracking-widest text-gray-500 hidden sm:block">
+                                    {store?.description || "Signature Scents for Every Moment"}
+                                </span>
+                            )}
                         </div>
 
                         {/* Desktop Navigation */}
                         <nav className="hidden lg:flex items-center gap-6">
-                            {NAV_LINKS.map((link) => (
+                            {navLinks.map((link) => (
                                 <Link
-                                    key={link.href}
-                                    href={link.href}
+                                    key={link.url}
+                                    href={link.url}
                                     className={cn(
-                                        "text-sm font-medium uppercase tracking-wide transition-all duration-300",
-                                        // @ts-ignore
-                                        link.highlight
-                                            ? "px-4 py-2 bg-white text-black font-bold hover:bg-gold-500 hover:text-white rounded-sm"
-                                            : "text-white/80 hover:text-gold-400"
+                                        "text-xs font-medium uppercase tracking-widest transition-all duration-300 text-white/80 hover:text-gold-400"
                                     )}
                                 >
                                     {link.label}
@@ -93,10 +94,10 @@ export default function Header() {
                             <button className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Search">
                                 <Search className="w-5 h-5" />
                             </button>
-                            <button className="p-2 hover:bg-white/10 rounded-full transition-colors hidden sm:block" aria-label="Wishlist">
-                                <Heart className="w-5 h-5" />
-                            </button>
-                            <Link href="/cart" className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Cart">
+                            <Link href="/cart" className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Cart" onClick={(e) => {
+                                e.preventDefault();
+                                setIsCartOpen(true);
+                            }}>
                                 <div className="relative">
                                     <ShoppingBag className="w-5 h-5" />
                                     {cartCount > 0 && (
@@ -129,7 +130,7 @@ export default function Header() {
                     isScrolled ? "top-[60px]" : "top-[75px] lg:top-[85px]"
                 )}
             >
-                <p className="text-xs font-medium tracking-widest uppercase animate-fade-in">
+                <p className="text-[10px] font-medium tracking-[0.2em] uppercase animate-fade-in text-gold-300">
                     {ANNOUNCEMENTS[announcementIndex]}
                 </p>
             </div>
@@ -141,14 +142,12 @@ export default function Header() {
             {mobileMenuOpen && (
                 <div className="fixed inset-0 z-40 bg-[#050505] pt-24 px-6 lg:hidden animate-fade-in">
                     <nav className="flex flex-col gap-6">
-                        {NAV_LINKS.map((link) => (
+                        {navLinks.map((link) => (
                             <Link
-                                key={link.href}
-                                href={link.href}
+                                key={link.url}
+                                href={link.url}
                                 className={cn(
-                                    "text-lg font-medium border-b border-white/10 pb-4 flex justify-between items-center transition-colors",
-                                    // @ts-ignore
-                                    link.highlight ? "text-gold-400" : "text-white/90"
+                                    "text-sm font-medium border-b border-white/10 pb-4 flex justify-between items-center transition-colors text-white/90 uppercase tracking-widest"
                                 )}
                                 onClick={() => setMobileMenuOpen(false)}
                             >
@@ -156,20 +155,6 @@ export default function Header() {
                                 <ChevronDown className="-rotate-90 w-4 h-4 text-white/40" />
                             </Link>
                         ))}
-                        <div className="flex gap-4 mt-8 justify-center border-t border-white/10 pt-8">
-                            <Link href="/account" className="flex flex-col items-center gap-2 text-xs uppercase text-white/80" onClick={() => setMobileMenuOpen(false)}>
-                                <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center border border-white/10">
-                                    <User className="w-5 h-5" />
-                                </div>
-                                Account
-                            </Link>
-                            <Link href="/wishlist" className="flex flex-col items-center gap-2 text-xs uppercase text-white/80" onClick={() => setMobileMenuOpen(false)}>
-                                <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center border border-white/10">
-                                    <Heart className="w-5 h-5" />
-                                </div>
-                                Wishlist
-                            </Link>
-                        </div>
                     </nav>
                 </div>
             )}

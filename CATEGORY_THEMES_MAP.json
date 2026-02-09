@@ -48,6 +48,12 @@
           "path": "templates/orbit_upfront",
           "port": 3006,
           "default": true
+        },
+        {
+          "value": "electronics_theme2",
+          "label": "Electronics Store - Theme 2",
+          "path": "templates/orbit_front_electronics/electronics-upfront-theme-2",
+          "port": 3018
         }
       ]
     },
@@ -56,9 +62,21 @@
         {
           "value": "food_main",
           "label": "Food & Beverage - Provision & Co.",
-          "path": "templates/orbit_front_all",
+          "path": "templates/orbit_front_all/theme-1",
           "port": 3007,
           "default": true
+        },
+        {
+          "value": "food_theme2",
+          "label": "Food & Beverage - Theme 2",
+          "path": "templates/orbit_front_all/theme-2",
+          "port": 3019
+        },
+        {
+          "value": "food_theme3",
+          "label": "Food & Beverage - Theme 3",
+          "path": "templates/orbit_front_all/theme-3",
+          "port": 3020
         }
       ]
     },
@@ -114,6 +132,17 @@
           "label": "Furniture & Home - Natural",
           "path": "templates/orbit-cosmetics-upfront/furniture-upfront",
           "port": 3011,
+          "default": true
+        }
+      ]
+    },
+    "Jewellery": {
+      "themes": [
+        {
+          "value": "jewellery_main",
+          "label": "Jewellery Store - Luxury",
+          "path": "templates/orbit_front_jewellery",
+          "port": 3017,
           "default": true
         }
       ]

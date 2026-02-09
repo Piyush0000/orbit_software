@@ -1,8 +1,11 @@
 "use client";
 
 import { Send, Mail } from "lucide-react";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Newsletter() {
+    const { customization } = useStorefront();
+    const newsletter = customization?.newsletter || {};
     return (
         <section className="relative py-24 overflow-hidden">
             {/* Background with gradient and blob */}
@@ -16,10 +19,11 @@ export default function Newsletter() {
                     </div>
 
                     <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6 font-display">
-                        Join Our Happy Family!
+                        {newsletter.title || "Join Our Happy Family!"}
                     </h2>
                     <p className="text-xl text-white/90 mb-10 font-medium">
-                        Get expert parenting tips, fun activity ideas, and exclusive offers delivered straight to your inbox. No spam, just joy! ✨
+                        {newsletter.subtitle ||
+                            "Get expert parenting tips, fun activity ideas, and exclusive offers delivered straight to your inbox. No spam, just joy! ✨"}
                     </p>
 
                     <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto" onSubmit={(e) => e.preventDefault()}>
@@ -29,12 +33,12 @@ export default function Newsletter() {
                             className="flex-1 px-6 py-4 rounded-full bg-white/95 text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-accent/50 shadow-lg text-lg"
                         />
                         <button className="px-8 py-4 bg-foreground text-white font-bold rounded-full hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-2 text-lg">
-                            Subscribe <Send className="w-5 h-5" />
+                            {newsletter.buttonText || "Subscribe"} <Send className="w-5 h-5" />
                         </button>
                     </form>
 
                     <p className="mt-6 text-white/70 text-sm">
-                        By subscribing, you agree to our Terms & Conditions.
+                        {newsletter.terms || "By subscribing, you agree to our Terms & Conditions."}
                     </p>
                 </div>
             </div>

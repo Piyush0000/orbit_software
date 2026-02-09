@@ -14,6 +14,7 @@ import {
   HelpCircleIcon,
   LayoutDashboardIcon,
   ListIcon,
+  PackageIcon,
   MessageSquare,
   MessageSquareMore,
   Palette,
@@ -94,6 +95,16 @@ const data = {
       title: "Merchants",
       url: "/dashboard/merchants",
       icon: UsersIcon,
+    },
+    {
+      title: "Orders",
+      url: "/dashboard/orders",
+      icon: PackageIcon,
+    },
+    {
+      title: "Products",
+      url: "/dashboard/products",
+      icon: FileTextIcon,
     },
   ],
   navClouds: [

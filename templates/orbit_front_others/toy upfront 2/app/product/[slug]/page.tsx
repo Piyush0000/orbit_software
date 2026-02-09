@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Star, ShieldCheck, Heart, Share2, Truck, RefreshCcw, Package, User, HelpCircle } from "lucide-react";
 import ProductCard from "@/components/ui/ProductCard";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
-import { products } from "@/lib/data";
+import { useStorefront } from "@/context/StorefrontContext";
 import { useParams } from "next/navigation";
 import confetti from "canvas-confetti";
 
@@ -13,7 +13,9 @@ export default function ProductPage() {
     const params = useParams();
     const slug = params?.slug as string;
 
-    const product = products.find(p => p.id === slug) || products[0];
+    const { products, refreshProduct, loading } = useStorefront();
+    const [product, setProduct] = useState(products[0]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
@@ -21,7 +23,30 @@ export default function ProductPage() {
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { addToCart } = useCart();
 
-    const images = product.images || [product.image || "/images/placeholder.png"];
+    useEffect(() => {
+        let active = true;
+        const localMatch = products.find((item) => String(item.id) === slug);
+        if (localMatch) {
+            setProduct(localMatch);
+            setIsLoading(false);
+            return () => {
+                active = false;
+            };
+        }
+
+        setIsLoading(true);
+        refreshProduct(slug).then((fresh) => {
+            if (!active) return;
+            if (fresh) setProduct(fresh);
+            setIsLoading(false);
+        });
+
+        return () => {
+            active = false;
+        };
+    }, [products, refreshProduct, slug]);
+
+    const images = product?.images || [product?.image || "/images/placeholder.png"];
 
     const isWishlisted = isInWishlist(product.id);
 
@@ -95,7 +120,8 @@ export default function ProductPage() {
         }
     ];
 
-    if (!product) return <div>Product not found</div>;
+    if (loading || isLoading) return <div className="container mx-auto px-4 py-12">Loading product...</div>;
+    if (!product) return <div className="container mx-auto px-4 py-12">Product not found</div>;
 
     return (
         <div className="bg-white pb-20">

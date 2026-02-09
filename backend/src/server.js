@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
+const { publicLimiter, dashboardLimiter } = require('./middleware/rateLimit');
 const env = require('./config/env');
 const { connectMongo } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
@@ -30,12 +30,10 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100
-  })
-);
+app.use('/api/storefront/public', publicLimiter);
+app.use('/api/public', publicLimiter);
+app.use('/api/products', dashboardLimiter);
+app.use('/api/website', dashboardLimiter);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/app-auth', appAuthRoutes);

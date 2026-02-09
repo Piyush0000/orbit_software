@@ -5,20 +5,31 @@ import Link from 'next/link';
 import ProductsDropdown from './ProductsDropdown';
 import MegaMenu from './MegaMenu';
 import ProfileDropdown from './ProfileDropdown';
+import { useStorefront } from '@/contexts/StorefrontContext';
 import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
-import { useStore } from '@/contexts/StoreContext';
 
 export default function Header() {
+  const { store, customization, categories } = useStorefront();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
+  const [activeCategories, setActiveCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (categories && categories.length > 0) {
+      setActiveCategories(categories);
+    } else {
+      setActiveCategories(['Men', 'Women', 'Kids']);
+    }
+  }, [categories]);
+
+  const shopName = store?.name || 'Upfront';
   const [isScrolled, setIsScrolled] = useState(false);
   const productsRef = useRef<HTMLDivElement>(null);
   const { getTotalItems } = useCart();
   const { wishlist } = useWishlist();
-  const { store } = useStore();
   const cartItemCount = getTotalItems();
   const wishlistCount = wishlist.length;
 
@@ -77,13 +88,13 @@ export default function Header() {
             {/* Logo */}
             <div className="flex-shrink-0 mr-12 flex items-center">
               <Link href="/" className="text-4xl font-heading font-medium tracking-tighter text-black uppercase">
-                {store?.name || "Store"}
+                {shopName}
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-10 h-full">
-              {['Men', 'Women', 'Kids'].map((category) => (
+              {activeCategories.slice(0, 5).map((category) => (
                 <Link
                   key={category}
                   href={`/products?category=${category}`}

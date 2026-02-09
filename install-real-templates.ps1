@@ -8,11 +8,15 @@ $templates = @(
     @{Name="Toys (Main)"; Path="templates\orbit_front_others\toy upfront 2"},
     @{Name="Fashion"; Path="templates\orbit_front_others\fashion_upfront_2"},
     @{Name="Electronics"; Path="templates\orbit_upfront"},
-    @{Name="Food & Beverage"; Path="templates\orbit_front_all"},
+    @{Name="Electronics (Theme 2)"; Path="templates\orbit_front_electronics\electronics-upfront-theme-2"},
+    @{Name="Food & Beverage (Theme 1)"; Path="templates\orbit_front_all\theme-1"},
+    @{Name="Food & Beverage (Theme 2)"; Path="templates\orbit_front_all\theme-2"},
+    @{Name="Food & Beverage (Theme 3)"; Path="templates\orbit_front_all\theme-3"},
     @{Name="Footwear"; Path="templates\orbit_front_others\FOOTWEAR UPFRONT"},
     @{Name="Perfume"; Path="templates\orbit-cosmetics-upfront\perfume-upfront"},
     @{Name="Beauty"; Path="templates\orbit-cosmetics-upfront\beauty-personal-care-upfront"},
-    @{Name="Furniture"; Path="templates\orbit-cosmetics-upfront\furniture-upfront"}
+    @{Name="Furniture"; Path="templates\orbit-cosmetics-upfront\furniture-upfront"},
+    @{Name="Jewellery"; Path="templates\orbit_front_jewellery"}
 )
 
 $installed = 0

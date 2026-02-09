@@ -1,14 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function AnnouncementBar() {
-  const announcements = [
-    "🎉 Free Shipping on Orders Over ₹999!",
-    "🚀 New Robot Kits Just Arrived - Shop Now",
-    "🎁 Get 10% Off Your First Order with Code: TOY10"
-  ];
+  const { customization } = useStorefront();
+  const announcements = useMemo(() => {
+    const custom = customization?.announcementBar as Record<string, string> | undefined;
+    if (custom?.text) return [custom.text];
+    return [
+      "🎉 Free Shipping on Orders Over ₹999!",
+      "🚀 New Robot Kits Just Arrived - Shop Now",
+      "🎁 Get 10% Off Your First Order with Code: TOY10"
+    ];
+  }, [customization]);
 
   const [current, setCurrent] = useState(0);
 
@@ -20,7 +26,13 @@ export default function AnnouncementBar() {
   }, [announcements.length]);
 
   return (
-    <div className="bg-gray-900 text-white text-xs md:text-sm font-medium py-2 relative overflow-hidden">
+    <div
+      className="text-xs md:text-sm font-medium py-2 relative overflow-hidden"
+      style={{
+        backgroundColor: (customization?.announcementBar as Record<string, string>)?.backgroundColor || "#111827",
+        color: (customization?.announcementBar as Record<string, string>)?.textColor || "#ffffff"
+      }}
+    >
       <div className="container mx-auto px-4 flex items-center justify-center relative z-10">
         <button
           onClick={() => setCurrent((prev) => (prev - 1 + announcements.length) % announcements.length)}

@@ -1,18 +1,12 @@
-'use client';
-
 import Link from 'next/link';
 import styles from './Footer.module.css';
-import { useStore } from '@/contexts/StoreContext';
 
 export function Footer() {
-    const { store } = useStore();
-    const storeName = store?.name || 'Store';
-
     return (
         <footer className={styles.footer}>
             <div className={styles.container}>
                 <div className={`${styles.column} ${styles.brandColumn}`}>
-                    <h3>{storeName}</h3>
+                    <h3>Upfront</h3>
                     <p>
                         Premium footwear designed for performance and style.
                         Walk your way with confidence.
@@ -49,7 +43,7 @@ export function Footer() {
             </div>
 
             <div className={styles.bottom}>
-                &copy; {new Date().getFullYear()} {storeName}. All rights reserved.
+                &copy; {new Date().getFullYear()} Upfront Footwear. All rights reserved.
             </div>
         </footer>
     );

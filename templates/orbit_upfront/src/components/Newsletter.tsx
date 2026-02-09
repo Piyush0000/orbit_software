@@ -1,4 +1,20 @@
+'use client';
+
+import { useStorefront } from '@/contexts/StorefrontContext';
+
 export default function Newsletter() {
+    const { store, customization } = useStorefront();
+    const newsletter = (customization?.newsletter || {}) as Record<string, string>;
+    const title = newsletter.title || `Get 10% Off Your First Order`;
+    const highlight = newsletter.highlight || '10% Off';
+    const [titleBefore, titleAfter] = title.includes(highlight)
+        ? title.split(highlight)
+        : [title, ''];
+    const subtitle = newsletter.subtitle || 'Subscribe to our newsletter to receive exclusive offers, latest news and updates.';
+    const badge = newsletter.badge || 'STAY UPDATED';
+    const buttonText = newsletter.buttonText || 'Subscribe';
+    const terms = newsletter.terms || `By subscribing you agree to our Privacy Policy`;
+
     return (
         <section className="bg-black text-white py-20 relative overflow-hidden">
             {/* Abstract shapes/glow just for visual interest */}
@@ -10,13 +26,15 @@ export default function Newsletter() {
 
                     <div className="lg:w-1/2 text-center lg:text-left">
                         <span className="inline-block py-1 px-3 rounded-full bg-white/10 border border-white/20 text-[#E7F874] text-sm font-bold mb-4">
-                            STAY UPDATED
+                            {badge}
                         </span>
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                            Get <span className="text-[#E7F874]">10% Off</span> Your First Order
+                            {titleBefore}
+                            <span className="text-[#E7F874]">{highlight}</span>
+                            {titleAfter}
                         </h2>
                         <p className="text-gray-400 text-lg max-w-md mx-auto lg:mx-0">
-                            Subscribe to our newsletter to receive exclusive offers, latest news and updates.
+                            {subtitle}
                         </p>
                     </div>
 
@@ -31,11 +49,12 @@ export default function Newsletter() {
                                 type="button"
                                 className="bg-[#E7F874] text-black font-bold py-4 px-8 rounded-full hover:bg-white hover:text-black transition-colors duration-300"
                             >
-                                Subscribe
+                                {buttonText}
                             </button>
                         </form>
                         <p className="text-gray-500 text-xs mt-4 text-center lg:text-left">
-                            By subscribing you agree to our <a href="#" className="underline hover:text-white">Privacy Policy</a>
+                            {terms.replace('Privacy Policy', '')}
+                            <a href="#" className="underline hover:text-white">Privacy Policy</a>
                         </p>
                     </div>
 

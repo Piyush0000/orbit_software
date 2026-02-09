@@ -42,6 +42,8 @@ export function OnboardingFunnel() {
             { key: "COMPLETED", label: "Completed" },
             { key: "BLOCKED", label: "Blocked" },
         ]
+        if (error) return stages.map(s => ({ stage: s.label, count: 0, percentage: 0, status: "pending" }));
+        
         return stages.map((stage) => {
             const count = statusSummary[stage.key] || 0
             const percentage = totalStores ? Math.round((count / totalStores) * 100) : 0
@@ -57,7 +59,7 @@ export function OnboardingFunnel() {
                             : "pending",
             }
         })
-    }, [statusSummary, totalStores])
+    }, [statusSummary, totalStores, error])
 
     return (
         <Card className="bg-card border-muted">

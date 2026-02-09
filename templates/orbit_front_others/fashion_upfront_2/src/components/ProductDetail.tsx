@@ -1,34 +1,21 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/store/cartStore';
-import { getProducts } from '@/lib/products-api';
-import { mapApiProducts } from '@/lib/product-adapter';
-import ProductReviews from '@/components/ProductReviews';
+import { useStorefront } from '@/contexts/StorefrontContext';
+import ProductReviews from '@/components/ProductReviews'; // Ensure this component handles string IDs if it uses them
+import { parseINRToNumber } from '@/lib/utils';
 
-export default function ProductDetail({ productId }: { productId: number }) {
-  const [products, setProducts] = useState<ReturnType<typeof mapApiProducts>>([]);
-  const [loading, setLoading] = useState(true);
+export default function ProductDetail({ productId }: { productId: string | number }) {
+  const { products, loading } = useStorefront();
+  const [product, setProduct] = useState<any>(null); // Use existing Product type if possible
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoading(true);
-        const apiProducts = await getProducts();
-        setProducts(mapApiProducts(apiProducts));
-      } catch (error) {
-        console.error('Failed to load products:', error);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
-  }, []);
-
-  const product = products.find(p => p.id === productId);
+    if (products.length > 0) {
+      // Loose comparison to handle string/number mismatch if any
+      const found = products.find(p => String(p.id) === String(productId));
+      setProduct(found || null);
+    }
+  }, [products, productId]);
 
   // Move hooks before the early return to comply with Rules of Hooks
   const { addToCart } = useCart();
@@ -38,18 +25,9 @@ export default function ProductDetail({ productId }: { productId: number }) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
-  // Safety check
-  if (loading) {
-    return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)' }}>Loading product...</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Fetching product details.</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="p-20 text-center">Loading product...</div>;
 
+  // Safety check
   if (!product) {
     return (
       <div className="py-8 px-4 sm:px-6 lg:px-8">
@@ -61,9 +39,8 @@ export default function ProductDetail({ productId }: { productId: number }) {
     );
   }
 
-  // Extract numeric price from string (remove ₹ and commas)
-  // Handle cases like "₹3,999" -> 3999, "₹12,449" -> 12449
-  const priceNum = parseInt(product.price.replace(/[₹,\s]/g, ''), 10) || 0;
+  // use priceNum from product if available, else parse
+  const priceNum = typeof product.priceNum === 'number' ? product.priceNum : parseINRToNumber(String(product.price));
 
   const handleQuantityChange = (delta: number) => {
     setQuantity(prev => {
@@ -75,14 +52,14 @@ export default function ProductDetail({ productId }: { productId: number }) {
   };
 
   const handleAddToCart = () => {
-    if ((product.sizes && !selectedSize) || (product.colors && !selectedColor)) {
+    if ((product.sizes && product.sizes.length > 0 && !selectedSize) || (product.colors && product.colors.length > 0 && !selectedColor)) {
       alert('Please select size and color');
       return;
     }
 
     // Create a descriptive string including variants
     const variantDescription = [
-      product.shortDescription,
+      product.description?.slice(0, 50) + '...', // Shorten description
       selectedSize ? `Size: ${selectedSize}` : '',
       selectedColor ? `Color: ${selectedColor}` : ''
     ].filter(Boolean).join(' | ');
@@ -90,7 +67,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: String(product.price),
       priceNum: priceNum,
       image: product.images ? product.images[0] : product.image,
       shortDescription: variantDescription,
@@ -102,7 +79,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
 
   const handleBuyNow = () => {
     // UI only - no backend logic
-    if ((product.sizes && !selectedSize) || (product.colors && !selectedColor)) {
+    if ((product.sizes && product.sizes.length > 0 && !selectedSize) || (product.colors && product.colors.length > 0 && !selectedColor)) {
       alert('Please select size and color');
       return;
     }
@@ -110,15 +87,12 @@ export default function ProductDetail({ productId }: { productId: number }) {
   };
 
   // Logic for Related Products:
-  // 1. Filter out current product
-  // 2. Match Category OR Tags
-  // 3. Limit to 4 suggestions
   const relatedProducts = products
     .filter(p => {
       if (p.id === product.id) return false;
       const sameCategory = p.category === product.category;
-      const matchingTags = p.tags?.some(tag => product.tags?.includes(tag));
-      return sameCategory || matchingTags;
+      // const matchingTags = p.tags?.some(tag => product.tags?.includes(tag)); // Optional
+      return sameCategory;
     })
     .slice(0, 4);
 

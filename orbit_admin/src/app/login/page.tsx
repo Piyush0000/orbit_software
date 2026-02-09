@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { loginAdmin } from "@/lib/admin-api";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  const [expired, setExpired] = useState<string | null>(null);
+  const [callback, setCallback] = useState<string | null>(null);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    setExpired(searchParams.get("expired"));
+    setCallback(searchParams.get("callback"));
+  }, []);
 
   const submit = async () => {
     setLoading(true);
     setError("");
     try {
       await loginAdmin(email, password);
-      router.push("/dashboard");
+      router.push(callback || "/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -32,6 +41,11 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Admin Login</CardTitle>
+          {expired && (
+            <p className="text-sm text-amber-600 bg-amber-50 p-2 rounded border border-amber-200 mt-2">
+              Your session has expired. Please log in again.
+            </p>
+          )}
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <Input

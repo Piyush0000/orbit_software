@@ -4,9 +4,12 @@ import { useState } from 'react';
 import { useCart } from '@/store/cartStore';
 import Link from 'next/link';
 import { formatINR } from '@/lib/utils';
+import { useStorefront } from '@/contexts/StorefrontContext';
+import { createOrder } from '@/lib/storefront-api';
 
 export default function Checkout() {
   const { cartItems, getSubtotal, clearCart, discount } = useCart();
+  const { store } = useStorefront();
   const subtotal = getSubtotal();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -20,6 +23,8 @@ export default function Checkout() {
     paymentMethod: 'cod'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -29,16 +34,53 @@ export default function Checkout() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError(null);
 
-    // UI only - simulate form submission
-    setTimeout(() => {
-      alert('Order placed successfully! (UI only - no backend)');
+    try {
+      if (!store?.id) {
+        throw new Error('Store not resolved. Please try again.');
+      }
+      const discountAmount = subtotal * discount;
+      const taxable = subtotal - discountAmount;
+      const tax = taxable * 0.18;
+      const shipping = 0;
+      const payload = {
+        storeId: store.id,
+        customerName: `${formData.firstName} ${formData.lastName}`.trim(),
+        customerEmail: formData.email,
+        shippingAddress: {
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode
+        },
+        billingAddress: {
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode
+        },
+        tax,
+        shipping,
+        items: cartItems.map((item) => ({
+          productId: String(item.id),
+          name: item.name,
+          quantity: item.quantity,
+          price: item.priceNum,
+          variantInfo: item.size ? { size: item.size } : undefined
+        }))
+      };
+
+      const { order } = await createOrder(payload);
+      setOrderNumber(order.orderNumber);
       clearCart();
-      setIsSubmitting(false);
-      // Reset form
       setFormData({
         firstName: '',
         lastName: '',
@@ -50,7 +92,11 @@ export default function Checkout() {
         zipCode: '',
         paymentMethod: 'cod'
       });
-    }, 1500);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to place order');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (cartItems.length === 0) {
@@ -405,6 +451,16 @@ export default function Checkout() {
                   </div>
                 </div>
 
+                {orderNumber && (
+                  <div className="mb-4 rounded-lg border px-4 py-3 text-sm" style={{ borderColor: 'var(--card-border)', color: 'var(--text)' }}>
+                    Order placed! Your order number is <strong>{orderNumber}</strong>.
+                  </div>
+                )}
+                {submitError && (
+                  <div className="mb-4 rounded-lg border px-4 py-3 text-sm text-red-600" style={{ borderColor: 'var(--card-border)' }}>
+                    {submitError}
+                  </div>
+                )}
                 <button
                   type="submit"
                   disabled={isSubmitting}

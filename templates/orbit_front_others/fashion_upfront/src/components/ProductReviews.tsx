@@ -5,13 +5,14 @@ import ReviewList from './reviews/ReviewList';
 import ProductQnA from './reviews/ProductQnA';
 
 interface ProductReviewsProps {
-    productId: number;
+    productId: number | string;
 }
 
 export default function ProductReviews({ productId }: ProductReviewsProps) {
-    const reviews = useMemo(() => getReviewsByProductId(productId), [productId]);
-    const questions = useMemo(() => getQuestionsByProductId(productId), [productId]);
-    const ratingStats = useMemo(() => getRatingStats(productId), [productId]);
+    const normalizedId = typeof productId === 'number' ? productId : Number(productId);
+    const reviews = useMemo(() => getReviewsByProductId(normalizedId), [normalizedId]);
+    const questions = useMemo(() => getQuestionsByProductId(normalizedId), [normalizedId]);
+    const ratingStats = useMemo(() => getRatingStats(normalizedId), [normalizedId]);
 
     return (
         <section className="py-12 border-t" style={{ borderColor: 'var(--card-border)' }}>

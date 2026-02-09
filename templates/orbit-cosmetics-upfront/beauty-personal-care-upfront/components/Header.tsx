@@ -4,28 +4,31 @@ import Link from "next/link";
 import { Search, ShoppingBag, User, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose, SheetDescription } from "@/components/ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { useStorefront } from "@/context/StorefrontContext";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 
 export function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
     const { cartCount, setIsCartOpen } = useCart();
+    const { customization, store } = useStorefront();
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-    // Add scroll event listener to toggle background style if needed
-    if (typeof window !== "undefined") {
-        window.addEventListener("scroll", () => {
+    useEffect(() => {
+        const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
-        });
-    }
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
-    const navLinks = [
-        { name: "Shop", href: "/shop" },
-        { name: "Best Sellers", href: "/#bestsellers" },
-        { name: "Concerns", href: "/concerns" },
-        { name: "About Us", href: "/about" },
+    const navLinks = customization?.navbar?.links?.length ? customization.navbar.links : [
+        { label: "Shop", url: "/shop" },
+        { label: "Best Sellers", url: "/#bestsellers" },
+        { label: "Concerns", url: "/concerns" },
+        { label: "About Us", url: "/about" },
     ];
 
     return (
@@ -44,29 +47,29 @@ export function Header() {
                             </SheetTrigger>
                             <SheetContent side="left" className="w-[300px] flex flex-col p-6">
                                 <SheetHeader className="text-left px-0">
-                                    <SheetTitle className="font-serif text-2xl font-bold">
-                                        LUMIÈRE<span className="text-primary">.</span>
+                                    <SheetTitle className="font-serif text-2xl font-bold uppercase">
+                                        {store?.name || "LUMIÈRE"}<span className="text-primary">.</span>
                                     </SheetTitle>
-                                    <SheetDescription className="text-xs text-muted-foreground">
-                                        Premium Beauty & Skincare
+                                    <SheetDescription className="text-xs text-muted-foreground capitalize">
+                                        {store?.description || "Premium Beauty & Skincare"}
                                     </SheetDescription>
                                 </SheetHeader>
 
                                 <nav className="flex flex-col gap-6 mt-10">
                                     {navLinks.map((link) => (
-                                        <SheetClose key={link.name} asChild>
+                                        <SheetClose key={link.label} asChild>
                                             <Link
-                                                href={link.href}
+                                                href={link.url}
                                                 className="text-lg font-medium hover:text-primary transition-colors border-b border-border/40 pb-2"
                                             >
-                                                {link.name}
+                                                {link.label}
                                             </Link>
                                         </SheetClose>
                                     ))}
                                 </nav>
 
                                 <div className="mt-auto pb-8 text-sm text-muted-foreground">
-                                    <p>© 2024 Lumière Beauty.</p>
+                                    <p>© 2024 {store?.name || "Lumière Beauty"}.</p>
                                 </div>
                             </SheetContent>
                         </Sheet>
@@ -74,16 +77,21 @@ export function Header() {
 
                     {/* Logo */}
                     <div className="flex-1 flex items-center justify-center md:justify-start md:flex-none">
-                        <Link href="/" className="text-2xl font-serif font-bold tracking-tighter text-foreground">
-                            LUMIÈRE<span className="text-primary">.</span>
+                        <Link href="/" className="text-2xl font-serif font-bold tracking-tighter text-foreground uppercase">
+                           {store?.logo ? (
+                               /* eslint-disable-next-line @next/next/no-img-element */
+                               <img src={store.logo} alt={store.name} style={{ height: customization?.navbar?.logoHeight || '40px' }} />
+                           ) : (
+                               <> {store?.name || "LUMIÈRE"}<span className="text-primary">.</span></>
+                           )}
                         </Link>
                     </div>
 
                     {/* Desktop Nav */}
                     <nav className="hidden md:flex gap-8 items-center">
                         {navLinks.map((link) => (
-                            <Link key={link.name} href={link.href} className="text-sm font-medium hover:text-primary transition-colors uppercase tracking-wide">
-                                {link.name}
+                            <Link key={link.label} href={link.url} className="text-sm font-medium hover:text-primary transition-colors uppercase tracking-wide">
+                                {link.label}
                             </Link>
                         ))}
                     </nav>
@@ -98,9 +106,11 @@ export function Header() {
                         >
                             <Search className="h-5 w-5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="hover:bg-secondary rounded-full">
-                            <User className="h-5 w-5" />
-                        </Button>
+                        <Link href="/login">
+                            <Button variant="ghost" size="icon" className="hover:bg-secondary rounded-full">
+                                <User className="h-5 w-5" />
+                            </Button>
+                        </Link>
                         <Button
                             variant="ghost"
                             size="icon"

@@ -1,5 +1,15 @@
 const { prisma } = require('../config/database');
+const bcrypt = require('bcryptjs');
 const { getStoreAnalytics } = require('../services/analyticsService');
+
+const generateTempPassword = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  let password = '';
+  for (let i = 0; i < 12; i += 1) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+};
 
 // Register a new store (public merchant onboarding)
 const registerStore = async (req, res, next) => {
@@ -55,10 +65,12 @@ const registerStore = async (req, res, next) => {
     }
 
     // Create a temporary user for the store owner
+    const tempPassword = generateTempPassword();
+    const hashedTempPassword = await bcrypt.hash(tempPassword, 10);
     const tempUser = await prisma.user.create({
       data: {
         email,
-        password: 'temp-password', // Will be updated during activation
+        password: hashedTempPassword,
         fullName: `${ownerFirstName || ''} ${ownerLastName || ''}`.trim() || 'Merchant',
         role: 'MERCHANT',
       }
@@ -83,6 +95,18 @@ const registerStore = async (req, res, next) => {
         status: 'NOT_STARTED',
         currentStep: 1,
         completionPercent: 0,
+      }
+    });
+
+    // Store credentials for admin view
+    await prisma.merchantCredentials.create({
+      data: {
+        userId: tempUser.id,
+        storeId: store.id,
+        email,
+        temporaryPassword: tempPassword,
+        mustChangePassword: true,
+        createdByAdminId: null
       }
     });
 

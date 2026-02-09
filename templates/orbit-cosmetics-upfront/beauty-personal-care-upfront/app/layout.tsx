@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
-import { StoreProvider } from "@/context/StoreContext";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { StorefrontProvider } from "@/context/StorefrontContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,7 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <StoreProvider>
+        <StorefrontProvider>
           <CartProvider>
             <Header />
             <CartDrawer />
@@ -41,7 +41,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </CartProvider>
-        </StoreProvider>
+        </StorefrontProvider>
       </body>
     </html>
   );

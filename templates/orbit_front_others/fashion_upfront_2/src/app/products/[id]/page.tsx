@@ -9,8 +9,12 @@ export default function ProductPage() {
   const params = useParams();
 
   // Derive productId directly from params
-  const rawId = params?.id ? parseInt(params.id as string) : 1;
-  const productId = (!isNaN(rawId) && rawId > 0) ? rawId : 1;
+  const { id } = params;
+  const productId = Array.isArray(id) ? id[0] : id; // Handle potential array from catch-all routes, though typically string here.
+
+  if (!productId) {
+    return <div>Invalid Product ID</div>;
+  }
 
   return (
     <div

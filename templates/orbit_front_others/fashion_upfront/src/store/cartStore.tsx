@@ -7,8 +7,8 @@ import { parseINRToNumber } from '@/lib/utils';
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
-  removeFromCart: (id: number, size?: string) => void;
-  updateQuantity: (id: number, quantity: number, size?: string) => void;
+  removeFromCart: (id: number | string, size?: string) => void;
+  updateQuantity: (id: number | string, quantity: number, size?: string) => void;
   getTotalItems: () => number;
   getSubtotal: () => number;
   clearCart: () => void;
@@ -73,7 +73,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const removeFromCart = (id: number, size?: string) => {
+  const removeFromCart = (id: number | string, size?: string) => {
     setCartItems((prev) => prev.filter((item) => {
       if (size) {
         return !(item.id === id && item.size === size);
@@ -82,7 +82,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const updateQuantity = (id: number, quantity: number, size?: string) => {
+  const updateQuantity = (id: number | string, quantity: number, size?: string) => {
     if (quantity < 1) {
       removeFromCart(id, size);
       return;

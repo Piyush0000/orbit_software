@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { WishlistProvider } from "@/context/WishlistContext";
-import { StoreProvider } from "@/contexts/StoreContext";
+import { StorefrontProvider } from "@/context/StorefrontContext";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -32,13 +32,13 @@ export default function RootLayout({
         className={`${nunito.variable} ${fredoka.variable} antialiased min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
-        <StoreProvider>
+        <StorefrontProvider>
           <WishlistProvider>
             <Header />
             <main className="flex-grow">{children}</main>
             <Footer />
           </WishlistProvider>
-        </StoreProvider>
+        </StorefrontProvider>
       </body>
     </html>
   );

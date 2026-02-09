@@ -2,62 +2,29 @@
 
 import { use, useState, useEffect } from 'react';
 import Image from 'next/image';
+import { products } from '@/data/products';
 import { notFound } from 'next/navigation';
 import { Heart, Star, ShoppingBag, Truck, RotateCcw } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext'; // Import useCart
-import { getProducts } from '@/lib/products-api';
-import { mapApiProducts, type FootwearProduct } from '@/lib/product-adapter';
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
-    const [products, setProducts] = useState<FootwearProduct[]>([]);
-    const [loading, setLoading] = useState(true);
     const product = products.find(p => p.id === id);
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { addToCart } = useCart(); // Get addToCart
 
     const [selectedSize, setSelectedSize] = useState<string>('');
-    const [selectedColor, setSelectedColor] = useState<string>('');
-    const [activeImage, setActiveImage] = useState('');
+    const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0] || '');
+    const [activeImage, setActiveImage] = useState(product?.image || '');
 
-    // Reviews State (no dummy data)
-    const [reviews, setReviews] = useState<{ id: number; user: string; rating: number; comment: string; date: string }[]>([]);
+    // Reviews State
+    const [reviews, setReviews] = useState([
+        { id: 1, user: 'John Doe', rating: 5, comment: 'Great shoes! Very comfortable.', date: '2023-10-15' },
+        { id: 2, user: 'Jane Smith', rating: 4, comment: 'Good quality but sizing runs a bit small.', date: '2023-11-02' }
+    ]);
     const [newReview, setNewReview] = useState({ user: '', rating: 5, comment: '' });
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-
-    useEffect(() => {
-        const loadProducts = async () => {
-            try {
-                setLoading(true);
-                const apiProducts = await getProducts();
-                const mapped = mapApiProducts(apiProducts);
-                setProducts(mapped);
-            } catch (error) {
-                console.error('Failed to load products:', error);
-                setProducts([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadProducts();
-    }, []);
-
-    useEffect(() => {
-        if (product) {
-            setSelectedColor(product.colors?.[0] || '');
-            setActiveImage(product.image || '');
-        }
-    }, [product]);
-
-    if (loading) {
-        return (
-            <div style={{ padding: '4rem', textAlign: 'center' }}>
-                <h1>Loading product...</h1>
-            </div>
-        );
-    }
 
     if (!product) {
         notFound();

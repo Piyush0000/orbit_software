@@ -8,7 +8,7 @@ export default function Cart() {
   const { cartItems, updateQuantity, removeFromCart, getSubtotal, discount, promoCode, applyPromoCode, removePromoCode } = useCart();
   const subtotal = getSubtotal();
 
-  const handleQuantityChange = (id: number, delta: number) => {
+  const handleQuantityChange = (id: number | string, delta: number) => {
     const item = cartItems.find((item) => item.id === id);
     if (item) {
       const newQuantity = item.quantity + delta;

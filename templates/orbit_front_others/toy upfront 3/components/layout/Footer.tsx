@@ -1,13 +1,20 @@
-"use client";
-
 import Link from "next/link";
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Footer() {
-    const { store } = useStore();
+    const { store, customization } = useStorefront();
+    const footer = (customization?.footerContent || {}) as Record<string, string>;
+    const contact = (customization?.contactInfo || {}) as Record<string, string>;
+    const socialLinks = customization?.socialLinks || [];
     const storeName = store?.name || "ToyStore";
-
+    const description =
+        footer.description ||
+        store?.description ||
+        "Creating happy memories with safe, sustainable, and educational toys. Approved by kids, trusted by parents.";
+    const email = contact.email || "support@toystore.com";
+    const phone = contact.phone || "+1 (555) 123-4567";
+    const address = contact.address || "123 Playful Street,\nToyland City, TC 90210";
     return (
         <footer className="bg-[#4A403A] text-[#F3E9E2] pt-12 lg:pt-20 pb-10 rounded-t-[2rem] lg:rounded-t-[3rem] mt-12">
             <div className="container mx-auto px-4">
@@ -18,13 +25,20 @@ export default function Footer() {
                             {storeName}<span className="text-accent">.</span>
                         </h3>
                         <p className="text-sm leading-relaxed text-gray-300 max-w-xs">
-                            Creating happy memories with safe, sustainable, and educational toys.
-                            Approved by kids, trusted by parents.
+                            {description}
                         </p>
                         <div className="flex gap-4">
-                            <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all"><Facebook className="w-5 h-5" /></a>
-                            <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all"><Instagram className="w-5 h-5" /></a>
-                            <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all"><Twitter className="w-5 h-5" /></a>
+                            {(socialLinks.length ? socialLinks : [
+                                { label: "Facebook", href: "#" },
+                                { label: "Instagram", href: "#" },
+                                { label: "Twitter", href: "#" }
+                            ]).map((link) => (
+                                <a key={link.label} href={link.href} className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all" aria-label={link.label}>
+                                    {link.label === "Facebook" && <Facebook className="w-5 h-5" />}
+                                    {link.label === "Instagram" && <Instagram className="w-5 h-5" />}
+                                    {link.label === "Twitter" && <Twitter className="w-5 h-5" />}
+                                </a>
+                            ))}
                         </div>
                     </div>
 
@@ -58,26 +72,33 @@ export default function Footer() {
                                 <div className="p-2 bg-white/5 rounded-full shrink-0 text-primary">
                                     <MapPin className="w-5 h-5" />
                                 </div>
-                                <span className="opacity-90">123 Playful Street,<br />Toyland City, TC 90210</span>
+                                <span className="opacity-90">
+                                    {address.split("\n").map((line, index) => (
+                                        <span key={index}>
+                                            {line}
+                                            <br />
+                                        </span>
+                                    ))}
+                                </span>
                             </li>
                             <li className="flex items-center gap-4">
                                 <div className="p-2 bg-white/5 rounded-full shrink-0 text-primary">
                                     <Phone className="w-5 h-5" />
                                 </div>
-                                <span className="opacity-90">+1 (555) 123-4567</span>
+                                <span className="opacity-90">{phone}</span>
                             </li>
                             <li className="flex items-center gap-4">
                                 <div className="p-2 bg-white/5 rounded-full shrink-0 text-primary">
                                     <Mail className="w-5 h-5" />
                                 </div>
-                                <span className="opacity-90">support@toystore.com</span>
+                                <span className="opacity-90">{email}</span>
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400 font-medium">
-                    <p>© {new Date().getFullYear()} ToyStore Inc. All rights reserved.</p>
+                    <p>© {new Date().getFullYear()} {storeName}. All rights reserved.</p>
                     <div className="flex gap-8">
                         <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
                         <Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>

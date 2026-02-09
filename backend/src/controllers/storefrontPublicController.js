@@ -25,6 +25,12 @@ exports.getStoreInfo = async (req, res) => {
         description: true,
         logo: true,
         category: true,
+        categoryConfig: {
+          select: {
+            category: true,
+            config: true
+          }
+        },
         isActive: true,
         createdAt: true,
         settings: {
@@ -215,6 +221,10 @@ exports.getStoreProducts = async (req, res) => {
         sku: true,
         stock: true,
         images: true,
+        category: true,
+        tags: true,
+        customFields: true,
+        isFeatured: true,
         isActive: true,
         createdAt: true,
         variants: {

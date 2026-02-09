@@ -1,31 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import ProductCard from "@/components/ui/ProductCard";
-
-// Mock Products Data (Expanded)
-const mockProducts = Array.from({ length: 12 }).map((_, i) => ({
-    id: i + 1,
-    name: `Fun Toy Product ${i + 1}`,
-    price: 20 + i * 5,
-    rating: 4.5,
-    reviews: 10 + i,
-    age: "3-5",
-    badge: i % 3 === 0 ? "Bestseller" : null,
-    image: "/api/placeholder/400/400",
-}));
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function CategoryPage() {
     const params = useParams();
     const slug = params?.slug as string;
     const [showFilters, setShowFilters] = useState(false);
+    const { products, loading, categoryConfig } = useStorefront();
+    const enabledFilters = (categoryConfig as { filters?: string[] } | null)?.filters || ["price", "age", "material"];
+    const enabledFilterSet = new Set(enabledFilters);
+    const ageOptions = Array.from(new Set(products.map((product) => product.age).filter(Boolean))) as string[];
+    const materialOptions: string[] = [];
 
     // Format slug for title
     const title = slug
         ? slug.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())
         : "All Toys";
+
+    const filteredProducts = useMemo(() => {
+        if (!slug || slug === "all") return products;
+        return products.filter((product) =>
+            (product.category || "").toLowerCase().includes(slug.toLowerCase())
+        );
+    }, [products, slug]);
 
     return (
         <div className="bg-background min-h-screen pb-24">
@@ -51,7 +52,8 @@ export default function CategoryPage() {
                             </div>
 
                             {/* Price Range */}
-                            <div className="mb-8 border-b border-muted/40 pb-6 last:border-0">
+                            {enabledFilterSet.has("price") && (
+                                <div className="mb-8 border-b border-muted/40 pb-6 last:border-0">
                                 <h4 className="font-bold text-sm mb-4 text-foreground/80">Price Range</h4>
                                 <div className="space-y-3">
                                     {["Under ₹500", "₹500 - ₹1000", "₹1000 - ₹2000", "₹2000+"].map((price, i) => (
@@ -66,13 +68,15 @@ export default function CategoryPage() {
                                         </label>
                                     ))}
                                 </div>
-                            </div>
+                                </div>
+                            )}
 
                             {/* Age Group */}
-                            <div className="mb-8 border-b border-muted/40 pb-6 last:border-0">
+                            {enabledFilterSet.has("age") && (
+                                <div className="mb-8 border-b border-muted/40 pb-6 last:border-0">
                                 <h4 className="font-bold text-sm mb-4 text-foreground/80">Age Group</h4>
                                 <div className="space-y-3">
-                                    {["0-2 Years", "3-5 Years", "6-8 Years", "9-12 Years", "Teens"].map((age) => (
+                                    {(ageOptions.length ? ageOptions : ["0-2 Years", "3-5 Years", "6-8 Years", "9-12 Years", "Teens"]).map((age) => (
                                         <label key={age} className="flex items-center gap-3 cursor-pointer group">
                                             <div className="relative flex items-center">
                                                 <input type="checkbox" className="peer appearance-none w-5 h-5 border-2 border-muted rounded-md checked:bg-primary checked:border-primary transition-all" />
@@ -84,13 +88,15 @@ export default function CategoryPage() {
                                         </label>
                                     ))}
                                 </div>
-                            </div>
+                                </div>
+                            )}
 
                             {/* Material */}
-                            <div>
+                            {enabledFilterSet.has("material") && (
+                                <div>
                                 <h4 className="font-bold text-sm mb-4 text-foreground/80">Material</h4>
                                 <div className="space-y-3">
-                                    {["Wood", "Plastic", "Plush", "Metal", "Eco-friendly"].map((mat) => (
+                                    {(materialOptions.length ? materialOptions : ["Wood", "Plastic", "Plush", "Metal", "Eco-friendly"]).map((mat) => (
                                         <label key={mat} className="flex items-center gap-3 cursor-pointer group">
                                             <div className="relative flex items-center">
                                                 <input type="checkbox" className="peer appearance-none w-5 h-5 border-2 border-muted rounded-md checked:bg-primary checked:border-primary transition-all" />
@@ -102,7 +108,8 @@ export default function CategoryPage() {
                                         </label>
                                     ))}
                                 </div>
-                            </div>
+                                </div>
+                            )}
                         </div>
                     </aside>
 
@@ -136,9 +143,13 @@ export default function CategoryPage() {
 
                         {/* Product Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {mockProducts.map((product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
+                            {loading ? (
+                                <div className="col-span-full text-center text-gray-500">Loading products...</div>
+                            ) : (
+                                filteredProducts.map((product) => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>

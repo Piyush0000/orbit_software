@@ -7,12 +7,14 @@ const {
   getOrder,
   updateStatus,
   updateFulfillment,
-  cancelOrder
+  cancelOrder,
+  lookupOrder
 } = require('../controllers/orderController');
 
 const router = express.Router();
 
 router.post('/', createOrder); // storefront can create order without auth
+router.post('/lookup', lookupOrder); // public order lookup (requires orderNumber + email)
 router.get('/store/:storeId', auth, rbac([ROLES.MERCHANT, ROLES.ADMIN]), listOrders);
 router.get('/:id', auth, getOrder);
 router.put('/:id/status', auth, rbac([ROLES.MERCHANT, ROLES.ADMIN]), updateStatus);

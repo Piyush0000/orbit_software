@@ -63,6 +63,29 @@ const {
   updateMerchantDomain,
   getProvisioningDetails
 } = require('../controllers/adminProvisioningController');
+const {
+  createMerchant,
+  listMerchantCredentials,
+  getMerchantCredentials,
+  updateMerchantPassword
+} = require('../controllers/adminMerchantProvisioningController');
+const {
+  listCategoryConfigs,
+  getStoreCategoryConfig,
+  updateStoreCategoryConfig
+} = require('../controllers/categoryConfigController');
+const {
+  listOrders: listAdminOrders,
+  getOrder: getAdminOrder,
+  updateStatus: updateAdminOrderStatus,
+  updateFulfillment: updateAdminOrderFulfillment,
+  updatePaymentStatus: updateAdminPaymentStatus
+} = require('../controllers/adminOrderController');
+const {
+  listProducts: listAdminProducts,
+  updateProductStock,
+  updateVariantStock
+} = require('../controllers/adminProductController');
 
 const router = express.Router();
 const guard = [adminAuth, adminRbac([ADMIN_ROLES.SUPER_ADMIN, ADMIN_ROLES.SUPPORT_ADMIN])];
@@ -170,7 +193,17 @@ router.get('/plans', guard, async (req, res) => {
   res.json({ plans });
 });
 
-// Provisioning routes
+// Category config management
+router.get('/category-configs', guard, listCategoryConfigs);
+router.get('/stores/:storeId/category-config', guard, getStoreCategoryConfig);
+router.put(
+  '/stores/:storeId/category-config',
+  guard,
+  withValidation([body('category').notEmpty(), body('config').notEmpty()]),
+  updateStoreCategoryConfig
+);
+
+// Legacy provisioning routes (for existing stores)
 router.get('/provisioning/pending', guard, listPendingMerchants);
 router.get('/provisioning/:storeId', guard, getProvisioningDetails);
 router.post(
@@ -180,5 +213,67 @@ router.post(
   provisionMerchant
 );
 router.put('/provisioning/:storeId/domain', guard, updateMerchantDomain);
+
+// New merchant provisioning routes (create from scratch)
+router.post(
+  '/provision',
+  guard,
+  withValidation([
+    body('merchantName').notEmpty().withMessage('Merchant name is required'),
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('category').notEmpty().withMessage('Category is required'),
+    body('theme').notEmpty().withMessage('Theme is required'),
+    body('subdomain').notEmpty().withMessage('Subdomain is required')
+  ]),
+  createMerchant
+);
+
+// Merchant credentials management
+router.get('/merchant-credentials', guard, listMerchantCredentials);
+router.get('/merchant-credentials/:id', guard, getMerchantCredentials);
+router.put(
+  '/merchant-credentials/:id/password',
+  guard,
+  withValidation([body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')]),
+  updateMerchantPassword
+);
+
+// Admin order management
+router.get('/orders', guard, listAdminOrders);
+router.get('/orders/:id', guard, getAdminOrder);
+router.put(
+  '/orders/:id/status',
+  guard,
+  withValidation([body('status').notEmpty()]),
+  updateAdminOrderStatus
+);
+router.put(
+  '/orders/:id/fulfillment',
+  guard,
+  withValidation([body('fulfillmentStatus').notEmpty()]),
+  updateAdminOrderFulfillment
+);
+router.put(
+  '/orders/:id/payment',
+  guard,
+  withValidation([body('paymentStatus').notEmpty()]),
+  updateAdminPaymentStatus
+);
+
+// Admin product inventory
+router.get('/products', guard, listAdminProducts);
+router.put(
+  '/products/:id/stock',
+  guard,
+  withValidation([body('stock').isInt({ min: 0 })]),
+  updateProductStock
+);
+router.put(
+  '/variants/:variantId/stock',
+  guard,
+  withValidation([body('stock').isInt({ min: 0 })]),
+  updateVariantStock
+);
 
 module.exports = router;

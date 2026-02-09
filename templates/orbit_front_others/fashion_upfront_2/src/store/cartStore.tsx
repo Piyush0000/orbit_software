@@ -7,8 +7,8 @@ import { parseINRToNumber } from '@/lib/utils';
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
-  removeFromCart: (id: number, size?: string) => void;
-  updateQuantity: (id: number, quantity: number, size?: string) => void;
+  removeFromCart: (id: string | number, size?: string) => void;
+  updateQuantity: (id: string | number, quantity: number, size?: string) => void;
   getTotalItems: () => number;
   getSubtotal: () => number;
   clearCart: () => void;
@@ -53,15 +53,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cartItems]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
-    setCartItems((prev) => {
-      const existingItem = prev.find((cartItem) =>
+    setCartItems((prev: CartItem[]) => {
+      const existingItem = prev.find((cartItem: CartItem) =>
         cartItem.id === item.id && cartItem.size === item.size
       );
 
       if (existingItem) {
         // If item exists, update quantity (max 5)
         const newQuantity = Math.min(existingItem.quantity + quantity, 5);
-        return prev.map((cartItem) =>
+        return prev.map((cartItem: CartItem) =>
           (cartItem.id === item.id && cartItem.size === item.size)
             ? { ...cartItem, quantity: newQuantity }
             : cartItem
@@ -73,8 +73,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const removeFromCart = (id: number, size?: string) => {
-    setCartItems((prev) => prev.filter((item) => {
+  const removeFromCart = (id: string | number, size?: string) => {
+    setCartItems((prev: CartItem[]) => prev.filter((item: CartItem) => {
       if (size) {
         return !(item.id === id && item.size === size);
       }
@@ -82,7 +82,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const updateQuantity = (id: number, quantity: number, size?: string) => {
+  const updateQuantity = (id: string | number, quantity: number, size?: string) => {
     if (quantity < 1) {
       removeFromCart(id, size);
       return;
@@ -91,8 +91,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       quantity = 5;
     }
 
-    setCartItems((prev) =>
-      prev.map((item) => {
+    setCartItems((prev: CartItem[]) =>
+      prev.map((item: CartItem) => {
         if (size) {
           return (item.id === id && item.size === size) ? { ...item, quantity } : item;
         }
@@ -102,11 +102,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const getTotalItems = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
+    return cartItems.reduce((total: number, item: CartItem) => total + item.quantity, 0);
   };
 
   const getSubtotal = () => {
-    return cartItems.reduce((total, item) => total + (item.priceNum * item.quantity), 0);
+    return cartItems.reduce((total: number, item: CartItem) => total + (item.priceNum * item.quantity), 0);
   };
 
   // Promo Code State

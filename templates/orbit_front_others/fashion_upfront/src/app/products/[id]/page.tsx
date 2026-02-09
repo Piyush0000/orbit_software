@@ -9,8 +9,7 @@ export default function ProductPage() {
   const params = useParams();
 
   // Derive productId directly from params
-  const rawId = params?.id ? parseInt(params.id as string) : 1;
-  const productId = (!isNaN(rawId) && rawId > 0) ? rawId : 1;
+  const productId = params?.id ? String(params.id) : '';
 
   return (
     <div

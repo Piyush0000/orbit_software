@@ -4,7 +4,6 @@ import "./globals.css";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
 import { CartProvider } from "@/store/cartStore";
 import { WishlistProvider } from "@/store/wishlistStore";
-import { StoreProvider } from "@/contexts/StoreContext";
 
 const oswald = Oswald({
   subsets: ["latin"],
@@ -17,6 +16,8 @@ const inter = Inter({
   variable: "--font-inter",
   display: "swap",
 });
+
+import { StorefrontProvider } from "@/contexts/StorefrontContext";
 
 export const metadata: Metadata = {
   title: "Upfront | Modern Urban Fashion",
@@ -32,13 +33,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${oswald.variable} font-sans antialiased`} suppressHydrationWarning>
         <ThemeWrapper>
-          <StoreProvider>
+          <StorefrontProvider>
             <WishlistProvider>
               <CartProvider>
                 {children}
               </CartProvider>
             </WishlistProvider>
-          </StoreProvider>
+          </StorefrontProvider>
         </ThemeWrapper>
       </body>
     </html>

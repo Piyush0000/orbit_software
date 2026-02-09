@@ -7,6 +7,7 @@ const {
   getStoreCategories,
   getStoreTheme
 } = require('../controllers/storefrontPublicController');
+const { cache } = require('../middleware/cache');
 
 const router = express.Router();
 
@@ -20,10 +21,22 @@ const router = express.Router();
 router.get('/:subdomain/info', getStoreInfo);
 
 // Website customization (branding, colors, hero section, etc.)
-router.get('/:subdomain/customization', getStoreCustomization);
+router.get(
+  '/:subdomain/customization',
+  cache((req) => `store:customization:subdomain:${req.params.subdomain}`, 300),
+  getStoreCustomization
+);
 
 // Products
-router.get('/:subdomain/products', getStoreProducts);
+router.get(
+  '/:subdomain/products',
+  cache(
+    (req) =>
+      `store:products:subdomain:${req.params.subdomain}:category:${req.query.category || 'all'}:search:${req.query.search || 'all'}:limit:${req.query.limit || 50}:offset:${req.query.offset || 0}`,
+    120
+  ),
+  getStoreProducts
+);
 router.get('/:subdomain/products/:productId', getStoreProduct);
 
 // Categories

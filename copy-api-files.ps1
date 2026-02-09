@@ -5,12 +5,17 @@ $templates = @(
     "templates\orbit_front_others\fashion_upfront_2",
     "templates\orbit_front_others\fashion_upfront",
     "templates\orbit_upfront",
+    "templates\orbit_front_electronics\electronics-upfront-theme-2",
+    "templates\orbit_front_all\theme-1",
+    "templates\orbit_front_all\theme-2",
+    "templates\orbit_front_all\theme-3",
     "templates\orbit_front_others\FOOTWEAR UPFRONT",
     "templates\orbit-cosmetics-upfront\perfume-upfront",
     "templates\orbit-cosmetics-upfront\perfume-upfront-theme2",
     "templates\orbit-cosmetics-upfront\perfume-upfront-theme3",
     "templates\orbit-cosmetics-upfront\beauty-personal-care-upfront",
     "templates\orbit-cosmetics-upfront\furniture-upfront",
+    "templates\orbit_front_jewellery",
     "templates\orbit_front_others\toy upfront 3",
     "templates\orbit_front_others\toys upfront"
 )

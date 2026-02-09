@@ -25,7 +25,7 @@ export default function CategoryGrid() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-6 md:gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6 md:gap-8">
                     {categories.map((cat) => (
                         <Link
                             key={cat.slug}

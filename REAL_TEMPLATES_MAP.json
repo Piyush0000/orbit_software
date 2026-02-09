@@ -35,7 +35,7 @@
     },
     "food": {
       "name": "Food & Beverage",
-      "path": "templates/orbit_front_all",
+      "path": "templates/orbit_front_all/theme-1",
       "port": 3007,
       "description": "Appetizing - For restaurants and food delivery",
       "colors": {
@@ -87,6 +87,17 @@
         "secondary": "#78350F",
         "accent": "#F5F5DC"
       }
+    },
+    "jewellery": {
+      "name": "Jewellery Store",
+      "path": "templates/orbit_front_jewellery",
+      "port": 3017,
+      "description": "Luxury - For jewellery and accessories",
+      "colors": {
+        "primary": "#7C2D12",
+        "secondary": "#FDE68A",
+        "accent": "#111827"
+      }
     }
   },
   "variants": {
@@ -107,6 +118,24 @@
       "path": "templates/orbit_front_others/fashion_upfront",
       "port": 3014,
       "parent": "fashion"
+    },
+    "electronics_theme2": {
+      "name": "Electronics Store (Theme 2)",
+      "path": "templates/orbit_front_electronics/electronics-upfront-theme-2",
+      "port": 3018,
+      "parent": "electronics"
+    },
+    "food_theme2": {
+      "name": "Food & Beverage (Theme 2)",
+      "path": "templates/orbit_front_all/theme-2",
+      "port": 3019,
+      "parent": "food"
+    },
+    "food_theme3": {
+      "name": "Food & Beverage (Theme 3)",
+      "path": "templates/orbit_front_all/theme-3",
+      "port": 3020,
+      "parent": "food"
     },
     "perfume_theme2": {
       "name": "Perfume Store (Theme 2)",

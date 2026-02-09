@@ -3,7 +3,7 @@ import "./globals.css";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
 import { CartProvider } from "@/store/cartStore";
 import { WishlistProvider } from "@/store/wishlistStore";
-import { StoreProvider } from "@/contexts/StoreContext";
+import { StorefrontProvider } from "@/contexts/StorefrontContext";
 
 export const metadata: Metadata = {
   title: "Upfront",
@@ -19,13 +19,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
         <ThemeWrapper>
-          <StoreProvider>
+          <StorefrontProvider>
             <WishlistProvider>
               <CartProvider>
                 {children}
               </CartProvider>
             </WishlistProvider>
-          </StoreProvider>
+          </StorefrontProvider>
         </ThemeWrapper>
       </body>
     </html>

@@ -1,19 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import { Search, ShoppingCart, Heart, User, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { Search, ShoppingCart, Heart, User, Menu, X, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
 import AnnouncementBar from "./AnnouncementBar";
+import ProfileDropdown from "./ProfileDropdown";
+import { useAuth } from "@/store/authStore";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useStore } from "@/context/StoreContext";
-import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Header() {
+    const { store, customization } = useStorefront();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { wishlist } = useWishlist();
     const { cartCount } = useCart();
-    const { store, customization } = useStore();
+    const { isAuthenticated } = useAuth();
+    const pathname = usePathname();
+    const logoUrl = customization?.logo || store?.logo || "";
+    const storeName = store?.name || "ToyStore";
+    const navLinks = customization?.navLinks?.length
+        ? customization.navLinks
+        : [
+            { label: "Educational", href: "/category/educational" },
+            { label: "Outdoor", href: "/category/outdoor" },
+            { label: "New Arrivals", href: "/category/new-arrivals" }
+        ];
+
+    // Close menu when route changes
+    useEffect(() => {
+        setIsMobileMenuOpen(false);
+    }, [pathname]);
+
+    // Prevent body scroll when menu is open
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isMobileMenuOpen]);
 
 
     return (
@@ -28,54 +58,36 @@ export default function Header() {
                 <div className="flex items-center justify-between gap-4">
                     {/* Mobile Menu Button */}
                     <button
-                        className="lg:hidden p-2 text-foreground/80 hover:bg-muted rounded-full transition-colors"
+                        className="lg:hidden p-2 text-foreground/80 hover:bg-muted rounded-full transition-colors z-50 relative"
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Toggle menu"
                     >
-                        {isMobileMenuOpen ? <X /> : <Menu />}
+                        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
 
-                    {/* Logo - Dynamic from merchant's customization */}
-                    <Link href="/" className="flex-shrink-0 group flex items-center gap-2">
-                        {customization?.logo ? (
-                            <div className="flex items-center gap-3">
-                                <Image
-                                    src={customization.logo}
-                                    alt={store?.name || "Store Logo"}
-                                    width={48}
-                                    height={48}
-                                    className="object-contain rounded-lg"
-                                />
-                                <span className="text-2xl font-extrabold text-foreground font-display tracking-tight leading-none">
-                                    {store?.name || "Store"}
-                                </span>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="bg-primary/10 p-2 rounded-xl rotate-3 group-hover:rotate-6 transition-transform">
-                                    <span className="text-2xl">🧸</span>
-                                </div>
-                                <span className="text-3xl font-extrabold text-foreground font-display tracking-tight leading-none">
-                                    {store?.name || "ToyStore"}
-                                    <span className="text-secondary animate-pulse">.</span>
-                                </span>
-                            </>
-                        )}
+                    {/* Logo */}
+                    <Link href="/" className="flex-shrink-0 group flex items-center gap-2 z-50 relative">
+                        <div className="bg-primary/10 p-2 rounded-xl rotate-3 group-hover:rotate-6 transition-transform">
+                            {logoUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={logoUrl} alt={storeName} className="h-8 w-8 rounded-lg object-cover" />
+                            ) : (
+                                <span className="text-2xl">🧸</span>
+                            )}
+                        </div>
+                        <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-display tracking-tight leading-none">
+                            {storeName}
+                            <span className="text-secondary animate-pulse">.</span>
+                        </span>
                     </Link>
 
                     {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center gap-2 font-medium text-foreground/80">
-                        <div className="group relative cursor-pointer px-4 py-2 hover:bg-muted/50 rounded-full transition-all">
-                            <span className="group-hover:text-primary transition-colors">By Age</span>
-                            <div className="absolute top-full left-0 w-56 bg-white/95 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl p-2 hidden group-hover:block border border-gray-100 mt-2">
-                                <Link href="/category/age-0-2" className="block px-4 py-3 hover:bg-muted/50 rounded-xl text-sm transition-colors text-foreground/80 hover:text-primary">0 - 2 Years</Link>
-                                <Link href="/category/age-3-5" className="block px-4 py-3 hover:bg-muted/50 rounded-xl text-sm transition-colors text-foreground/80 hover:text-primary">3 - 5 Years</Link>
-                                <Link href="/category/age-6-8" className="block px-4 py-3 hover:bg-muted/50 rounded-xl text-sm transition-colors text-foreground/80 hover:text-primary">6 - 8 Years</Link>
-                                <Link href="/category/age-9-12" className="block px-4 py-3 hover:bg-muted/50 rounded-xl text-sm transition-colors text-foreground/80 hover:text-primary">9 - 12 Years</Link>
-                            </div>
-                        </div>
-                        <Link href="/category/educational" className="px-4 py-2 hover:bg-muted/50 rounded-full hover:text-primary transition-all">Educational</Link>
-                        <Link href="/category/outdoor" className="px-4 py-2 hover:bg-muted/50 rounded-full hover:text-primary transition-all">Outdoor</Link>
-                        <Link href="/category/new-arrivals" className="px-4 py-2 hover:bg-muted/50 rounded-full hover:text-primary transition-all">New Arrivals</Link>
+                        {navLinks.map((link) => (
+                            <Link key={link.href} href={link.href} className="px-4 py-2 hover:bg-muted/50 rounded-full hover:text-primary transition-all">
+                                {link.label}
+                            </Link>
+                        ))}
                     </nav>
 
                     {/* Search Bar */}
@@ -102,7 +114,7 @@ export default function Header() {
                     </form>
 
                     {/* User Actions */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 z-50 relative">
                         <Link href="/wishlist" className="p-2.5 hover:bg-muted rounded-full transition-colors relative group text-foreground/70 hover:text-red-400">
                             <Heart className="w-6 h-6 transition-transform group-hover:scale-110" />
                             {wishlist.length > 0 && (
@@ -119,9 +131,18 @@ export default function Header() {
                                 </span>
                             )}
                         </Link>
-                        <Link href="/profile" className="p-2.5 hover:bg-muted rounded-full transition-colors hidden sm:block text-foreground/70 hover:text-secondary group">
-                            <User className="w-6 h-6 transition-transform group-hover:scale-110" />
-                        </Link>
+                        {isAuthenticated ? (
+                            <div className="relative group p-2.5 hover:bg-muted rounded-full transition-colors hidden sm:block">
+                                <User className="w-6 h-6 text-foreground/70" />
+                                <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                    <ProfileDropdown />
+                                </div>
+                            </div>
+                        ) : (
+                            <Link href="/auth/login" className="px-4 py-2 bg-primary text-white rounded-full font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hidden sm:block">
+                                Login
+                            </Link>
+                        )}
                     </div>
                 </div>
 
@@ -135,7 +156,7 @@ export default function Header() {
                             window.location.href = `/category/all?search=${query}`;
                         }
                     }}
-                    className="md:hidden mt-4 relative"
+                    className="md:hidden mt-4 relative z-0"
                 >
                     <input
                         type="text"
@@ -147,6 +168,58 @@ export default function Header() {
                         <Search className="w-4 h-4" />
                     </button>
                 </form>
+            </div>
+
+            {/* Mobile Menu Overlay */}
+            <div
+                className={`fixed inset-0 bg-white z-[100] h-[100dvh] transition-all duration-300 lg:hidden flex flex-col pt-24 px-6 overflow-y-auto ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+                    }`}
+            >
+                <div className="flex flex-col gap-6 text-xl font-bold text-foreground">
+                    <div className="space-y-4">
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Shop</p>
+                        {navLinks.map((link) => (
+                            <Link key={link.href} href={link.href} className="flex items-center justify-between py-2 border-b border-gray-100">
+                                {link.label} <ChevronRight className="w-4 h-4 text-gray-400" />
+                            </Link>
+                        ))}
+                    </div>
+
+                    <div className="space-y-4 mt-4">
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Categories</p>
+                        {navLinks.map((link) => (
+                            <Link key={link.href} href={link.href} className="flex items-center justify-between py-2 border-b border-gray-100">
+                                {link.label} <ChevronRight className="w-4 h-4 text-gray-400" />
+                            </Link>
+                        ))}
+                    </div>
+
+                    <div className="mt-8 pt-8 border-t border-gray-100">
+                        {isAuthenticated ? (
+                            <div className="space-y-4">
+                                <Link href="/profile" className="flex items-center gap-3 py-2 text-gray-600 hover:text-primary">
+                                    <User className="w-5 h-5" />
+                                    My Profile
+                                </Link>
+                                <button
+                                    onClick={() => {
+                                        useAuth.getState().logout();
+                                        window.location.reload();
+                                    }}
+                                    className="flex items-center gap-3 py-2 text-red-600 w-full text-left"
+                                >
+                                    <span className="w-5 h-5 flex items-center justify-center">→</span>
+                                    Log Out
+                                </button>
+                            </div>
+                        ) : (
+                            <Link href="/auth/login" className="flex items-center gap-3 py-2 text-primary font-bold">
+                                <User className="w-5 h-5" />
+                                Login / Sign Up
+                            </Link>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-outfit);
+  --font-serif: var(--font-playfair);
+
+  /* Refined Luxury Sapphire Blue Palette */
+  --color-gold-50: #eff6ff;
+  --color-gold-100: #dbeafe;
+  --color-gold-200: #bfdbfe;
+  --color-gold-300: #93c5fd;
+  /* Deep Sapphire */
+  --color-gold-400: #3b82f6;
+  --color-gold-500: #2563eb;
+  --color-gold-600: #1d4ed8;
+
+  /* Cool Luxury Neutrals */
+  --color-contrast-black: #0f172a;
+  --color-soft-black: #1e293b;
+  --color-off-white: #f8fafc;
+  /* Alabaster/Cool White */
+  --color-cream: #f1f5f9;
+  --color-charcoal: #334155;
+
+  --animate-fade-in: fade-in 0.8s ease-out forwards;
+  --animate-slide-up: slide-up 0.8s ease-out forwards;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+:root {
+  --background: #f8fafc;
+  --foreground: #020617;
+  --primary: var(--primary-color, #2563eb);
+  --secondary: var(--secondary-color, #1e293b);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617;
+    --foreground: #f8fafc;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-outfit), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), serif;
+}

@@ -1,34 +1,13 @@
-'use client';
-
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/store/cartStore';
-import { getProducts } from '@/lib/products-api';
-import { mapApiProducts } from '@/lib/product-adapter';
+import { useStorefront } from '@/contexts/StorefrontContext';
 import ProductReviews from '@/components/ProductReviews';
 
-export default function ProductDetail({ productId }: { productId: number }) {
-  const [products, setProducts] = useState<ReturnType<typeof mapApiProducts>>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoading(true);
-        const apiProducts = await getProducts();
-        setProducts(mapApiProducts(apiProducts));
-      } catch (error) {
-        console.error('Failed to load products:', error);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
-  }, []);
-
-  const product = products.find(p => p.id === productId);
+export default function ProductDetail({ productId }: { productId: string }) {
+  const { products, refreshProduct, loading } = useStorefront();
+  const [product, setProduct] = useState(products[0]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Move hooks before the early return to comply with Rules of Hooks
   const { addToCart } = useCart();
@@ -38,13 +17,35 @@ export default function ProductDetail({ productId }: { productId: number }) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
+  useEffect(() => {
+    let active = true;
+    const localMatch = products.find((item) => String(item.id) === productId);
+    if (localMatch) {
+      setProduct(localMatch);
+      setIsLoading(false);
+      return () => {
+        active = false;
+      };
+    }
+
+    setIsLoading(true);
+    refreshProduct(productId).then((fresh) => {
+      if (!active) return;
+      if (fresh) setProduct(fresh);
+      setIsLoading(false);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [products, refreshProduct, productId]);
+
   // Safety check
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)' }}>Loading product...</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Fetching product details.</p>
         </div>
       </div>
     );
@@ -63,7 +64,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
 
   // Extract numeric price from string (remove ₹ and commas)
   // Handle cases like "₹3,999" -> 3999, "₹12,449" -> 12449
-  const priceNum = parseInt(product.price.replace(/[₹,\s]/g, ''), 10) || 0;
+  const priceNum = product.priceNum || 0;
 
   const handleQuantityChange = (delta: number) => {
     setQuantity(prev => {
@@ -199,18 +200,22 @@ export default function ProductDetail({ productId }: { productId: number }) {
                 <span className="text-3xl font-bold" style={{ color: 'var(--text)' }}>
                   {product.price}
                 </span>
-                <span className="text-xl line-through" style={{ color: 'var(--text-muted)' }}>
-                  {product.originalPrice}
-                </span>
-                <span
-                  className="px-3 py-1 rounded-full text-sm font-semibold"
-                  style={{
-                    backgroundColor: '#dc2626',
-                    color: '#ffffff'
-                  }}
-                >
-                  {product.discount}% OFF
-                </span>
+                {product.originalPrice && (
+                  <span className="text-xl line-through" style={{ color: 'var(--text-muted)' }}>
+                    {product.originalPrice}
+                  </span>
+                )}
+                {product.discount ? (
+                  <span
+                    className="px-3 py-1 rounded-full text-sm font-semibold"
+                    style={{
+                      backgroundColor: '#dc2626',
+                      color: '#ffffff'
+                    }}
+                  >
+                    {product.discount}% OFF
+                  </span>
+                ) : null}
               </div>
             </div>
 

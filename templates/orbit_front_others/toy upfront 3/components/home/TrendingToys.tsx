@@ -3,31 +3,11 @@
 import Link from "next/link";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import ProductCard from "../ui/ProductCard";
-import { useEffect, useState } from "react";
-import { getProducts } from "@/lib/products-api";
-import { mapApiProducts, type ToyProduct } from "@/lib/product-adapter";
+
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function TrendingToys() {
-    const [products, setProducts] = useState<ToyProduct[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const loadProducts = async () => {
-            try {
-                setLoading(true);
-                const apiProducts = await getProducts();
-                setProducts(mapApiProducts(apiProducts));
-            } catch (error) {
-                console.error("Failed to load products:", error);
-                setProducts([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadProducts();
-    }, []);
-
+    const { products, loading } = useStorefront();
     return (
         <section className="py-12 bg-white">
             <div className="container mx-auto px-4">
@@ -48,9 +28,7 @@ export default function TrendingToys() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {loading ? (
-                        <p className="col-span-full text-center text-gray-500">Loading products...</p>
-                    ) : products.length === 0 ? (
-                        <p className="col-span-full text-center text-gray-500">No products available.</p>
+                        <div className="col-span-full text-center text-gray-500">Loading products...</div>
                     ) : (
                         products.map((product) => (
                             <ProductCard key={product.id} product={product} />

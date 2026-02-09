@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useStorefront } from '@/contexts/StorefrontContext';
 
 interface FilterOption {
   id: string;
@@ -8,35 +9,44 @@ interface FilterOption {
   options: string[];
 }
 
-const filterCategories: FilterOption[] = [
-  {
-    id: 'category',
-    label: 'Category',
-    options: ['Electronics', 'Accessories', 'Audio', 'Computers', 'Mobile', 'Wearables']
-  },
-  {
-    id: 'price',
-    label: 'Price Range',
-    options: ['₹0 - ₹4,000', '₹4,000 - ₹8,000', '₹8,000 - ₹16,000', '₹16,000 - ₹40,000', '₹40,000+']
-  },
-  {
-    id: 'brand',
-    label: 'Brand',
-    options: ['Premium', 'Smart', 'Wireless', 'Pro', 'Elite']
-  },
-  {
-    id: 'rating',
-    label: 'Rating',
-    options: ['4+ Stars', '3+ Stars', '2+ Stars', '1+ Stars']
-  }
-];
-
 interface ProductsDropdownProps {
   onFilterChange: (filters: Record<string, string[]>) => void;
 }
 
 export default function ProductsDropdown({ onFilterChange }: ProductsDropdownProps) {
+  const { categories, brands, categoryConfig } = useStorefront();
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
+  const filterCategories = useMemo<FilterOption[]>(() => {
+    const enabledFilters = (categoryConfig as { filters?: string[] } | null)?.filters || ['category', 'brand', 'price', 'rating'];
+    const enabledFilterSet = new Set(enabledFilters);
+    const categoryOptions = categories.length
+      ? categories
+      : ['Electronics', 'Accessories', 'Audio', 'Computers', 'Mobile', 'Wearables'];
+    const brandOptions = brands.length ? brands : ['Premium', 'Smart', 'Wireless', 'Pro', 'Elite'];
+
+    return [
+      {
+        id: 'category',
+        label: 'Category',
+        options: categoryOptions
+      },
+      {
+        id: 'price',
+        label: 'Price Range',
+        options: ['₹0 - ₹4,000', '₹4,000 - ₹8,000', '₹8,000 - ₹16,000', '₹16,000 - ₹40,000', '₹40,000+']
+      },
+      {
+        id: 'brand',
+        label: 'Brand',
+        options: brandOptions
+      },
+      {
+        id: 'rating',
+        label: 'Rating',
+        options: ['4+ Stars', '3+ Stars', '2+ Stars', '1+ Stars']
+      }
+    ].filter((item) => enabledFilterSet.has(item.id));
+  }, [brands, categories, categoryConfig]);
 
   const toggleFilter = (categoryId: string, option: string) => {
     setSelectedFilters(prev => {

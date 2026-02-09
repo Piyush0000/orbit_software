@@ -1,53 +1,76 @@
 "use client";
 
-import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
-import { Product } from "@/lib/data";
+import { Product } from "@/types/product";
 import { useState } from "react";
 import QuickViewModal from "@/components/shop/QuickViewModal";
+import { motion } from "framer-motion";
 
 interface CategoryPageTemplateProps {
     title: string;
     description?: string;
     products: Product[];
+    loading?: boolean;
 }
 
-export default function CategoryPageTemplate({ title, description, products }: CategoryPageTemplateProps) {
+export default function CategoryPageTemplate({ title, description, products, loading }: CategoryPageTemplateProps) {
     const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
-    return (
-        <main className="min-h-screen bg-white">
-            <Header />
+    if (loading) {
+        return (
+            <div className="bg-white min-h-screen pt-40 pb-16 flex items-center justify-center">
+                <div className="animate-pulse flex flex-col items-center">
+                    <div className="w-16 h-16 border-t-2 border-b-2 border-gold-500 rounded-full animate-spin mb-8" />
+                    <p className="font-serif text-2xl text-gray-300 italic tracking-widest">Opening Collection...</p>
+                </div>
+            </div>
+        );
+    }
 
-            <div className="bg-gray-50 py-12 md:py-16">
-                <div className="container mx-auto px-4 lg:px-8 text-center">
-                    <h1 className="font-serif text-3xl md:text-5xl font-bold mb-4 animate-fade-in text-gray-900">
+    return (
+        <main className="min-h-screen bg-white pt-40 pb-32">
+            <div className="container mx-auto px-6 lg:px-12">
+                {/* Dynamic Header */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1 }}
+                    className="max-w-4xl mb-24 space-y-8"
+                >
+                    <div className="inline-flex items-center gap-4">
+                        <div className="h-[1px] w-12 bg-gold-400" />
+                        <span className="text-gold-600 uppercase tracking-[0.4em] text-[10px] font-bold">Curated Selection</span>
+                    </div>
+                    <h1 className="text-6xl md:text-8xl font-serif text-gray-900 font-light italic leading-tight">
                         {title}
                     </h1>
                     {description && (
-                        <p className="text-gray-500 max-w-2xl mx-auto uppercase tracking-wide text-xs md:text-sm animate-fade-in delay-100">
+                        <p className="text-gray-500 text-xl font-light leading-relaxed max-w-2xl border-l-2 border-gray-50 pl-8">
                             {description}
                         </p>
                     )}
-                </div>
-            </div>
+                </motion.div>
 
-            <div className="container mx-auto px-4 lg:px-8 py-12 md:py-16">
                 {products.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-24">
                         {products.map((product, index) => (
-                            <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
+                            <motion.div 
+                                key={product.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1, duration: 0.8 }}
+                            >
                                 <ProductCard
                                     product={product}
                                     onQuickView={setQuickViewProduct}
                                 />
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-20">
-                        <h3 className="text-xl font-medium text-gray-900 mb-2">No products found</h3>
-                        <p className="text-gray-500">We couldn't find any products in this category matching your criteria.</p>
+                    <div className="text-center py-32 border border-dashed border-gray-100 rounded-[3.5rem] bg-gray-50/30">
+                        <h3 className="font-serif text-3xl text-gray-300 italic mb-4">No fragrances found</h3>
+                        <p className="text-gray-400 text-sm font-light uppercase tracking-widest">Discover our other collections meanwhile.</p>
                     </div>
                 )}
             </div>

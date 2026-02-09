@@ -89,7 +89,7 @@ export function BrandCards() {
                                 <Icon className={`h-5 w-5 ${card.iconColor}`} />
                             </div>
                             <CardTitle className="text-4xl font-bold tabular-nums mt-2">
-                                {loading ? "—" : card.value}
+                                {loading ? "—" : error ? "Error" : card.value}
                             </CardTitle>
                             <p className="text-xs text-muted-foreground mt-1">
                                 {error || card.description}

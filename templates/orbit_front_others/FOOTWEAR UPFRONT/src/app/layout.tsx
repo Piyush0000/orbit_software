@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${oswald.variable} ${inter.variable}`}>
+      <body className={`${oswald.variable} ${inter.variable}`} suppressHydrationWarning>
         <Providers>
           <Header />
           <main style={{ minHeight: '80vh', paddingTop: '90px' }}>

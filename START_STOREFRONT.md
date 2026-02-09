@@ -21,6 +21,7 @@ cd "D:\orbit\templates\orbit_front_others\toy upfront 2"
 ### Step 3: Install Dependencies (First Time Only)
 ```powershell
 npm install
+
 ```
 
 ### Step 4: Start Template on Port 3004

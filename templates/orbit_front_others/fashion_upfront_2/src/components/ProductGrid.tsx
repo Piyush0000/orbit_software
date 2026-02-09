@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -7,9 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
 import { Product } from '@/types/product';
-import { usdToInr, parseINRToNumber } from '@/lib/utils';
-import { getProducts } from '@/lib/products-api';
-import { mapApiProducts } from '@/lib/product-adapter';
+import { parseINRToNumber } from '@/lib/utils'; // usdToInr removed
+import { useStorefront } from '@/contexts/StorefrontContext';
 
 // Define filter state locally
 interface FilterState {
@@ -22,8 +19,9 @@ interface FilterState {
 
 export default function ProductGrid() {
   const searchParams = useSearchParams();
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(true);
+  const { products: allProducts, categories: contextCategories, brands: contextBrands, loading, categoryConfig } = useStorefront();
+  const enabledFilters = (categoryConfig as { filters?: string[] } | null)?.filters || ['category', 'brand', 'price', 'availability', 'size'];
+  const enabledFilterSet = new Set(enabledFilters);
 
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     category: [],
@@ -44,23 +42,6 @@ export default function ProductGrid() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoadingProducts(true);
-        const apiProducts = await getProducts();
-        setAllProducts(mapApiProducts(apiProducts));
-      } catch (error) {
-        console.error('Failed to load products:', error);
-        setAllProducts([]);
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
-
-    loadProducts();
-  }, []);
-
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('popular');
   const [showFilters, setShowFilters] = useState(false);
@@ -70,11 +51,15 @@ export default function ProductGrid() {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
-  const categories = ['Men', 'Women', 'Kids'];
-  const brands = ['H&M', 'Levi\'s', 'Zara', 'Gucci', 'Nike', 'Woodland', 'Mothercare', 'Ray-Ban'];
+  const categories = contextCategories.length > 0 ? contextCategories : ['Men', 'Women', 'Kids'];
+  const brands = contextBrands.length > 0 ? contextBrands : ['H&M', 'Levi\'s', 'Zara', 'Gucci', 'Nike', 'Woodland', 'Mothercare', 'Ray-Ban'];
+  
+  // Note: Prices are hardcoded in INR. If store uses USD, this needs adjustment.
   const prices = ['₹0 - ₹2,000', '₹2,000 - ₹5,000', '₹5,000 - ₹10,000', '₹10,000+'];
   const availability = ['In Stock', 'Out of Stock'];
-  const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  // Sizes might also need to be dynamic, but keeping hardcoded for now as API might not provide a global list easy.
+  const sizeOptions = Array.from(new Set(allProducts.flatMap((product) => product.sizes || []))).filter(Boolean);
+  const sizes = sizeOptions.length ? sizeOptions : ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
   const toggleFilter = (type: keyof FilterState, value: string) => {
     setActiveFilters(prev => {
@@ -103,11 +88,11 @@ export default function ProductGrid() {
       return;
     }
 
-    const priceInINRNum = parseINRToNumber(product.price);
+    const priceInINRNum = typeof product.price === 'string' ? parseINRToNumber(product.price) : product.price;
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: String(product.price),
       priceNum: priceInINRNum,
       image: product.image,
       shortDescription: product.description,
@@ -120,6 +105,7 @@ export default function ProductGrid() {
 
   // Derive filtered and sorted products
   const displayedProducts = useMemo(() => {
+    if (loading) return [];
     let filtered = [...allProducts];
 
     const subcategoryParam = searchParams.get('subcategory');
@@ -140,37 +126,38 @@ export default function ProductGrid() {
         product.name.toLowerCase().includes(query) ||
         product.description.toLowerCase().includes(query) ||
         product.category.toLowerCase().includes(query) ||
-        product.brand.toLowerCase().includes(query)
+        (product.brand && product.brand.toLowerCase().includes(query))
       );
     }
 
-    if (activeFilters.category.length > 0) {
+    if (enabledFilterSet.has('category') && activeFilters.category.length > 0) {
       filtered = filtered.filter(p => activeFilters.category.includes(p.category));
     }
-    if (activeFilters.brand.length > 0) {
-      filtered = filtered.filter(p => activeFilters.brand.includes(p.brand));
+    if (enabledFilterSet.has('brand') && activeFilters.brand.length > 0) {
+      filtered = filtered.filter(p => p.brand && activeFilters.brand.includes(p.brand));
     }
-    if (activeFilters.size.length > 0) {
+    if (enabledFilterSet.has('size') && activeFilters.size.length > 0) {
       filtered = filtered.filter(p =>
         p.sizes && p.sizes.some(s => activeFilters.size.includes(s))
       );
     }
-    if (activeFilters.availability.length > 0) {
+    if (enabledFilterSet.has('availability') && activeFilters.availability.length > 0) {
       if (activeFilters.availability.includes('In Stock')) {
-        filtered = filtered.filter(p => p.stock);
+        filtered = filtered.filter(p => p.stock !== false); // Default to true if undefined
       }
       if (activeFilters.availability.includes('Out of Stock')) {
-        filtered = filtered.filter(p => !p.stock);
+        filtered = filtered.filter(p => p.stock === false);
       }
     }
-    if (activeFilters.price.length > 0) {
+    if (enabledFilterSet.has('price') && activeFilters.price.length > 0) {
       filtered = filtered.filter(p => {
-        const priceInINR = usdToInr(p.priceNum);
+        // Use priceNum directly, assuming it matches the currency logic of the filter
+        const priceValue = p.priceNum; 
         return activeFilters.price.some(range => {
-          if (range === '₹0 - ₹2,000') return priceInINR <= 2000;
-          if (range === '₹2,000 - ₹5,000') return priceInINR > 2000 && priceInINR <= 5000;
-          if (range === '₹5,000 - ₹10,000') return priceInINR > 5000 && priceInINR <= 10000;
-          if (range === '₹10,000+') return priceInINR > 10000;
+          if (range === '₹0 - ₹2,000') return priceValue <= 2000;
+          if (range === '₹2,000 - ₹5,000') return priceValue > 2000 && priceValue <= 5000;
+          if (range === '₹5,000 - ₹10,000') return priceValue > 5000 && priceValue <= 10000;
+          if (range === '₹10,000+') return priceValue > 10000;
           return false;
         });
       });
@@ -180,13 +167,17 @@ export default function ProductGrid() {
       switch (sortBy) {
         case 'price_low': return a.priceNum - b.priceNum;
         case 'price_high': return b.priceNum - a.priceNum;
-        case 'newest': return (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);
+        case 'newest': return (b.createdAt ? new Date(b.createdAt).getTime() : 0) - (a.createdAt ? new Date(a.createdAt).getTime() : 0);
         case 'popular': default: return (b.popularity || 0) - (a.popularity || 0);
       }
     });
 
     return filtered;
-  }, [activeFilters, searchQuery, sortBy, searchParams, allProducts]);
+  }, [activeFilters, searchQuery, sortBy, searchParams, allProducts, loading, enabledFilters]);
+
+  if (loading) {
+     return <div className="py-20 text-center">Loading products...</div>;
+  }
 
   return (
     <section id="products" className="py-20 bg-white">
@@ -252,7 +243,7 @@ export default function ProductGrid() {
                 { title: 'Price', items: prices, key: 'price' as keyof FilterState },
                 { title: 'Brand', items: brands, key: 'brand' as keyof FilterState },
                 { title: 'Size', items: sizes, key: 'size' as keyof FilterState },
-              ].map((section) => (
+              ].filter((section) => enabledFilterSet.has(section.key)).map((section) => (
                 <div key={section.title}>
                   <h4 className="font-bold text-xs uppercase tracking-widest text-zinc-400 mb-4">{section.title}</h4>
                   <div className="space-y-2.5">
@@ -279,12 +270,7 @@ export default function ProductGrid() {
 
         {/* Product Grid */}
         <div className="min-h-[400px]">
-          {loadingProducts ? (
-            <div className="text-center py-32 bg-zinc-50">
-              <h3 className="text-2xl font-heading uppercase mb-2">Loading products...</h3>
-              <p className="text-zinc-500 mb-6 font-light">Fetching the latest catalog.</p>
-            </div>
-          ) : displayedProducts.length === 0 ? (
+          {displayedProducts.length === 0 ? (
             <div className="text-center py-32 bg-zinc-50">
               <h3 className="text-2xl font-heading uppercase mb-2">No items match your search</h3>
               <p className="text-zinc-500 mb-6 font-light">Try adjusting your filters or search terms.</p>

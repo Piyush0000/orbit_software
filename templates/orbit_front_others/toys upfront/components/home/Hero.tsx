@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Hero() {
+    const { customization } = useStorefront();
+    const hero = customization?.heroSection || {};
+    const heroTitle = hero.title || "Spark Joy in";
+    const heroSubtitle = hero.subtitle || "Every Moment";
+    const heroDescription =
+        hero.description ||
+        "From educational wonders to outdoor adventures, find the perfect toys that help your little ones learn, grow, and have a blast.";
+    const heroBadge = hero.badge || "New Collection Available";
+    const heroImage = hero.image || hero.imageUrl || "/hero-image.jpg";
     return (
         <section className="relative overflow-hidden bg-sky-50 pt-16 pb-20 lg:pt-24 lg:pb-32">
             <div className="container mx-auto px-4">
@@ -21,8 +31,8 @@ export default function Hero() {
                             <div className="relative h-full w-full rounded-[30%_70%_70%_30%_/_30%_30%_70%_70%] overflow-hidden shadow-2xl border-[6px] border-white transform hover:rotate-1 transition-transform duration-700">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
-                                    src="/hero-image.jpg"
-                                    alt="Happy kids playing with toys"
+                                    src={heroImage}
+                                    alt={heroTitle}
                                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-1000"
                                 />
                             </div>
@@ -42,12 +52,12 @@ export default function Hero() {
                     {/* Text Content - ON RIGHT */}
                     <div className="flex-1 text-center lg:text-left">
                         <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-white border border-blue-200 text-primary font-bold text-sm shadow-sm">
-                            New Collection Available
+                            {heroBadge}
                         </div>
                         <h1 className="text-5xl lg:text-7xl font-extrabold text-gray-900 mb-6 font-display leading-[1.1] tracking-tight">
-                            Spark Joy in <br />
+                            {heroTitle} <br />
                             <span className="text-primary relative inline-block">
-                                Every Moment
+                                {heroSubtitle}
                                 {/* Underline decoration */}
                                 <svg className="absolute w-full h-3 -bottom-1 left-0 text-secondary -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
                                     <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
@@ -55,22 +65,21 @@ export default function Hero() {
                             </span>
                         </h1>
                         <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                            From educational wonders to outdoor adventures, find the perfect
-                            toys that help your little ones learn, grow, and have a blast.
+                            {heroDescription}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                             <Link
                                 href="/category/all"
                                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-primary rounded-full hover:bg-blue-400 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                             >
-                                Explore Toys
+                                {hero.ctaText || "Explore Toys"}
                                 <ArrowRight className="ml-2 w-5 h-5" />
                             </Link>
                             <Link
                                 href="/category/educational"
                                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-gray-700 bg-white border-2 border-gray-100 rounded-full hover:border-primary/30 hover:bg-sky-50 transition-all"
                             >
-                                Educational
+                                {hero.secondaryCtaText || "Educational"}
                             </Link>
                         </div>
 

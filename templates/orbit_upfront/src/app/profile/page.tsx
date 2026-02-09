@@ -3,13 +3,23 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { useWishlist } from '@/store/wishlistStore';
 import { useCart } from '@/store/cartStore';
+
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
     const [activeTab, setActiveTab] = useState('orders');
     const { wishlist, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        // Clear any auth state here
+        router.push('/auth/login');
+    };
 
     const renderContent = () => {
         switch (activeTab) {
@@ -47,7 +57,7 @@ export default function ProfilePage() {
                         <div>
                             <h2 className="text-xl font-bold mb-6 border-b pb-2">Profile Details</h2>
                             <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-xs font-bold text-gray-500 uppercase mb-1">First Name</label>
                                         <input type="text" defaultValue="John" className="w-full border-b-2 border-gray-200 focus:border-black outline-none py-2 transition-colors bg-transparent" />
@@ -224,53 +234,60 @@ export default function ProfilePage() {
     // Actually let's just render a flat clean list with headers
 
     return (
-        <div className="min-h-screen bg-white pt-10 pb-20 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="min-h-screen flex flex-col transition-colors duration-300">
+            <Header />
+            <main className="flex-grow bg-white pt-10 pb-20 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto">
 
-                {/* Profile Header Block */}
-                <div className="bg-white mb-8 border-b pb-8">
-                    <div className="flex justify-between items-end">
-                        <div>
-                            <h1 className="text-2xl font-bold mb-1">Account</h1>
-                            <p className="text-sm text-gray-500">John Doe</p>
+                    {/* Profile Header Block */}
+                    <div className="bg-white mb-8 border-b pb-8">
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <h1 className="text-2xl font-bold mb-1">Account</h1>
+                                <p className="text-sm text-gray-500">John Doe</p>
+                            </div>
+                            {/* Could add specific edit button here */}
                         </div>
-                        {/* Could add specific edit button here */}
-                    </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-8">
-                    {/* Sidebar */}
-                    <div className="w-full md:w-64 flex-shrink-0 border-r pr-8">
-                        <nav className="space-y-1">
-                            {['overview', 'orders', 'wishlist', 'profile', 'addresses'].map(id => {
-                                const item = menuItems.find(x => x.id === id);
-                                if (!item) return null;
-                                return (
-                                    <button
-                                        key={id}
-                                        onClick={() => setActiveTab(id)}
-                                        className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors border-l-4 ${activeTab === id
-                                            ? 'border-[#E7F874] text-black bg-yellow-50/50'
-                                            : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-black'
-                                            }`}
-                                    >
-                                        {item.label}
-                                    </button>
-                                )
-                            })}
-                            <div className="my-4 border-t border-gray-100"></div>
-                            <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-600 hover:text-red-500 hover:bg-red-50 border-l-4 border-transparent">
-                                Logout
-                            </button>
-                        </nav>
                     </div>
 
-                    {/* Main Content */}
-                    <div className="flex-1 min-h-[600px]">
-                        {renderContent()}
+                    <div className="flex flex-col md:flex-row gap-8">
+                        {/* Sidebar */}
+                        <div className="w-full md:w-64 flex-shrink-0 border-b md:border-b-0 md:border-r pb-8 md:pb-0 md:pr-8">
+                            <nav className="space-y-1">
+                                {['overview', 'orders', 'wishlist', 'profile', 'addresses'].map(id => {
+                                    const item = menuItems.find(x => x.id === id);
+                                    if (!item) return null;
+                                    return (
+                                        <button
+                                            key={id}
+                                            onClick={() => setActiveTab(id)}
+                                            className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors border-l-4 ${activeTab === id
+                                                ? 'border-[#E7F874] text-black bg-yellow-50/50'
+                                                : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-black'
+                                                }`}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    )
+                                })}
+                                <div className="my-4 border-t border-gray-100"></div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full text-left px-4 py-3 text-sm font-medium text-gray-600 hover:text-red-500 hover:bg-red-50 border-l-4 border-transparent"
+                                >
+                                    Logout
+                                </button>
+                            </nav>
+                        </div>
+
+                        {/* Main Content */}
+                        <div className="flex-1 min-h-[600px]">
+                            {renderContent()}
+                        </div>
                     </div>
                 </div>
-            </div>
+            </main>
+            <Footer />
         </div>
     );
 }

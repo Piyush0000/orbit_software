@@ -1,16 +1,27 @@
 "use client";
-
-import Image from "next/image";
 import Link from "next/link";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Hero() {
+    const { customization } = useStorefront();
+
     return (
         <section className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden bg-contrast-black">
             {/* Background with luxury texture overlay */}
-            <div className="absolute inset-0 opacity-40">
-                {/* Placeholder for a luxury background texture/image */}
-                <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-800 via-contrast-black to-contrast-black" />
-            </div>
+            {customization?.hero?.backgroundImage ? (
+                <div className="absolute inset-0 opacity-40">
+                     {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                        src={customization.hero.backgroundImage} 
+                        alt="Background" 
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+            ) : (
+                <div className="absolute inset-0 opacity-40">
+                    <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-800 via-contrast-black to-contrast-black" />
+                </div>
+            )}
 
             {/* Content Container */}
             <div className="relative z-10 container mx-auto px-4 text-center">
@@ -19,33 +30,30 @@ export default function Hero() {
                         Luxury • Long Lasting • Authentic
                     </p>
 
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white font-medium leading-tight">
-                        Discover Your <br />
-                        <span className="italic text-gold-200">Signature Scent</span>
+                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white font-medium leading-tight uppercase tracking-tighter">
+                        {customization?.hero?.title?.split(' ').map((word, i) => (
+                             <span key={i} className={i === 2 ? "italic text-gold-200 block" : ""}>
+                               {word}{' '}
+                             </span>
+                        )) || (<>Discover Your <br /><span className="italic text-gold-200">Signature Scent</span></>)}
                     </h1>
 
                     <p className="text-gray-300 max-w-xl mx-auto text-lg font-light">
-                        Experience the essence of elegance with our curated collection of premium fragrances for every occasion.
+                        {customization?.hero?.subtitle || "Experience the essence of elegance with our curated collection of premium fragrances for every occasion."}
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                         <Link
-                            href="/men"
-                            className="px-8 py-4 bg-white text-black text-sm uppercase tracking-widest font-bold hover:bg-gold-500 hover:text-white transition-colors duration-300 min-w-[160px]"
+                            href={customization?.hero?.ctaLink || "/shop"}
+                            className="px-8 py-4 bg-white text-black text-xs uppercase tracking-[0.2em] font-bold hover:bg-gold-500 hover:text-white transition-colors duration-300 min-w-[180px]"
                         >
-                            Shop Men
+                            {customization?.hero?.ctaText || "Shop Collection"}
                         </Link>
                         <Link
-                            href="/women"
-                            className="px-8 py-4 border border-white text-white text-sm uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-colors duration-300 min-w-[160px]"
+                            href="/shop?category=women"
+                            className="px-8 py-4 border border-white text-white text-xs uppercase tracking-[0.2em] font-bold hover:bg-white hover:text-black transition-colors duration-300 min-w-[180px]"
                         >
-                            Shop Women
-                        </Link>
-                        <Link
-                            href="/luxury"
-                            className="px-8 py-4 bg-transparent text-gold-300 text-sm uppercase tracking-widest font-bold border border-gold-300 hover:bg-gold-300 hover:text-black transition-colors duration-300 min-w-[160px]"
-                        >
-                            Luxury
+                            Explore Scents
                         </Link>
                     </div>
                 </div>

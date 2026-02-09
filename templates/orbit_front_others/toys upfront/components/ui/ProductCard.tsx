@@ -8,10 +8,10 @@ interface Product {
     id: number | string;
     name: string;
     price: number;
-    rating: number;
-    reviews: number;
+    rating?: number;
+    reviews?: number;
     image?: string;
-    age: string;
+    age?: string;
     badge?: string | null;
     originalPrice?: number;
 }
@@ -62,16 +62,22 @@ export default function ProductCard({ product }: { product: Product }) {
 
             {/* Content */}
             <div className="p-5 flex-1 flex flex-col">
-                <div className="text-xs text-gray-400 font-medium mb-1">Age {product.age} Years</div>
+                {product.age ? (
+                    <div className="text-xs text-gray-400 font-medium mb-1">Age {product.age} Years</div>
+                ) : null}
                 <h3 className="font-bold text-gray-900 text-lg mb-2 group-hover:text-primary transition-colors line-clamp-2">
                     <Link href={`/product/${product.id}`}>{product.name}</Link>
                 </h3>
 
-                <div className="flex items-center mb-4">
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    <span className="text-sm font-medium text-gray-700 ml-1">{product.rating}</span>
-                    <span className="text-xs text-gray-400 ml-1">({product.reviews})</span>
-                </div>
+                {product.rating !== undefined && (
+                    <div className="flex items-center mb-4">
+                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                        <span className="text-sm font-medium text-gray-700 ml-1">{product.rating}</span>
+                        {product.reviews !== undefined ? (
+                            <span className="text-xs text-gray-400 ml-1">({product.reviews})</span>
+                        ) : null}
+                    </div>
+                )}
 
                 <div className="mt-auto flex items-center justify-between">
                     <div className="flex items-baseline gap-2">

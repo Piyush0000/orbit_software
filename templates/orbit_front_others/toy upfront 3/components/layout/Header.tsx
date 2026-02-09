@@ -2,17 +2,27 @@
 
 import Link from "next/link";
 import { Search, ShoppingCart, Heart, MapPin, Phone, User, Menu, X, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AnnouncementBar from "./AnnouncementBar";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useStore } from "@/contexts/StoreContext";
+import { useAuth } from "@/store/authStore";
+import { useStorefront } from "@/context/StorefrontContext";
 
 export default function Header() {
+    const { store, customization } = useStorefront();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { wishlist } = useWishlist();
     const { cartCount } = useCart();
-    const { store } = useStore();
+    const { user, isAuthenticated, logout } = useAuth();
+    const [mounted, setMounted] = useState(false);
+    const logoUrl = customization?.logo || store?.logo || "";
+    const storeName = store?.name || "ToyStore";
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
 
 
     return (
@@ -32,10 +42,15 @@ export default function Header() {
                     {/* Logo Area */}
                     <Link href="/" className="flex-shrink-0 flex items-center gap-2 group">
                         <div className="bg-primary/20 p-1.5 rounded-lg rotate-3 group-hover:rotate-12 transition-transform">
-                            <span className="text-2xl">🧸</span>
+                            {logoUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={logoUrl} alt={storeName} className="h-8 w-8 rounded-md object-cover" />
+                            ) : (
+                                <span className="text-2xl">🧸</span>
+                            )}
                         </div>
                         <span className="text-3xl font-extrabold text-foreground font-display tracking-tight leading-none">
-                            {store?.name || "ToyStore"}
+                            {storeName}
                             <span className="text-secondary animate-pulse text-4xl leading-none">.</span>
                         </span>
                     </Link>
@@ -89,6 +104,31 @@ export default function Header() {
                             <span className="text-secondary font-bold">Cart</span>
                             {cartCount > 0 && <span className="bg-secondary text-white text-[10px] px-1.5 py-0.5 rounded-full">{cartCount}</span>}
                         </Link>
+
+                        {mounted && isAuthenticated ? (
+                            <div className="flex items-center gap-2 pl-4 border-l border-gray-300">
+                                <span className="font-bold text-secondary">Hi, {user?.name}</span>
+                                <button
+                                    onClick={() => {
+                                        logout();
+                                        window.location.reload();
+                                    }}
+                                    className="text-xs text-red-500 hover:text-red-600 underline"
+                                >
+                                    Sign Out
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-4 pl-4 border-l border-gray-300">
+                                <Link href="/auth/login" className="flex items-center gap-1 hover:text-secondary">
+                                    <User className="w-4 h-4" />
+                                    <span>Login</span>
+                                </Link>
+                                <Link href="/auth/register" className="flex items-center gap-1 hover:text-secondary">
+                                    <span>Register</span>
+                                </Link>
+                            </div>
+                        )}
                     </div>
                     {/* Mobile Icons (Visible only on mobile) */}
                     <div className="flex lg:hidden items-center gap-3">
@@ -98,6 +138,66 @@ export default function Header() {
                         </Link>
                     </div>
 
+                </div>
+            </div>
+
+            {/* Mobile Menu Overlay */}
+            <div className={`fixed inset-0 bg-white z-[100] h-[100dvh] transition-all duration-300 lg:hidden flex flex-col pt-24 px-6 overflow-y-auto ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
+                <div className="flex flex-col gap-6 text-xl font-bold text-foreground">
+                    <div className="space-y-4">
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Shop By Category</p>
+                        <Link href="/category/educational" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between py-2 border-b border-gray-100">Learning <span className="text-gray-400">→</span></Link>
+                        <Link href="/category/soft-toys" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between py-2 border-b border-gray-100">Soft Toys <span className="text-gray-400">→</span></Link>
+                        <Link href="/category/action-figures" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between py-2 border-b border-gray-100">Action Figures <span className="text-gray-400">→</span></Link>
+                        <Link href="/category/outdoor" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between py-2 border-b border-gray-100">Outdoor <span className="text-gray-400">→</span></Link>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-gray-100">
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">My Account</p>
+                        {mounted && isAuthenticated ? (
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3 py-2 text-gray-900 font-bold border-b border-gray-100 mb-2">
+                                    <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                                        {user?.name?.charAt(0) || 'U'}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span>{user?.name || 'User'}</span>
+                                        <span className="text-xs text-gray-500 font-normal">{user?.email}</span>
+                                    </div>
+                                </div>
+                                <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 py-2 text-gray-600 hover:text-secondary">
+                                    <User className="w-5 h-5" />
+                                    My Profile
+                                </Link>
+                                <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 py-2 text-gray-600 hover:text-secondary">
+                                    <span className="w-5 h-5 flex items-center justify-center font-bold">📦</span>
+                                    My Orders
+                                </Link>
+                                <button
+                                    onClick={() => {
+                                        logout();
+                                        setIsMobileMenuOpen(false);
+                                        window.location.reload();
+                                    }}
+                                    className="flex items-center gap-3 py-2 text-red-500 w-full text-left"
+                                >
+                                    <span className="w-5 h-5 flex items-center justify-center">→</span>
+                                    Sign Out
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <Link href="/auth/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 py-2 text-secondary font-bold">
+                                    <User className="w-5 h-5" />
+                                    Login / Register
+                                </Link>
+                                <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 py-2 text-gray-600 hover:text-secondary">
+                                    <Heart className="w-5 h-5" />
+                                    Shortlist {wishlist.length > 0 && `(${wishlist.length})`}
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
