@@ -8,7 +8,7 @@ import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
 import { Product } from '@/types/product';
 import { usdToInr, parseINRToNumber } from '@/lib/utils';
-import { products as allProducts } from '@/data/products';
+import { StorefrontAPI } from '@/lib/api';
 
 // Define filter state locally
 interface FilterState {
@@ -29,6 +29,30 @@ export default function ProductGrid() {
     availability: [],
     size: [],
   });
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await StorefrontAPI.getProducts();
+        setProducts(data.products || []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Failed to load products');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Initialize from URL params
   useEffect(() => {
@@ -104,7 +128,7 @@ export default function ProductGrid() {
 
   // Derive filtered and sorted products
   const displayedProducts = useMemo(() => {
-    let filtered = [...allProducts];
+    let filtered = [...products];
 
     const subcategoryParam = searchParams.get('subcategory');
     if (subcategoryParam) {
@@ -113,7 +137,7 @@ export default function ProductGrid() {
         product.category.toLowerCase() === searchParams.get('category')?.toLowerCase() && (
           product.name.toLowerCase().includes(term) ||
           product.description.toLowerCase().includes(term) ||
-          (product.tags && product.tags.some(tag => tag.toLowerCase().includes(term))) ||
+          (product.tags && product.tags.some((tag: string) => tag.toLowerCase().includes(term))) ||
           product.category.toLowerCase().includes(term)
         ));
     }
@@ -136,7 +160,7 @@ export default function ProductGrid() {
     }
     if (activeFilters.size.length > 0) {
       filtered = filtered.filter(p =>
-        p.sizes && p.sizes.some(s => activeFilters.size.includes(s))
+        p.sizes && p.sizes.some((s: string) => activeFilters.size.includes(s))
       );
     }
     if (activeFilters.availability.length > 0) {
@@ -170,7 +194,7 @@ export default function ProductGrid() {
     });
 
     return filtered;
-  }, [activeFilters, searchQuery, sortBy, searchParams]);
+  }, [activeFilters, searchQuery, sortBy, searchParams, products]);
 
   return (
     <section id="products" className="py-20 bg-[var(--page-bg)]">
@@ -264,7 +288,19 @@ export default function ProductGrid() {
 
         {/* Product Grid */}
         <div className="min-h-[400px]">
-          {displayedProducts.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-32">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-32 bg-[var(--section-alt)]">
+              <h3 className="text-2xl font-heading uppercase mb-2 text-[var(--text-primary)]">Error Loading Products</h3>
+              <p className="text-[var(--text-secondary)] mb-6 font-light">{error}</p>
+              <button onClick={() => window.location.reload()} className="px-8 py-3 bg-[var(--text-primary)] text-[var(--page-bg)] text-sm font-bold uppercase tracking-widest hover:bg-[var(--text-secondary)] transition-colors">
+                Retry
+              </button>
+            </div>
+          ) : displayedProducts.length === 0 ? (
             <div className="text-center py-32 bg-[var(--section-alt)]">
               <h3 className="text-2xl font-heading uppercase mb-2 text-[var(--text-primary)]">No items match your search</h3>
               <p className="text-[var(--text-secondary)] mb-6 font-light">Try adjusting your filters or search terms.</p>
@@ -351,7 +387,7 @@ export default function ProductGrid() {
             </div>
           )}
 
-          {displayedProducts.length > 0 && (
+          {!loading && displayedProducts.length > 0 && (
             <div className="mt-12 text-center">
               <span className="text-xs text-[var(--text-secondary)] uppercase tracking-widest">Showing {displayedProducts.length} Products</span>
             </div>

@@ -28,12 +28,7 @@ exports.getStoreInfo = async (req, res) => {
         description: true,
         logo: true,
         category: true,
-        categoryConfig: {
-          select: {
-            category: true,
-            config: true
-          }
-        },
+        categoryConfig: true,
         isActive: true,
         createdAt: true,
         settings: {
@@ -47,7 +42,7 @@ exports.getStoreInfo = async (req, res) => {
             contactPhone: true,
           }
         },
-        theme: {
+        themeTemplate: {
           select: {
             id: true,
             name: true,
@@ -708,5 +703,70 @@ exports.verifyPublicPayment = async (req, res) => {
   } catch (error) {
     console.error('Error verifying payment:', error);
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * GET /api/storefront/public/:subdomain/sections
+ * Get products for homepage sections based on customization
+ */
+exports.getStoreSections = async (req, res) => {
+  try {
+    const { subdomain } = req.params;
+
+    const store = await prisma.store.findUnique({
+      where: { subdomain },
+      include: {
+        websiteCustomization: true
+      }
+    });
+
+    if (!store) {
+      return res.status(404).json({ success: false, message: 'Store not found' });
+    }
+
+    const sections = store.websiteCustomization?.productSections || [];
+    const sectionsData = {};
+
+    // Process each section to fetch its specific products
+    for (const section of sections) {
+      let queryWhere = {
+        storeId: store.id,
+        isActive: true
+      };
+
+      // Apply category filter if specified
+      if (section.category) {
+        queryWhere.category = section.category;
+      }
+
+      // Apply type-based filters
+      if (section.type === 'featured') {
+        queryWhere.isFeatured = true;
+      }
+
+      const products = await prisma.product.findMany({
+        where: queryWhere,
+        take: section.limit || 8,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          variants: true
+        }
+      });
+
+      sectionsData[section.id || section.title] = {
+        ...section,
+        products
+      };
+    }
+
+    res.json({
+      success: true,
+      data: sectionsData
+    });
+
+  } catch (error) {
+    console.error('Error fetching homepage products:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch homepage products' });
   }
 };

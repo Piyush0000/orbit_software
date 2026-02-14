@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, Search, Menu } from "lucide-react";
+import { ShoppingCart, Search, Menu, User, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose, SheetDescription } from "@/components/ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 
@@ -15,11 +15,13 @@ export function Header() {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     // Add scroll event listener
-    if (typeof window !== "undefined") {
-        window.addEventListener("scroll", () => {
+    useEffect(() => {
+        const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
-        });
-    }
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const navLinks = [
         { name: "Shop", href: "/shop" },

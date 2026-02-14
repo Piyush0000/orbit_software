@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
 import { CartProvider } from "@/store/cartStore";
 import { WishlistProvider } from "@/store/wishlistStore";
+import { StoreProvider } from "@/contexts/store-context";
 
 const oswald = Oswald({
   subsets: ["latin"],
@@ -31,11 +32,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${oswald.variable} font-sans antialiased`} suppressHydrationWarning>
         <ThemeWrapper>
-          <WishlistProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
-          </WishlistProvider>
+          <StoreProvider>
+            <WishlistProvider>
+              <CartProvider>
+                {children}
+              </CartProvider>
+            </WishlistProvider>
+          </StoreProvider>
         </ThemeWrapper>
       </body>
     </html>

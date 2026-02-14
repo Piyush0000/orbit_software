@@ -6,6 +6,7 @@ import { useStore } from '@/lib/api';
 interface StoreContextType {
   storeInfo: any;
   customization: any;
+  sections: any;
   loading: boolean;
   error: string | null;
 }

@@ -40,7 +40,7 @@ export class StorefrontAPI {
   }
 
   // Get products with optional filters
-  static async getProducts(options = {}) {
+  static async getProducts(options: any = {}) {
     try {
       const { category, search, limit = 50, offset = 0 } = options;
       const params = new URLSearchParams();
@@ -61,7 +61,7 @@ export class StorefrontAPI {
   }
 
   // Get single product
-  static async getProduct(productId) {
+  static async getProduct(productId: string | number) {
     try {
       const response = await fetch(`${API_BASE_URL}/${this.subdomain}/products/${productId}`);
       const data = await response.json();
@@ -99,8 +99,21 @@ export class StorefrontAPI {
     }
   }
 
+  // Get homepage sections with products
+  static async getStoreSections() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${this.subdomain}/sections`);
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message || 'Failed to fetch sections');
+      return data.data;
+    } catch (error) {
+      console.error('Error fetching sections:', error);
+      return {};
+    }
+  }
+
   // Create order
-  static async createOrder(orderData) {
+  static async createOrder(orderData: any) {
     try {
       const response = await fetch(`${API_BASE_URL}/${this.subdomain}/orders`, {
         method: 'POST',
@@ -119,7 +132,7 @@ export class StorefrontAPI {
   }
 
   // Verify payment
-  static async verifyPayment(paymentData) {
+  static async verifyPayment(paymentData: any) {
     try {
       const response = await fetch(`${API_BASE_URL}/${this.subdomain}/orders/verify`, {
         method: 'POST',
@@ -144,6 +157,7 @@ import { useState, useEffect } from 'react';
 export function useStore() {
   const [storeInfo, setStoreInfo] = useState(null);
   const [customization, setCustomization] = useState(null);
+  const [sections, setSections] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -151,12 +165,14 @@ export function useStore() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [info, custom] = await Promise.all([
+        const [info, custom, sectionsData] = await Promise.all([
           StorefrontAPI.getStoreInfo(),
-          StorefrontAPI.getStoreCustomization()
+          StorefrontAPI.getStoreCustomization(),
+          StorefrontAPI.getStoreSections()
         ]);
         setStoreInfo(info);
         setCustomization(custom);
+        setSections(sectionsData);
       } catch (err: any) {
         setError(err.message || 'Unknown error');
         console.error('Error loading store data:', err);
@@ -171,6 +187,7 @@ export function useStore() {
   return {
     storeInfo,
     customization,
+    sections,
     loading,
     error
   };

@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
+import { StoreProvider } from "@/context/store-context";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -31,13 +32,15 @@ export default function RootLayout({
       <body
         className={`${nunito.variable} ${fredoka.variable} antialiased min-h-screen flex flex-col`}
       >
-        <WishlistProvider>
-          <CartProvider>
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-          </CartProvider>
-        </WishlistProvider>
+        <StoreProvider>
+          <WishlistProvider>
+            <CartProvider>
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </CartProvider>
+          </WishlistProvider>
+        </StoreProvider>
       </body>
     </html>
   );

@@ -49,6 +49,9 @@ router.get('/:subdomain/categories', getStoreCategories);
 // Theme configuration
 router.get('/:subdomain/theme', getStoreTheme);
 
+// Homepage sections
+router.get('/:subdomain/sections', getStoreSections);
+
 // Domain resolution for storefront hub
 router.get('/resolve', resolveStoreByDomain);
 

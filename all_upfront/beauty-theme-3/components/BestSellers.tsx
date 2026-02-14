@@ -1,12 +1,16 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { useStoreContext } from "@/context/store-context";
 
 // Dummy Data
-const products = [
+const staticProducts = [
     { id: 1, name: "Luminous Glow Serum", price: "₹3,599", category: "Skincare", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=500" },
     { id: 2, name: "Velvet Matte Lipstick", price: "₹2,299", category: "Makeup", image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&q=80&w=500" },
     { id: 3, name: "Hydrating Rose Mist", price: "₹2,599", category: "Skincare", image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=500" },
@@ -14,15 +18,43 @@ const products = [
 ];
 
 export function BestSellers() {
+    const { sections, loading: contextLoading } = useStoreContext();
+    const [products, setProducts] = useState<any[]>([]);
+    const [title, setTitle] = useState("Best Sellers");
+    const [subtitle, setSubtitle] = useState("Customer Favorites");
+
+    useEffect(() => {
+        if (!contextLoading && sections) {
+            const sectionConfig = Object.values(sections).find((s: any) => 
+                s.type === 'best_sellers' || 
+                s.id?.toLowerCase().includes('best') || 
+                s.title?.toLowerCase().includes('best') ||
+                s.type === 'featured' ||
+                s.id?.toLowerCase().includes('feat') ||
+                s.title?.toLowerCase().includes('feat')
+            ) as any;
+
+            if (sectionConfig && sectionConfig.products && sectionConfig.products.length > 0) {
+                setProducts(sectionConfig.products);
+                if (sectionConfig.title) setTitle(sectionConfig.title);
+                if (sectionConfig.subtitle) setSubtitle(sectionConfig.subtitle);
+            } else {
+                setProducts(staticProducts);
+            }
+        }
+    }, [sections, contextLoading]);
+
+    if (contextLoading) return null;
+
     return (
         <section id="bestsellers" className="py-24 px-4 bg-background border-t border-border/40">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-16">
                     <span className="text-primary text-sm uppercase tracking-[0.2em] font-medium mb-3 block">
-                        Customer Favorites
+                        {subtitle}
                     </span>
                     <h2 className="text-4xl md:text-5xl font-serif text-foreground">
-                        Best Sellers
+                        {title}
                     </h2>
                 </div>
 
@@ -31,7 +63,7 @@ export function BestSellers() {
                         <Card key={product.id} className="group overflow-hidden border-none shadow-none bg-transparent rounded-none">
                             <div className="relative aspect-[3/4] overflow-hidden bg-muted mb-4 rounded-sm">
                                 <Image
-                                    src={product.image}
+                                    src={product.image || (product.images && product.images[0]) || "https://via.placeholder.com/500"}
                                     alt={product.name}
                                     fill
                                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
@@ -50,7 +82,7 @@ export function BestSellers() {
                                 <h3 className="text-lg font-medium mb-1 group-hover:text-primary transition-colors line-clamp-1 font-serif">
                                     {product.name}
                                 </h3>
-                                <p className="text-lg text-primary">{product.price}</p>
+                                <p className="text-lg text-primary">₹{product.price?.toLocaleString()}</p>
                             </CardContent>
                         </Card>
                     ))}

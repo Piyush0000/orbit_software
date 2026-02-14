@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ShoppingCart, Search, Menu } from "lucide-react";
+import { ShoppingCart, Search, Menu, Heart, User, ShoppingBag, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 

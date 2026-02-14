@@ -55,8 +55,8 @@ function DrawerContent({
   showCloseButton?: boolean
 }) {
   return (
-    <SheetPortal>
-      <SheetOverlay />
+    <DrawerPortal>
+      <DrawerOverlay />
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
@@ -81,7 +81,7 @@ function DrawerContent({
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Content>
-    </SheetPortal>
+    </DrawerPortal>
   )
 }
 

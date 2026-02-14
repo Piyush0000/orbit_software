@@ -1,35 +1,53 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/store/cartStore';
-import { products } from '@/data/products';
+import { StorefrontAPI } from '@/lib/api';
 import ProductReviews from '@/components/ProductReviews';
 
 export default function ProductDetail({ productId }: { productId: number }) {
-  const product = products.find(p => p.id === productId);
-
-  // Move hooks before the early return to comply with Rules of Hooks
   const { addToCart } = useCart();
+  const [product, setProduct] = useState<any>(null);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [showCartMessage, setShowCartMessage] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
-  // Safety check
-  if (!product) {
-    return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)' }}>Product not found</h1>
-          <p style={{ color: 'var(--text-muted)' }}>The product you&apos;re looking for doesn&apos;t exist.</p>
-        </div>
-      </div>
-    );
-  }
+  // Fetch product data from API
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const productData = await StorefrontAPI.getProduct(productId);
+        setProduct(productData);
+
+        // Fetch related products
+        if (productData) {
+          const relatedData = await StorefrontAPI.getProducts({ category: productData.category });
+          const filteredRelated = relatedData.products
+            .filter((p: any) => p.id !== productData.id)
+            .slice(0, 4);
+          setRelatedProducts(filteredRelated);
+        }
+        
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching product:', err);
+        setError('Failed to load product');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
 
   // Extract numeric price from string (remove ₹ and commas)
   // Handle cases like "₹3,999" -> 3999, "₹12,449" -> 12449
-  const priceNum = parseInt(product.price.replace(/[₹,\s]/g, ''), 10) || 0;
+  const priceNum = product ? parseInt(product.price.replace(/[₹,\s]/g, ''), 10) || 0 : 0;
 
   const handleQuantityChange = (delta: number) => {
     setQuantity(prev => {
@@ -41,6 +59,8 @@ export default function ProductDetail({ productId }: { productId: number }) {
   };
 
   const handleAddToCart = () => {
+    if (!product) return;
+
     if ((product.sizes && !selectedSize) || (product.colors && !selectedColor)) {
       alert('Please select size and color');
       return;
@@ -68,6 +88,8 @@ export default function ProductDetail({ productId }: { productId: number }) {
 
   const handleBuyNow = () => {
     // UI only - no backend logic
+    if (!product) return;
+
     if ((product.sizes && !selectedSize) || (product.colors && !selectedColor)) {
       alert('Please select size and color');
       return;
@@ -75,18 +97,26 @@ export default function ProductDetail({ productId }: { productId: number }) {
     alert(`Buy Now: ${quantity} x ${product.name} (${selectedSize}, ${selectedColor})`);
   };
 
-  // Logic for Related Products:
-  // 1. Filter out current product
-  // 2. Match Category OR Tags
-  // 3. Limit to 4 suggestions
-  const relatedProducts = products
-    .filter(p => {
-      if (p.id === product.id) return false;
-      const sameCategory = p.category === product.category;
-      const matchingTags = p.tags?.some(tag => product.tags?.includes(tag));
-      return sameCategory || matchingTags;
-    })
-    .slice(0, 4);
+  if (loading) {
+    return (
+      <div className="py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)' }}>Product not found</h1>
+          <p style={{ color: 'var(--text-muted)' }}>The product you&apos;re looking for doesn&apos;t exist.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8">
@@ -123,7 +153,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
 
             {/* Thumbnail Carousel */}
             <div className="flex gap-3 overflow-x-auto pb-2">
-              {product.images?.map((image, index) => (
+              {product.images?.map((image: string, index: number) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
@@ -192,7 +222,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
                   Select Size
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {product.sizes.map(size => (
+                  {product.sizes.map((size: string) => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
@@ -219,7 +249,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
                   Select Color
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {product.colors.map(color => (
+                  {product.colors.map((color: string) => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
@@ -361,7 +391,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
                 Features
               </h2>
               <ul className="space-y-3">
-                {product.features?.map((feature, index) => (
+                {product.features?.map((feature: string, index: number) => (
                   <li key={index} className="flex items-start">
                     <svg
                       className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0"

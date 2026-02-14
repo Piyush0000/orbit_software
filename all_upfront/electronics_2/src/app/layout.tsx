@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
 import { CartProvider } from "@/store/cartStore";
 import { WishlistProvider } from "@/store/wishlistStore";
+import { StoreProvider } from "@/contexts/store-context";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -34,19 +35,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${poppins.variable} antialiased font-sans`}>
-        <ThemeWrapper>
-          <WishlistProvider>
-            <CartProvider>
-              <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-grow">
-                  {children}
-                </main>
-                <Footer />
-              </div>
-            </CartProvider>
-          </WishlistProvider>
-        </ThemeWrapper>
+        <StoreProvider>
+          <ThemeWrapper>
+            <WishlistProvider>
+              <CartProvider>
+                <div className="flex flex-col min-h-screen">
+                  <Header />
+                  <main className="flex-grow">
+                    {children}
+                  </main>
+                  <Footer />
+                </div>
+              </CartProvider>
+            </WishlistProvider>
+          </ThemeWrapper>
+        </StoreProvider>
       </body>
     </html>
   );

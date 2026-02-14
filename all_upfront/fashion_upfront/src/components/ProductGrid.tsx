@@ -8,7 +8,7 @@ import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
 import { Product } from '@/types/product';
 import { usdToInr, parseINRToNumber } from '@/lib/utils';
-import { products as allProducts } from '@/data/products';
+import { StorefrontAPI } from '@/lib/api';
 
 // Define filter state locally
 interface FilterState {
@@ -29,6 +29,30 @@ export default function ProductGrid() {
     availability: [],
     size: [],
   });
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await StorefrontAPI.getProducts();
+        setProducts(data.products || []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Failed to load products');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Initialize from URL params
   useEffect(() => {
@@ -104,7 +128,7 @@ export default function ProductGrid() {
 
   // Derive filtered and sorted products
   const displayedProducts = useMemo(() => {
-    let filtered = [...allProducts];
+    let filtered = [...products];
 
     // 0. Subcategory Filtering (from URL)
     const subcategoryParam = searchParams.get('subcategory');
@@ -114,7 +138,7 @@ export default function ProductGrid() {
         product.category.toLowerCase() === searchParams.get('category')?.toLowerCase() && (
           product.name.toLowerCase().includes(term) ||
           product.description.toLowerCase().includes(term) ||
-          (product.tags && product.tags.some(tag => tag.toLowerCase().includes(term))) ||
+          (product.tags && product.tags.some((tag: string) => tag.toLowerCase().includes(term))) ||
           product.category.toLowerCase().includes(term) // Fallback
         ));
     }
@@ -142,7 +166,7 @@ export default function ProductGrid() {
     // Size
     if (activeFilters.size.length > 0) {
       filtered = filtered.filter(p =>
-        p.sizes && p.sizes.some(s => activeFilters.size.includes(s))
+        p.sizes && p.sizes.some((s: string) => activeFilters.size.includes(s))
       );
     }
     // Availability
@@ -184,7 +208,7 @@ export default function ProductGrid() {
     });
 
     return filtered;
-  }, [activeFilters, searchQuery, sortBy, searchParams]);
+  }, [activeFilters, searchQuery, sortBy, searchParams, products]);
 
   return (
     <section
@@ -392,7 +416,27 @@ export default function ProductGrid() {
 
         {/* Product Grid - Full Width */}
         <div className="w-full">
-          {displayedProducts.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20 rounded-lg border border-dashed" style={{ borderColor: 'var(--card-border)' }}>
+              <svg className="w-16 h-16 mx-auto mb-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text)' }}>Error Loading Products</h3>
+              <p className="text-lg mb-6" style={{ color: 'var(--text-muted)' }}>
+                {error}
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 rounded-lg font-medium transition-colors hover:opacity-90 bg-blue-600 text-white"
+              >
+                Retry
+              </button>
+            </div>
+          ) : displayedProducts.length === 0 ? (
             <div className="text-center py-20 rounded-lg border border-dashed" style={{ borderColor: 'var(--card-border)' }}>
               <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -492,7 +536,7 @@ export default function ProductGrid() {
             </div>
           )}
           {/* Results Count */}
-          {displayedProducts.length > 0 && (
+          {!loading && displayedProducts.length > 0 && (
             <div className="mt-6 text-right text-sm" style={{ color: 'var(--text-muted)' }}>
               Showing {displayedProducts.length} product{displayedProducts.length !== 1 ? 's' : ''}
             </div>

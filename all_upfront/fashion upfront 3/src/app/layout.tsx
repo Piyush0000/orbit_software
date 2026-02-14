@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
 import { CartProvider } from "@/store/cartStore";
 import { WishlistProvider } from "@/store/wishlistStore";
+import { StoreProvider } from "@/contexts/store-context";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -33,15 +34,17 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-[var(--page-bg)] text-[var(--text-primary)] min-h-screen flex flex-col`}>
         <ThemeWrapper>
-          <WishlistProvider>
-            <CartProvider>
-              <Header />
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
-            </CartProvider>
-          </WishlistProvider>
+          <StoreProvider>
+            <WishlistProvider>
+              <CartProvider>
+                <Header />
+                <main className="flex-grow">
+                  {children}
+                </main>
+                <Footer />
+              </CartProvider>
+            </WishlistProvider>
+          </StoreProvider>
         </ThemeWrapper>
       </body>
     </html>

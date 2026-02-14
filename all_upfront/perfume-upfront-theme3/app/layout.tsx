@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Manrope } from "next/font/google"; // Updated fonts
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
+import { StoreProvider } from "@/context/store-context";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -33,13 +34,15 @@ export default function RootLayout({
       <body
         className={`${cormorant.variable} ${manrope.variable} antialiased flex flex-col min-h-screen bg-[#0f0a14] text-[#e9e4f0]`}
       >
-        <CartProvider>
-          <Header />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <Footer />
-        </CartProvider>
+        <StoreProvider>
+          <CartProvider>
+            <Header />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </CartProvider>
+        </StoreProvider>
       </body>
     </html>
   );
