@@ -107,11 +107,6 @@ const data = {
       url: "/dashboard/products",
       icon: FileTextIcon,
     },
-    {
-      title: "Leads",
-      url: "/dashboard/leads",
-      icon: UserPlus,
-    },
   ],
   navClouds: [
     // Commented out until these features are implemented

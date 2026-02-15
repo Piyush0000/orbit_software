@@ -59,8 +59,10 @@ import {
   Building, 
   Globe,
   MessageSquare,
-  Loader2
+  Loader2,
+  AlertCircle
 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface Lead {
   id: string;
@@ -72,8 +74,8 @@ interface Lead {
   status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' | 'lost';
   source: string;
   message?: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: any; // Changed to any to handle potential non-Timestamp data safely
+  updatedAt: any;
   assignedTo?: string;
   notes?: string;
 }
@@ -82,6 +84,7 @@ export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -89,24 +92,71 @@ export default function LeadsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Partial<Lead> | null>(null);
 
+  // Helper to safely format dates
+  const formatDate = (date: any) => {
+    if (!date) return "N/A";
+    try {
+      if (typeof date.toDate === 'function') {
+        return date.toDate().toLocaleDateString();
+      }
+      if (date.seconds) {
+        return new Date(date.seconds * 1000).toLocaleDateString();
+      }
+      return new Date(date).toLocaleDateString();
+    } catch (e) {
+      return "Invalid Date";
+    }
+  };
+
+  const formatDateTime = (date: any) => {
+    if (!date) return "N/A";
+    try {
+      if (typeof date.toDate === 'function') {
+        return date.toDate().toLocaleString();
+      }
+      if (date.seconds) {
+        return new Date(date.seconds * 1000).toLocaleString();
+      }
+      return new Date(date).toLocaleString();
+    } catch (e) {
+      return "Invalid Date";
+    }
+  };
+
   // Fetch leads from Firebase
   useEffect(() => {
-    const leadsRef = collection(db, "leads");
-    const q = query(leadsRef, orderBy("createdAt", "desc"));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const leadsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Lead));
-      
-      setLeads(leadsData);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching leads:", error);
-      setLoading(false);
-    });
+    // Try fetching with ordering first
+    const setupListener = () => {
+      try {
+        const leadsRef = collection(db, "leads");
+        // Note: orderBy might cause missing docs if field is missing, or require an index
+        const q = query(leadsRef, orderBy("createdAt", "desc"));
+        
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const leadsData = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          } as Lead));
+          
+          setLeads(leadsData);
+          setLoading(false);
+          setError(null);
+        }, (err) => {
+          console.error("Error fetching leads:", err);
+          setError(`Error loading leads: ${err.message}. Check permissions or console.`);
+          setLoading(false);
+        });
 
+        return unsubscribe;
+      } catch (err: any) {
+        console.error("Setup error:", err);
+        setError(`Setup error: ${err.message}`);
+        setLoading(false);
+        return () => {};
+      }
+    };
+
+    const unsubscribe = setupListener();
     return () => unsubscribe();
   }, []);
 
@@ -117,8 +167,8 @@ export default function LeadsPage() {
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(lead => 
-        lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (lead.name && lead.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (lead.email && lead.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (lead.company && lead.company.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
@@ -179,6 +229,7 @@ export default function LeadsPage() {
       setEditingLead(null);
     } catch (error) {
       console.error("Error updating lead:", error);
+      alert("Failed to update lead");
     }
   };
 
@@ -189,6 +240,7 @@ export default function LeadsPage() {
       await deleteDoc(doc(db, "leads", leadId));
     } catch (error) {
       console.error("Error deleting lead:", error);
+      alert("Failed to delete lead");
     }
   };
 
@@ -236,6 +288,16 @@ export default function LeadsPage() {
           </Select>
         </div>
       </div>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="mb-6">
         <LeadForm />
@@ -343,7 +405,7 @@ export default function LeadsPage() {
                     <TableCell>
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <Calendar className="h-3 w-3" />
-                        {lead.createdAt.toDate().toLocaleDateString()}
+                        {formatDate(lead.createdAt)}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -463,10 +525,10 @@ export default function LeadsPage() {
               
               <div className="flex justify-between text-sm text-muted-foreground">
                 <div>
-                  Created: {selectedLead.createdAt.toDate().toLocaleString()}
+                  Created: {formatDateTime(selectedLead.createdAt)}
                 </div>
                 <div>
-                  Updated: {selectedLead.updatedAt.toDate().toLocaleString()}
+                  Updated: {formatDateTime(selectedLead.updatedAt)}
                 </div>
               </div>
             </div>
