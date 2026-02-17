@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FFF9F5;
+  --foreground: #4A403A;
+
+  /* Brand Colors - Calm & Playful */
+  --primary: #88D498;
+  /* Soft Sage */
+  --secondary: #F4A261;
+  /* Soft Terracotta */
+  --accent: #E0C3FC;
+  /* Soft Lilac */
+  --muted: #F3E9E2;
+  /* Warm Beige */
+  --border: #E5D0C3;
+  /* Soft Warm Border */
+
+  /* Status Colors (Softened) */
+  --success: #A7D7C5;
+  --error: #FFB7B2;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-success: var(--success);
+  --color-error: var(--error);
+
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fredoka), ui-sans-serif, system-ui, sans-serif;
+
+  /* Radii */
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+}
+
+body {
+  background: var(--background);
+  background-image: radial-gradient(color-mix(in srgb, var(--color-secondary) 15%, transparent) 1px, transparent 1px);
+  background-size: 30px 30px;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

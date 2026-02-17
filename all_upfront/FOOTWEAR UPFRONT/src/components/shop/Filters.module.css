@@ -1,0 +1,106 @@
+.sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--color-gray-200);
+    padding-right: var(--spacing-md);
+    margin-right: var(--spacing-md);
+}
+
+/* Mobile: Hide by default or show as drawer (TODO: Mobile logic) */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+}
+
+.section {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-gray-100);
+}
+
+.sectionTitle {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.checkboxLabel:hover {
+    color: var(--color-gray-800);
+}
+
+.colorGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+}
+
+.colorOption {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--color-gray-200);
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.colorOption:hover {
+    transform: scale(1.1);
+    border-color: var(--color-primary);
+}
+
+.sizeGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+}
+
+.sizeOption {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    border: 1px solid var(--color-gray-200);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sizeOption:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-gray-100);
+}
+
+.selectedSize {
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+    border-color: var(--color-primary);
+}
+
+.selectedSize:hover {
+    background-color: var(--color-gray-800);
+    color: var(--color-secondary);
+}
+
+.selectedColor {
+    border-color: var(--color-accent);
+    transform: scale(1.1);
+    box-shadow: 0 0 0 2px var(--color-secondary), 0 0 0 4px var(--color-primary);
+}

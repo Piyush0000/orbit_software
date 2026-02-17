@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-oswald);
+}
+
+/* Modern Premium Theme */
+:root,
+[data-theme="light"] {
+  /* Backgrounds */
+  --page-bg: #ffffff;
+  --section-alt: #f8f8f8;
+  
+  /* Headers & Text */
+  --header-bg: #ffffff;
+  --header-border: transparent;
+  --text-primary: #000000;
+  --text-secondary: #525252; /* Neutral-600 */
+  --text-muted: #a3a3a3; /* Neutral-400 */
+  
+  /* UI Elements */
+  --card-bg: #ffffff;
+  --card-border: #e5e5e5;
+  
+  /* Accents */
+  --accent-color: #000000; /* Primary brand color (Black) */
+  --accent-hover: #333333;
+  --highlight: #CCF000; /* Volt Green - subtle engaging pop */
+  
+  /* Status */
+  --error: #ef4444;
+  --success: #22c55e;
+}
+
+body {
+  font-family: var(--font-inter), sans-serif;
+  color: var(--text-primary);
+  background-color: var(--page-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.font-heading {
+  font-family: var(--font-oswald), sans-serif;
+}
+
+/* Custom Cursor for Clothing Items */
+.cursor-clothing {
+  cursor: pointer;
+}
+
+/* Utility Class for Highlight Text */
+.text-highlight {
+  color: var(--highlight);
+}
+
+.bg-highlight {
+  background-color: var(--highlight);
+  color: black;
+}

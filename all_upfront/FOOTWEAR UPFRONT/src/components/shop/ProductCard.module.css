@@ -1,0 +1,170 @@
+.wishlistButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.wishlistButton:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-secondary);
+    transition: box-shadow 0.2s ease;
+    cursor: pointer;
+    height: 100%;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.imageContainer {
+    position: relative;
+    aspect-ratio: 1;
+    width: 100%;
+    background-color: var(--color-gray-100);
+    overflow: hidden;
+}
+
+.image {
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+
+.imageHover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover .imageHover {
+    opacity: 1;
+}
+
+.info {
+    padding: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.name {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-primary);
+}
+
+.category {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.priceContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.price {
+    color: var(--color-primary);
+}
+
+.originalPrice {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 0.9rem;
+}
+
+.discount {
+    color: #d32f2f;
+    /* Standard sale red, or could use accent */
+    font-size: 0.8rem;
+}
+
+.rating {
+    font-size: 0.8rem;
+    color: #fbbf24;
+    /* Star color */
+}
+
+.colors {
+    display: flex;
+    gap: 0.25rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
+.colorDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.actionsOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 2;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+}
+
+.card:hover .actionsOverlay {
+    transform: translateY(0);
+}
+
+.actionButton {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.actionButton:hover {
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+}
+
+.secondaryAction {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+}

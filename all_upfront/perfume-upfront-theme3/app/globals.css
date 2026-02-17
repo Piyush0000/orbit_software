@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-manrope);
+  --font-serif: var(--font-cormorant);
+
+  /* Essence of Elegance Palette */
+  --color-cream-50: #ffffff;
+  --color-cream-100: #fffdf9;
+  --color-cream-200: #f5f1e8;
+  /* Main BG */
+  --color-cream-300: #eae5d8;
+  /* Secondary BG */
+
+  --color-brown-100: #d7ccc8;
+  --color-brown-200: #bcaaa4;
+  --color-brown-300: #a1887f;
+  --color-brown-400: #8d6e63;
+  --color-brown-500: #795548;
+  --color-brown-600: #5d554a;
+  /* Body Text / Taupe */
+  --color-brown-700: #4a4238;
+  /* Buttons / Deep Brown */
+  --color-brown-800: #3e2723;
+  --color-brown-900: #2c2621;
+  /* Headings / Charcoal Brown */
+
+  /* Accents */
+  --color-gold-muted: #bfa070;
+  --color-gold-light: #d4be94;
+
+  --animate-fade-in: fade-in 0.8s ease-out forwards;
+  --animate-slide-up: slide-up 0.8s ease-out forwards;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
+  }
+}
+
+:root {
+  --background: #f5f1e8;
+  --foreground: #5d554a;
+  --primary: #4a4238;
+  --secondary: #eae5d8;
+  --accent: #bfa070;
+  --heading: #2c2621;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-manrope), sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-cormorant), serif;
+  font-weight: 400;
+  /* Slightly heavier than before for visibility */
+  color: var(--heading);
+  letter-spacing: 0.01em;
+}
+
+/* Updated Glass Panel for Light Theme */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #4a4238 0%, #bfa070 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

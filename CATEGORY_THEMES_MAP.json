@@ -1,0 +1,158 @@
+{
+  "categoryThemes": {
+    "Toys": {
+      "themes": [
+        {
+          "value": "toys_main",
+          "label": "Toys Store - Main (Playful & Colorful)",
+          "path": "templates/orbit_front_others/toy upfront 2",
+          "port": 3004,
+          "default": true
+        },
+        {
+          "value": "toys_alt1",
+          "label": "Toys Store - Variant 2 (Fun & Engaging)",
+          "path": "templates/orbit_front_others/toy upfront 3",
+          "port": 3012
+        },
+        {
+          "value": "toys_alt2",
+          "label": "Toys Store - Variant 3 (Bright & Happy)",
+          "path": "templates/orbit_front_others/toys upfront",
+          "port": 3013
+        }
+      ]
+    },
+    "Fashion": {
+      "themes": [
+        {
+          "value": "fashion_main",
+          "label": "Fashion Store - Main (Elegant & Minimal)",
+          "path": "templates/orbit_front_others/fashion_upfront_2",
+          "port": 3005,
+          "default": true
+        },
+        {
+          "value": "fashion_alt",
+          "label": "Fashion Store - Variant 2 (Chic & Modern)",
+          "path": "templates/orbit_front_others/fashion_upfront",
+          "port": 3014
+        }
+      ]
+    },
+    "Electronics": {
+      "themes": [
+        {
+          "value": "electronics_main",
+          "label": "Electronics Store - Modern Tech",
+          "path": "templates/orbit_upfront",
+          "port": 3006,
+          "default": true
+        },
+        {
+          "value": "electronics_theme2",
+          "label": "Electronics Store - Theme 2",
+          "path": "templates/orbit_front_electronics/electronics-upfront-theme-2",
+          "port": 3018
+        }
+      ]
+    },
+    "Food": {
+      "themes": [
+        {
+          "value": "food_main",
+          "label": "Food & Beverage - Provision & Co.",
+          "path": "templates/orbit_front_all/theme-1",
+          "port": 3007,
+          "default": true
+        },
+        {
+          "value": "food_theme2",
+          "label": "Food & Beverage - Theme 2",
+          "path": "templates/orbit_front_all/theme-2",
+          "port": 3019
+        },
+        {
+          "value": "food_theme3",
+          "label": "Food & Beverage - Theme 3",
+          "path": "templates/orbit_front_all/theme-3",
+          "port": 3020
+        }
+      ]
+    },
+    "Footwear": {
+      "themes": [
+        {
+          "value": "footwear_main",
+          "label": "Footwear Store - Stylish",
+          "path": "templates/orbit_front_others/FOOTWEAR UPFRONT",
+          "port": 3008,
+          "default": true
+        }
+      ]
+    },
+    "Perfume": {
+      "themes": [
+        {
+          "value": "perfume_main",
+          "label": "Perfume Store - Theme 1 (Classic)",
+          "path": "templates/orbit-cosmetics-upfront/perfume-upfront",
+          "port": 3009,
+          "default": true
+        },
+        {
+          "value": "perfume_theme2",
+          "label": "Perfume Store - Theme 2 (Elegant)",
+          "path": "templates/orbit-cosmetics-upfront/perfume-upfront-theme2",
+          "port": 3015
+        },
+        {
+          "value": "perfume_theme3",
+          "label": "Perfume Store - Theme 3 (Luxurious)",
+          "path": "templates/orbit-cosmetics-upfront/perfume-upfront-theme3",
+          "port": 3016
+        }
+      ]
+    },
+    "Beauty": {
+      "themes": [
+        {
+          "value": "beauty_main",
+          "label": "Beauty & Personal Care - Elegant",
+          "path": "templates/orbit-cosmetics-upfront/beauty-personal-care-upfront",
+          "port": 3010,
+          "default": true
+        }
+      ]
+    },
+    "Jewellery": {
+      "themes": [
+        {
+          "value": "jewellery_main",
+          "label": "Jewellery Store - Luxury",
+          "path": "templates/orbit_front_jewellery",
+          "port": 3017,
+          "default": true
+        },
+        {
+          "value": "jewellery_alt1",
+          "label": "Jewellery Store - Variant 1",
+          "path": "all_upfront/Jewellery_Upfront",
+          "port": 3021
+        },
+        {
+          "value": "jewellery_alt2",
+          "label": "Jewellery Store - Variant 2",
+          "path": "all_upfront/Jewellery_Upfront_2",
+          "port": 3022
+        },
+        {
+          "value": "jewellery_alt3",
+          "label": "Jewellery Store - Variant 3",
+          "path": "all_upfront/jewellery-upfront-1",
+          "port": 3023
+        }
+      ]
+    }
+  }
+}

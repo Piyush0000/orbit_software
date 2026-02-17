@@ -1,0 +1,58 @@
+export const products = [
+    {
+        id: "1",
+        name: "Robot Builder Kit",
+        price: 2499,
+        originalPrice: 2999,
+        rating: 4.8,
+        reviews: 124,
+        image: "/images/toy-robot.png",
+        images: ["/images/toy-robot.png", "/images/detail-1.png", "/images/detail-2.png"],
+        age: "8+",
+        badge: "Hot Seller",
+        description: "Build your own smart robot! This kit introduces kids to robotics and coding concepts in a fun, hands-on way. Includes 250+ pieces and a remote control.",
+        features: ["Remote Control", "Programmable", "Rechargeable Battery"]
+    },
+    {
+        id: "2",
+        name: "Wooden Activity Cube",
+        price: 3999,
+        originalPrice: 4599,
+        rating: 4.9,
+        reviews: 89,
+        image: "/images/toy-wooden.png",
+        images: ["/images/toy-wooden.png", "/images/detail-1.png"],
+        age: "1-3",
+        badge: "Best Value",
+        description: "A 5-in-1 wooden activity cube that helps develop fine motor skills, logic, and color recognition. Made from sustainable wood with non-toxic water-based paint.",
+        features: ["Shape Sorter", "Abacus", "Spinning Gears", "Maze"]
+    },
+    {
+        id: "3",
+        name: "Plush Dino Friend",
+        price: 1499,
+        originalPrice: 1999,
+        rating: 4.7,
+        reviews: 256,
+        image: "/images/toy-dino-green.png",
+        images: ["/images/toy-dino-green.png", "/images/detail-2.png"],
+        age: "0+",
+        badge: null,
+        description: "The softest dino friend for your little one. Hypoallergenic and perfect for cuddling. Machine washable for easy cleaning.",
+        features: ["Ultra Soft", "Hypoallergenic", "Machine Washable"]
+    },
+    {
+        id: "4",
+        name: "Space Explorer Set",
+        price: 4999,
+        originalPrice: 5999,
+        rating: 5.0,
+        reviews: 42,
+        image: "/images/toy-space.png",
+        images: ["/images/toy-space.png", "/images/detail-1.png"],
+        age: "5+",
+        badge: "New",
+        description: "Launch into an adventure with this Space Explorer Set! Includes a rocket ship, astronauts, and a rover. Perfect for imaginative play.",
+        features: ["Light & Sound", "Opening Doors", "Detailed Figures"]
+    },
+];
