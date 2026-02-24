@@ -2,8 +2,8 @@
   "templates": {
     "toys": {
       "name": "Toys Store",
-      "path": "templates/orbit_front_others/toy upfront 2",
-      "port": 3004,
+      "path": "all_upfront/toy upfront 2",
+      "port": 3023,
       "description": "Playful & Fun - Perfect for toy stores and kids products",
       "colors": {
         "primary": "#88D498",
@@ -13,8 +13,8 @@
     },
     "fashion": {
       "name": "Fashion Store",
-      "path": "templates/orbit_front_others/fashion_upfront_2",
-      "port": 3005,
+      "path": "all_upfront/fashion_upfront",
+      "port": 3014,
       "description": "Elegant & Minimal - For clothing and accessories",
       "colors": {
         "primary": "#000000",
@@ -24,8 +24,8 @@
     },
     "electronics": {
       "name": "Electronics Store",
-      "path": "templates/orbit_upfront",
-      "port": 3006,
+      "path": "all_upfront/electronics_1",
+      "port": 3011,
       "description": "Modern Tech - For gadgets and electronics",
       "colors": {
         "primary": "#1E3A8A",
@@ -35,8 +35,8 @@
     },
     "food": {
       "name": "Food & Beverage",
-      "path": "templates/orbit_front_all/theme-1",
-      "port": 3007,
+      "path": "all_upfront/food_1",
+      "port": 3017,
       "description": "Appetizing - For restaurants and food delivery",
       "colors": {
         "primary": "#DC2626",
@@ -46,8 +46,8 @@
     },
     "footwear": {
       "name": "Footwear Store",
-      "path": "templates/orbit_front_others/FOOTWEAR UPFRONT",
-      "port": 3008,
+      "path": "all_upfront/FOOTWEAR UPFRONT",
+      "port": 3004,
       "description": "Stylish - For shoes and footwear",
       "colors": {
         "primary": "#78350F",
@@ -57,8 +57,8 @@
     },
     "perfume": {
       "name": "Perfume Store",
-      "path": "templates/orbit-cosmetics-upfront/perfume-upfront",
-      "port": 3009,
+      "path": "all_upfront/perfume-upfront",
+      "port": 3020,
       "description": "Luxurious - For fragrances and perfumes",
       "colors": {
         "primary": "#831843",
@@ -68,8 +68,8 @@
     },
     "beauty": {
       "name": "Beauty & Personal Care",
-      "path": "templates/orbit-cosmetics-upfront/beauty-personal-care-upfront",
-      "port": 3010,
+      "path": "all_upfront/beauty-personal-care-upfront",
+      "port": 3008,
       "description": "Elegant - For cosmetics and skincare",
       "colors": {
         "primary": "#EC4899",
@@ -79,8 +79,8 @@
     },
     "jewellery": {
       "name": "Jewellery Store",
-      "path": "templates/orbit_front_jewellery",
-      "port": 3017,
+      "path": "all_upfront/Jewellery_Upfront",
+      "port": 3005,
       "description": "Luxury - For jewellery and accessories",
       "colors": {
         "primary": "#7C2D12",
@@ -90,70 +90,88 @@
     }
   },
   "variants": {
-    "toys_alt1": {
-      "name": "Toys Store (Alt 1)",
-      "path": "templates/orbit_front_others/toy upfront 3",
-      "port": 3012,
+    "toy_upfront_3": {
+      "name": "Toy Upfront 3",
+      "path": "all_upfront/toy upfront 3",
+      "port": 3024,
       "parent": "toys"
     },
-    "toys_alt2": {
-      "name": "Toys Store (Alt 2)",
-      "path": "templates/orbit_front_others/toys upfront",
-      "port": 3013,
+    "toys_upfront": {
+      "name": "Toys Upfront",
+      "path": "all_upfront/toys upfront",
+      "port": 3025,
       "parent": "toys"
     },
-    "fashion_alt": {
-      "name": "Fashion Store (Alt)",
-      "path": "templates/orbit_front_others/fashion_upfront",
-      "port": 3014,
+    "fashion_upfront_2": {
+      "name": "Fashion Upfront 2",
+      "path": "all_upfront/fashion_upfront_2",
+      "port": 3015,
       "parent": "fashion"
     },
-    "electronics_theme2": {
-      "name": "Electronics Store (Theme 2)",
-      "path": "templates/orbit_front_electronics/electronics-upfront-theme-2",
-      "port": 3018,
+    "fashion_upfront_3": {
+      "name": "Fashion Upfront 3",
+      "path": "all_upfront/fashion upfront 3",
+      "port": 3016,
+      "parent": "fashion"
+    },
+    "electronics_2": {
+      "name": "Electronics 2",
+      "path": "all_upfront/electronics_2",
+      "port": 3012,
       "parent": "electronics"
     },
-    "food_theme2": {
-      "name": "Food & Beverage (Theme 2)",
-      "path": "templates/orbit_front_all/theme-2",
+    "electronics_3": {
+      "name": "Electronics 3",
+      "path": "all_upfront/electronics_3",
+      "port": 3013,
+      "parent": "electronics"
+    },
+    "food_2": {
+      "name": "Food 2",
+      "path": "all_upfront/food_2",
+      "port": 3018,
+      "parent": "food"
+    },
+    "food_3": {
+      "name": "Food 3",
+      "path": "all_upfront/food_3",
       "port": 3019,
       "parent": "food"
     },
-    "food_theme3": {
-      "name": "Food & Beverage (Theme 3)",
-      "path": "templates/orbit_front_all/theme-3",
-      "port": 3020,
-      "parent": "food"
-    },
     "perfume_theme2": {
-      "name": "Perfume Store (Theme 2)",
-      "path": "templates/orbit-cosmetics-upfront/perfume-upfront-theme2",
-      "port": 3015,
+      "name": "Perfume Theme 2",
+      "path": "all_upfront/perfume-upfront-theme2",
+      "port": 3021,
       "parent": "perfume"
     },
     "perfume_theme3": {
-      "name": "Perfume Store (Theme 3)",
-      "path": "templates/orbit-cosmetics-upfront/perfume-upfront-theme3",
-      "port": 3016,
+      "name": "Perfume Theme 3",
+      "path": "all_upfront/perfume-upfront-theme3",
+      "port": 3022,
       "parent": "perfume"
     },
-    "jewellery_alt1": {
-      "name": "Jewellery Store (Alt 1)",
-      "path": "all_upfront/Jewellery_Upfront",
-      "port": 3021,
-      "parent": "jewellery"
+    "beauty_theme2": {
+      "name": "Beauty Theme 2",
+      "path": "all_upfront/beauty-theme-2",
+      "port": 3009,
+      "parent": "beauty"
     },
-    "jewellery_alt2": {
-      "name": "Jewellery Store (Alt 2)",
+    "beauty_theme3": {
+      "name": "Beauty Theme 3",
+      "path": "all_upfront/beauty-theme-3",
+      "port": 3010,
+      "parent": "beauty"
+    },
+    "jewellery_upfront_2": {
+      "name": "Jewellery Upfront 2",
       "path": "all_upfront/Jewellery_Upfront_2",
-      "port": 3022,
+      "port": 3006,
       "parent": "jewellery"
     },
-    "jewellery_alt3": {
-      "name": "Jewellery Store (Alt 3)",
+    "jewellery_upfront_1": {
+      "name": "Jewellery Upfront 1",
       "path": "all_upfront/jewellery-upfront-1",
-      "port": 3023,
+      "port": 3007,
       "parent": "jewellery"
     }
   }

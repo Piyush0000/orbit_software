@@ -47,10 +47,13 @@ export function MetaAdsDashboard() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
+    setHasMounted(true);
     loadStatus();
   }, []);
+
 
   const loadStatus = async () => {
     setLoading(true);
@@ -231,30 +234,34 @@ export function MetaAdsDashboard() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="h-[400px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={insights}>
-                    <defs>
-                      <linearGradient id="colorSpend" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="date_start" 
-                      tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
-                      stroke="#94a3b8"
-                      fontSize={12}
-                    />
-                    <YAxis stroke="#94a3b8" fontSize={12} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', border: 'none' }}
-                    />
-                    <Legend />
-                    <Bar name="Daily Spend ($)" dataKey="spend" fill="url(#colorSpend)" radius={[4, 4, 0, 0]} />
-                    <Line name="Clicks" type="monotone" dataKey="clicks" stroke="#8b5cf6" strokeWidth={2} dot={false} />
-                  </BarChart>
-                </ResponsiveContainer>
+                {hasMounted ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={insights}>
+                      <defs>
+                        <linearGradient id="colorSpend" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="date_start" 
+                        tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                        stroke="#94a3b8"
+                        fontSize={12}
+                      />
+                      <YAxis stroke="#94a3b8" fontSize={12} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', border: 'none' }}
+                      />
+                      <Legend />
+                      <Bar name="Daily Spend ($)" dataKey="spend" fill="url(#colorSpend)" radius={[4, 4, 0, 0]} />
+                      <Line name="Clicks" type="monotone" dataKey="clicks" stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-slate-50 rounded-lg animate-pulse" />
+                )}
               </div>
             </CardContent>
           </Card>

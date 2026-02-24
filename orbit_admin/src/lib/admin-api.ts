@@ -646,4 +646,22 @@ export const updateAdminVariantStock = (variantId: string, stock: number) =>
     },
   );
 
+// Meta Ads Integration
+export const getMetaStatus = () => 
+  adminRequest<{ connected: boolean; email?: string }>("/api/meta/status");
+
+export const getMetaAdAccounts = () => 
+  adminRequest<{ adAccounts: any[] }>("/api/meta/ad-accounts");
+
+export const getMetaCampaigns = (adAccountId: string) => 
+  adminRequest<{ campaigns: any[] }>(`/api/meta/ad-accounts/${adAccountId}/campaigns`);
+
+export const getMetaInsights = (adAccountId: string, params: any) => {
+  const search = new URLSearchParams();
+  if (params.datePreset) search.set("date_preset", params.datePreset);
+  if (params.timeIncrement) search.set("time_increment", params.timeIncrement);
+  return adminRequest<{ insights: any[] }>(`/api/meta/ad-accounts/${adAccountId}/insights?${search.toString()}`);
+};
+
+
 

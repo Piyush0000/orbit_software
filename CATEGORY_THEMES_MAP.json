@@ -3,80 +3,92 @@
     "Toys": {
       "themes": [
         {
-          "value": "toys_main",
-          "label": "Toys Store - Main (Playful & Colorful)",
-          "path": "templates/orbit_front_others/toy upfront 2",
-          "port": 3004,
+          "value": "toy_upfront_2",
+          "label": "Toy Upfront 2 (Main)",
+          "path": "all_upfront/toy upfront 2",
+          "port": 3023,
           "default": true
         },
         {
-          "value": "toys_alt1",
-          "label": "Toys Store - Variant 2 (Fun & Engaging)",
-          "path": "templates/orbit_front_others/toy upfront 3",
-          "port": 3012
+          "value": "toy_upfront_3",
+          "label": "Toy Upfront 3",
+          "path": "all_upfront/toy upfront 3",
+          "port": 3024
         },
         {
-          "value": "toys_alt2",
-          "label": "Toys Store - Variant 3 (Bright & Happy)",
-          "path": "templates/orbit_front_others/toys upfront",
-          "port": 3013
+          "value": "toys_upfront",
+          "label": "Toys Upfront",
+          "path": "all_upfront/toys upfront",
+          "port": 3025
         }
       ]
     },
     "Fashion": {
       "themes": [
         {
-          "value": "fashion_main",
-          "label": "Fashion Store - Main (Elegant & Minimal)",
-          "path": "templates/orbit_front_others/fashion_upfront_2",
-          "port": 3005,
+          "value": "fashion_upfront",
+          "label": "Fashion Upfront (Main)",
+          "path": "all_upfront/fashion_upfront",
+          "port": 3014,
           "default": true
         },
         {
-          "value": "fashion_alt",
-          "label": "Fashion Store - Variant 2 (Chic & Modern)",
-          "path": "templates/orbit_front_others/fashion_upfront",
-          "port": 3014
+          "value": "fashion_upfront_2",
+          "label": "Fashion Upfront 2",
+          "path": "all_upfront/fashion_upfront_2",
+          "port": 3015
+        },
+        {
+          "value": "fashion_upfront_3",
+          "label": "Fashion Upfront 3",
+          "path": "all_upfront/fashion upfront 3",
+          "port": 3016
         }
       ]
     },
     "Electronics": {
       "themes": [
         {
-          "value": "electronics_main",
-          "label": "Electronics Store - Modern Tech",
-          "path": "templates/orbit_upfront",
-          "port": 3006,
+          "value": "electronics_1",
+          "label": "Electronics 1 (Main)",
+          "path": "all_upfront/electronics_1",
+          "port": 3011,
           "default": true
         },
         {
-          "value": "electronics_theme2",
-          "label": "Electronics Store - Theme 2",
-          "path": "templates/orbit_front_electronics/electronics-upfront-theme-2",
-          "port": 3018
+          "value": "electronics_2",
+          "label": "Electronics 2",
+          "path": "all_upfront/electronics_2",
+          "port": 3012
+        },
+        {
+          "value": "electronics_3",
+          "label": "Electronics 3",
+          "path": "all_upfront/electronics_3",
+          "port": 3013
         }
       ]
     },
     "Food": {
       "themes": [
         {
-          "value": "food_main",
-          "label": "Food & Beverage - Provision & Co.",
-          "path": "templates/orbit_front_all/theme-1",
-          "port": 3007,
+          "value": "food_1",
+          "label": "Food 1 (Main)",
+          "path": "all_upfront/food_1",
+          "port": 3017,
           "default": true
         },
         {
-          "value": "food_theme2",
-          "label": "Food & Beverage - Theme 2",
-          "path": "templates/orbit_front_all/theme-2",
-          "port": 3019
+          "value": "food_2",
+          "label": "Food 2",
+          "path": "all_upfront/food_2",
+          "port": 3018
         },
         {
-          "value": "food_theme3",
-          "label": "Food & Beverage - Theme 3",
-          "path": "templates/orbit_front_all/theme-3",
-          "port": 3020
+          "value": "food_3",
+          "label": "Food 3",
+          "path": "all_upfront/food_3",
+          "port": 3019
         }
       ]
     },
@@ -84,9 +96,9 @@
       "themes": [
         {
           "value": "footwear_main",
-          "label": "Footwear Store - Stylish",
-          "path": "templates/orbit_front_others/FOOTWEAR UPFRONT",
-          "port": 3008,
+          "label": "Footwear Upfront (Main)",
+          "path": "all_upfront/FOOTWEAR UPFRONT",
+          "port": 3004,
           "default": true
         }
       ]
@@ -94,23 +106,23 @@
     "Perfume": {
       "themes": [
         {
-          "value": "perfume_main",
-          "label": "Perfume Store - Theme 1 (Classic)",
-          "path": "templates/orbit-cosmetics-upfront/perfume-upfront",
-          "port": 3009,
+          "value": "perfume_upfront",
+          "label": "Perfume Upfront (Main)",
+          "path": "all_upfront/perfume-upfront",
+          "port": 3020,
           "default": true
         },
         {
           "value": "perfume_theme2",
-          "label": "Perfume Store - Theme 2 (Elegant)",
-          "path": "templates/orbit-cosmetics-upfront/perfume-upfront-theme2",
-          "port": 3015
+          "label": "Perfume Theme 2",
+          "path": "all_upfront/perfume-upfront-theme2",
+          "port": 3021
         },
         {
           "value": "perfume_theme3",
-          "label": "Perfume Store - Theme 3 (Luxurious)",
-          "path": "templates/orbit-cosmetics-upfront/perfume-upfront-theme3",
-          "port": 3016
+          "label": "Perfume Theme 3",
+          "path": "all_upfront/perfume-upfront-theme3",
+          "port": 3022
         }
       ]
     },
@@ -118,10 +130,22 @@
       "themes": [
         {
           "value": "beauty_main",
-          "label": "Beauty & Personal Care - Elegant",
-          "path": "templates/orbit-cosmetics-upfront/beauty-personal-care-upfront",
-          "port": 3010,
+          "label": "Beauty & Personal Care (Main)",
+          "path": "all_upfront/beauty-personal-care-upfront",
+          "port": 3008,
           "default": true
+        },
+        {
+          "value": "beauty_theme2",
+          "label": "Beauty Theme 2",
+          "path": "all_upfront/beauty-theme-2",
+          "port": 3009
+        },
+        {
+          "value": "beauty_theme3",
+          "label": "Beauty Theme 3",
+          "path": "all_upfront/beauty-theme-3",
+          "port": 3010
         }
       ]
     },
@@ -129,28 +153,22 @@
       "themes": [
         {
           "value": "jewellery_main",
-          "label": "Jewellery Store - Luxury",
-          "path": "templates/orbit_front_jewellery",
-          "port": 3017,
+          "label": "Jewellery Upfront (Main)",
+          "path": "all_upfront/Jewellery_Upfront",
+          "port": 3005,
           "default": true
         },
         {
-          "value": "jewellery_alt1",
-          "label": "Jewellery Store - Variant 1",
-          "path": "all_upfront/Jewellery_Upfront",
-          "port": 3021
-        },
-        {
-          "value": "jewellery_alt2",
-          "label": "Jewellery Store - Variant 2",
+          "value": "jewellery_upfront_2",
+          "label": "Jewellery Upfront 2",
           "path": "all_upfront/Jewellery_Upfront_2",
-          "port": 3022
+          "port": 3006
         },
         {
-          "value": "jewellery_alt3",
-          "label": "Jewellery Store - Variant 3",
+          "value": "jewellery_upfront_1",
+          "label": "Jewellery Upfront 1",
           "path": "all_upfront/jewellery-upfront-1",
-          "port": 3023
+          "port": 3007
         }
       ]
     }
