@@ -119,7 +119,7 @@ const createMerchant = async (req, res, next) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create merchant in transaction
+    // Create merchant in transaction with increased timeout for production
     const result = await prisma.$transaction(async (tx) => {
       console.log('Transaction started. Available models on tx:', Object.keys(tx).filter(k=>!k.startsWith('$')));
       
@@ -297,6 +297,9 @@ const createMerchant = async (req, res, next) => {
       });
 
       return { user, store };
+    }, {
+      maxWait: 5000,
+      timeout: 30000
     });
 
     res.status(201).json({
@@ -313,14 +316,17 @@ const createMerchant = async (req, res, next) => {
         customDomain: customDomain || null,
         theme: theme,
         category: normalizedCategory,
-        dashboardUrl: `http://localhost:3003/login?email=${encodeURIComponent(email)}`,
+        dashboardUrl: process.env.NODE_ENV === 'production' 
+          ? `https://orbit-software-merchant.vercel.app/login?email=${encodeURIComponent(email)}`
+          : `http://localhost:3003/login?email=${encodeURIComponent(email)}`,
         storefrontUrl: customDomain 
-          ? `http://${customDomain}` 
-          : `http://${subdomain}.localhost:${await getUpfrontPort(theme, normalizedCategory)}`,
-        upfrontTemplateUrl: `http://localhost:${await getUpfrontPort(theme, normalizedCategory)}`,
+          ? `https://${customDomain}` 
+          : `https://${subdomain}.orbit360.shop`, // Default production pattern
+        upfrontTemplateUrl: `https://${theme}.orbit360.shop`,
         createdAt: result.user.createdAt
       }
     });
+
 
   } catch (error) {
     console.error('Create merchant error:', error);
