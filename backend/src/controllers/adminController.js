@@ -42,7 +42,12 @@ const deleteUser = async (req, res, next) => {
 
 const listStores = async (req, res, next) => {
   try {
-    const stores = await prisma.store.findMany();
+    const stores = await prisma.store.findMany({
+      include: {
+        user: { select: { email: true, fullName: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
     res.json({ stores });
   } catch (err) {
     next(err);

@@ -46,8 +46,18 @@ export default function Hero() {
     const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length)
     const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
 
+    const handleSectionClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId: 'heroSection' }, '*');
+        }
+    };
+
     return (
-        <section className="relative w-full overflow-hidden bg-white py-12 md:py-20 lg:py-28">
+        <section 
+            onClick={handleSectionClick}
+            className="relative w-full overflow-hidden bg-white py-12 md:py-20 lg:py-28 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+        >
             <div className="container mx-auto px-4 md:px-6">
                 <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
                     <div className="flex flex-col justify-center space-y-6 text-center lg:text-left">

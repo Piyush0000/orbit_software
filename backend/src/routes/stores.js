@@ -51,4 +51,19 @@ router.get('/:id/customers', auth, rbac([ROLES.MERCHANT, ROLES.ADMIN]), getCusto
 router.get('/:id/settings', auth, getSettings);
 router.put('/:id/settings', auth, updateSettings);
 
+// Customization Routes
+const { getCustomization, updateCustomization } = require('../controllers/storeController');
+router.get('/:id/customization', auth, rbac([ROLES.MERCHANT, ROLES.ADMIN]), getCustomization);
+router.put('/:id/customization', auth, rbac([ROLES.MERCHANT, ROLES.ADMIN]), updateCustomization);
+
+// Generic Upload Route
+const { upload } = require('../services/uploadService');
+router.post('/:id/upload', auth, rbac([ROLES.MERCHANT, ROLES.ADMIN]), upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+  const url = req.file.path && req.file.path.startsWith('http') 
+    ? req.file.path 
+    : `/uploads/${req.file.filename}`;
+  res.json({ url });
+});
+
 module.exports = router;

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ArrowUpCircleIcon,
   BarChartIcon,
@@ -23,13 +23,14 @@ import {
   SearchIcon,
   SettingsIcon,
   UsersIcon,
-} from "lucide-react"
+  ContactIcon,
+} from "lucide-react";
 
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
-import { getAdminMe } from "@/lib/admin-api"
+import { NavDocuments } from "@/components/nav-documents";
+import { NavMain } from "@/components/nav-main";
+import { NavSecondary } from "@/components/nav-secondary";
+import { NavUser } from "@/components/nav-user";
+import { getAdminMe } from "@/lib/admin-api";
 import {
   Sidebar,
   SidebarContent,
@@ -38,7 +39,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 const data = {
   navMain: [
@@ -48,14 +49,19 @@ const data = {
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Lifecycle",
-      url: "/dashboard/lifecycle",
-      icon: ListIcon,
-    },
-    {
-      title: "Analytics",
-      url: "/dashboard/analytics",
-      icon: BarChartIcon,
+      title: "CRM",
+      url: "#",
+      icon: UsersIcon,
+      items: [
+        {
+          title: "Leads",
+          url: "/dashboard/crm",
+        },
+        {
+          title: "Pipeline",
+          url: "/dashboard/crm/pipeline",
+        },
+      ],
     },
     {
       title: "Projects",
@@ -63,24 +69,14 @@ const data = {
       icon: FolderIcon,
     },
     {
+      title: "Analytics",
+      url: "/dashboard/analytics",
+      icon: BarChartIcon,
+    },
+    {
       title: "Team",
       url: "/dashboard/team",
       icon: UsersIcon,
-    },
-    {
-      title: "Brands",
-      url: "/dashboard/brands",
-      icon: ListIcon,
-    },
-    {
-      title: "Provisioning",
-      url: "/dashboard/provisioning",
-      icon: RocketIcon,
-    },
-    {
-      title: "Tickets",
-      url: "/dashboard/tickets",
-      icon: MessageSquare,
     },
     {
       title: "Communication",
@@ -92,20 +88,47 @@ const data = {
       url: "/dashboard/themes",
       icon: Palette,
     },
+  ],
+  inventory: [
     {
-      title: "Merchants",
-      url: "/dashboard/merchants",
-      icon: UsersIcon,
+      title: "Products",
+      url: "/dashboard/products",
+      icon: PackageIcon,
     },
     {
       title: "Orders",
       url: "/dashboard/orders",
-      icon: PackageIcon,
+      icon: ClipboardListIcon,
+    },
+  ],
+  marketing: [
+    {
+      title: "Marketing",
+      url: "#",
+      icon: RocketIcon,
+      items: [
+        {
+          title: "Email Campaigns",
+          url: "/dashboard/marketing/email",
+        },
+      ],
+    },
+  ],
+  setup: [
+    {
+      title: "Provisioning",
+      url: "/dashboard/provisioning",
+      icon: RocketIcon,
     },
     {
-      title: "Products",
-      url: "/dashboard/products",
-      icon: FileTextIcon,
+      title: "Merchants",
+      url: "/dashboard/merchants",
+      icon: UserPlus,
+    },
+    {
+      title: "Tickets",
+      url: "/dashboard/tickets",
+      icon: MessageSquare,
     },
   ],
   navClouds: [
@@ -163,61 +186,98 @@ const data = {
     //   icon: FileIcon,
     // },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = React.useState({
     name: "Admin",
     email: "",
     avatar: "",
-  })
+  });
 
   React.useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
     const load = async () => {
       try {
-        const { admin } = await getAdminMe()
-        if (!isMounted) return
+        const { admin } = await getAdminMe();
+        if (!isMounted) return;
         setUser({
           name: admin.fullName || "Admin",
           email: admin.email || "",
           avatar: "",
-        })
+        });
       } catch (_) {
         // keep fallback
       }
-    }
-    load()
+    };
+    load();
     return () => {
-      isMounted = false
-    }
-  }, [])
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a href="#">
-                <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">EVOC_ADMIN</span>
-              </a>
-            </SidebarMenuButton>
+            <div className="flex items-center gap-3 px-3 py-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-600/20 ring-1 ring-blue-400 overflow-hidden p-1.5">
+                <img
+                  src="/orbit360-logo.png"
+                  alt="Orbit360 Logo"
+                  className="h-full w-full object-contain brightness-0 invert"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-lg font-bold tracking-tight text-foreground">
+                  EVOC_ADMIN
+                </span>
+                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">
+                  Orbit Software
+                </span>
+              </div>
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+
+      <SidebarContent className="px-2">
+        <div className="mt-4 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+          Main Console
+        </div>
         <NavMain items={data.navMain} />
-        {data.documents.length > 0 && <NavDocuments items={data.documents} />}
+
+        <div className="mt-6 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+          Inventory
+        </div>
+        <NavMain items={data.inventory} />
+
+        <div className="mt-6 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+          Growth & Marketing
+        </div>
+        <NavMain items={data.marketing} />
+
+        <div className="mt-6 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+          System Setup
+        </div>
+        <NavMain items={data.setup} />
+
+        {data.documents.length > 0 && (
+          <>
+            <div className="mt-6 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+              Documents
+            </div>
+            <NavDocuments items={data.documents} />
+          </>
+        )}
+
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter>
-          <NavUser user={user} />
+
+      <SidebarFooter className="border-t border-border/50 bg-accent/30 p-2">
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

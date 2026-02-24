@@ -18,7 +18,9 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
+    CardFooter,
 } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -163,7 +165,7 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* FEATURE CONFIGURATIONS */}
                         <div className="space-y-6">
-                            <Card>
+                            <Card className="border-slate-200 shadow-sm">
                                 <CardHeader>
                                     <div className="flex items-center gap-2">
                                         <ShieldCheck className="h-5 w-5 text-primary" />

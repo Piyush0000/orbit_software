@@ -1,6 +1,7 @@
 const { prisma } = require('../config/database');
 const bcrypt = require('bcryptjs');
 const { getStoreAnalytics } = require('../services/analyticsService');
+const { ensureStoreExists, seedDummyProducts } = require('../services/storeService');
 
 const generateTempPassword = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
@@ -110,6 +111,9 @@ const registerStore = async (req, res, next) => {
       }
     });
 
+    // Seed dummy products so the user has content on their storefront immediately
+    await seedDummyProducts(store.id, category);
+
     res.status(201).json({
       success: true,
       message: 'Store registered successfully. Awaiting admin approval.',
@@ -139,13 +143,15 @@ const createStore = async (req, res, next) => {
         userId: req.user.id
       }
     });
+    
+    // Seed dummy products
+    await seedDummyProducts(store.id, 'Electronics'); // Fallback category
+    
     res.status(201).json({ store });
   } catch (err) {
     next(err);
   }
 };
-
-const { ensureStoreExists } = require('../services/storeService');
 
 const listStores = async (req, res, next) => {
   try {
@@ -351,6 +357,85 @@ const getSections = async (req, res, next) => {
   }
 };
 
+const getCustomization = async (req, res, next) => {
+  try {
+    const storeId = req.params.id;
+    let customization = await prisma.websiteCustomization.findUnique({
+      where: { storeId }
+    });
+
+    // Bootstrap defaults if none exist yet
+    if (!customization) {
+      const store = await prisma.store.findUnique({ where: { id: storeId }, select: { name: true, category: true } });
+      customization = await prisma.websiteCustomization.create({
+        data: {
+          storeId,
+          brandColors: { primary: '#000000', secondary: '#FFFFFF', accent: '#FF6B6B' },
+          heroSection: { 
+            title: store?.name ? `Welcome to ${store.name}` : 'Welcome to our Store',
+            subtitle: 'Discover amazing products at great prices.',
+            ctaText: 'Shop Now',
+            ctaLink: '/shop'
+          },
+          footerContent: { 
+            bio: 'Quality products for quality life.',
+            copyright: `© ${new Date().getFullYear()} ${store?.name || 'Store'}. All rights reserved.` 
+          }
+        }
+      });
+    }
+
+    res.json({ customization });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateCustomization = async (req, res, next) => {
+  try {
+    const storeId = req.params.id;
+    const data = req.body;
+    
+    // Allowed fields that can be updated
+    const validFields = ['logo', 'favicon', 'brandColors', 'typography', 'heroSection', 
+                         'aboutSection', 'contactInfo', 'headerStyle', 'footerContent', 
+                         'metaTitle', 'metaDescription', 'keywords', 'socialLinks', 
+                         'features', 'featuresSection', 'ctaButtons', 'navLinks', 
+                         'announcementBar', 'newsletter', 'productSections'];
+
+    // Recursively strip null values — Prisma rejects null for Json? fields in upsert
+    const deepStripNull = (obj) => {
+      if (Array.isArray(obj)) return obj.filter(v => v !== null).map(deepStripNull);
+      if (obj && typeof obj === 'object') {
+        return Object.fromEntries(
+          Object.entries(obj)
+            .filter(([, v]) => v !== null)
+            .map(([k, v]) => [k, deepStripNull(v)])
+        );
+      }
+      return obj;
+    };
+                         
+    const rawData = {};
+    for (const key of validFields) {
+      if (data[key] !== undefined && data[key] !== null) {
+        rawData[key] = deepStripNull(data[key]);
+      }
+    }
+    
+    const customization = await prisma.websiteCustomization.upsert({
+      where: { storeId },
+      update: rawData,
+      create: { storeId, ...rawData }
+    });
+    
+    res.json({ customization, success: true });
+  } catch (err) {
+    console.error('Update customization error:', err);
+    next(err);
+  }
+};
+
 module.exports = {
   registerStore,
   createStore,
@@ -363,6 +448,8 @@ module.exports = {
   storeAnalytics,
   getActivityLogs,
   getCustomers,
-  getSections
+  getSections,
+  getCustomization,
+  updateCustomization
 };
 

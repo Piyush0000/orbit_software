@@ -7,17 +7,20 @@ const auth = async (req, res, next) => {
     const header = req.headers.authorization || '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     if (!token) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      console.warn(`[Auth] No token provided for ${req.method} ${req.originalUrl}`);
+      return res.status(401).json({ message: 'Unauthorized: No token provided' });
     }
     const decoded = jwt.verify(token, env.jwt.secret);
     const user = await prisma.user.findUnique({ where: { id: decoded.id } });
     if (!user || !user.isActive) {
+      console.warn(`[Auth] User not found or inactive: ${decoded.id}`);
       return res.status(401).json({ message: 'User not active or not found' });
     }
     req.user = user;
     next();
   } catch (err) {
     if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+      console.warn(`[Auth] Invalid/Expired token: ${err.message}`);
       return res.status(401).json({ message: 'Invalid or expired token' });
     }
     console.error('Auth Middleware Error:', err);

@@ -55,9 +55,14 @@ const coerceProductNumbers = (data = {}) => {
 
 const createProduct = async (req, res, next) => {
   try {
-    const store = await ensureStoreExists(req.user);
+    let store;
+    if (req.query.storeId) {
+      store = await prisma.store.findFirst({ where: { id: req.query.storeId, userId: req.user.id } });
+    } else {
+      store = await ensureStoreExists(req.user);
+    }
     if (!store) {
-      return res.status(404).json({ message: 'Store not found' });
+      return res.status(404).json({ message: 'Store not found or unauthorized' });
     }
 
     if (!req.body?.name) {
@@ -92,9 +97,14 @@ const createProduct = async (req, res, next) => {
 
 const listProducts = async (req, res, next) => {
   try {
-    const store = await ensureStoreExists(req.user);
+    let store;
+    if (req.query.storeId) {
+      store = await prisma.store.findFirst({ where: { id: req.query.storeId, userId: req.user.id } });
+    } else {
+      store = await ensureStoreExists(req.user);
+    }
     if (!store) {
-      return res.status(404).json({ message: 'Store not found' });
+      return res.status(404).json({ message: 'Store not found or unauthorized' });
     }
 
     const products = await prisma.product.findMany({

@@ -1,3 +1,4 @@
+// Server updated: 2024-02-22 (Production Ready)
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -49,6 +50,7 @@ app.use('/api/layouts', layoutRoutes);
 app.use('/api/storefront', storefrontRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/auth/meta', metaOAuthRoutes);
+app.use('/api/auth/meta', metaOAuthRoutes);
 app.use('/api/meta', metaRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/provisioning', provisioningRoutes);

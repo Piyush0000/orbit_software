@@ -1,91 +1,35 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { StorefrontAPI } from '@/lib/api';
+import { useStoreContext } from '@/contexts/store-context';
 
 export default function Hero() {
-  const [heroContent, setHeroContent] = useState({
-    title: 'Urban',
-    subtitle: 'Elegance',
-    tagline: 'New Season Arrivals',
-    description: 'Discover the latest trends from top international brands. Up to 60% off on selected styles.',
-    ctaText: 'Shop Now',
-    ctaSecondaryText: 'Explore',
-    backgroundImage: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2000&auto=format&fit=crop'
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { customization } = useStoreContext();
 
-  useEffect(() => {
-    const fetchHeroContent = async () => {
-      try {
-        setLoading(true);
-        const customization = await StorefrontAPI.getStoreCustomization();
-        
-        if (customization?.heroSection) {
-          setHeroContent({
-            title: customization.heroSection.title || 'Urban',
-            subtitle: customization.heroSection.subtitle || 'Elegance',
-            tagline: customization.heroSection.tagline || 'New Season Arrivals',
-            description: customization.heroSection.description || 'Discover the latest trends from top international brands. Up to 60% off on selected styles.',
-            ctaText: customization.heroSection.ctaText || 'Shop Now',
-            ctaSecondaryText: customization.heroSection.ctaSecondaryText || 'Explore',
-            backgroundImage: customization.heroSection.backgroundImage || 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2000&auto=format&fit=crop'
-          });
-        } else {
-          // Use defaults if no customization
-          setHeroContent({
-            title: 'Urban',
-            subtitle: 'Elegance',
-            tagline: 'New Season Arrivals',
-            description: 'Discover the latest trends from top international brands. Up to 60% off on selected styles.',
-            ctaText: 'Shop Now',
-            ctaSecondaryText: 'Explore',
-            backgroundImage: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2000&auto=format&fit=crop'
-          });
-        }
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching hero content:', err);
-        setError('Failed to load hero content');
-        // Keep defaults
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleSectionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId: 'heroSection' }, '*');
+    }
+  };
 
-    fetchHeroContent();
-  }, []);
-
-  if (loading) {
-    return (
-      <section className="relative w-full h-[500px] md:h-[600px] overflow-hidden flex items-center">
-        {/* Background Image - Lifestyle Fashion */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0 transition-transform duration-700 hover:scale-105"
-          style={{
-            backgroundImage: 'url("https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2000&auto=format&fit=crop")', // Fashion lifestyle image
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/40 to-transparent"></div>
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-white">
-          <div className="max-w-2xl animate-fade-in-up flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const heroContent = {
+    title: customization?.heroSection?.title || 'Urban',
+    subtitle: customization?.heroSection?.subtitle || 'Elegance',
+    tagline: customization?.heroSection?.tagline || 'New Season Arrivals',
+    description: customization?.heroSection?.description || 'Discover the latest trends from top international brands. Up to 60% off on selected styles.',
+    ctaText: customization?.heroSection?.ctaText || customization?.heroSection?.buttonText || 'Shop Now',
+    ctaSecondaryText: customization?.heroSection?.ctaSecondaryText || 'Explore',
+    backgroundImage: customization?.heroSection?.backgroundImage || 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2000&auto=format&fit=crop'
+  };
 
   return (
-    <section className="relative w-full h-[500px] md:h-[600px] overflow-hidden flex items-center">
+    <section 
+      onClick={handleSectionClick}
+      className="relative w-full h-[500px] md:h-[600px] overflow-hidden flex items-center hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+    >
       {/* Background Image - Lifestyle Fashion */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0 transition-transform duration-700 hover:scale-105"
         style={{
-          backgroundImage: `url("${heroContent.backgroundImage || 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2000&auto=format&fit=crop'}")`, // Fashion lifestyle image
+          backgroundImage: `url("${heroContent.backgroundImage}")`,
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/40 to-transparent"></div>

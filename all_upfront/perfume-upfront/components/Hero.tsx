@@ -3,13 +3,35 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { useStoreContext } from "@/context/store-context";
+
 export default function Hero() {
+    const { customization } = useStoreContext();
+
+    const handleSectionClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId: 'heroSection' }, '*');
+        }
+    };
+
+    const headline = customization?.heroSection?.title || customization?.heroSection?.headline || "Discover Your Signature Scent";
+    const subheadline = customization?.heroSection?.subtitle || customization?.heroSection?.subheadline || "Experience the essence of elegance with our curated collection of premium fragrances for every occasion.";
+    const ctaText = customization?.heroSection?.ctaText || customization?.heroSection?.buttonText || "Shop Now";
+    const bgImage = customization?.heroSection?.backgroundImage;
+
     return (
-        <section className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden bg-contrast-black">
+        <section 
+            onClick={handleSectionClick}
+            className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden bg-contrast-black hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+        >
             {/* Background with luxury texture overlay */}
             <div className="absolute inset-0 opacity-40">
-                {/* Placeholder for a luxury background texture/image */}
-                <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-800 via-contrast-black to-contrast-black" />
+                {bgImage ? (
+                    <img src={bgImage} alt="Hero Background" className="w-full h-full object-cover" />
+                ) : (
+                    <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-800 via-contrast-black to-contrast-black" />
+                )}
             </div>
 
             {/* Content Container */}
@@ -20,12 +42,16 @@ export default function Hero() {
                     </p>
 
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white font-medium leading-tight">
-                        Discover Your <br />
-                        <span className="italic text-gold-200">Signature Scent</span>
+                        {headline.includes("Signature Scent") ? (
+                            <>
+                                {headline.replace("Signature Scent", "")} <br />
+                                <span className="italic text-gold-200">Signature Scent</span>
+                            </>
+                        ) : headline}
                     </h1>
 
                     <p className="text-gray-300 max-w-xl mx-auto text-lg font-light">
-                        Experience the essence of elegance with our curated collection of premium fragrances for every occasion.
+                        {subheadline}
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
@@ -45,7 +71,7 @@ export default function Hero() {
                             href="/luxury"
                             className="px-8 py-4 bg-transparent text-gold-300 text-sm uppercase tracking-widest font-bold border border-gold-300 hover:bg-gold-300 hover:text-black transition-colors duration-300 min-w-[160px]"
                         >
-                            Luxury
+                            {ctaText}
                         </Link>
                     </div>
                 </div>

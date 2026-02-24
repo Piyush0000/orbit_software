@@ -3,16 +3,28 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ProductsDropdown from './ProductsDropdown';
-import ProfileDropdown from './ProfileDropdown';
 import { useCart } from '@/store/cartStore';
+import { useStoreContext } from '@/contexts/store-context';
 
 export default function Header() {
+  const { customization, storeInfo } = useStoreContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
   const productsRef = useRef<HTMLDivElement>(null);
   const { getTotalItems } = useCart();
   const cartItemCount = getTotalItems();
+
+  const handleSectionClick = (sectionId: string) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId }, '*');
+    }
+  };
+
+  const announcementText = customization?.announcementBar?.text || "Tell a friend about Upfront & get a ₹500 coupon for next order!";
+  const logoText = customization?.headerStyle?.storeName || customization?.headerStyle?.logoText || storeInfo?.name || "Upfront";
+  const logoUrl = customization?.headerStyle?.logoUrl;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -45,12 +57,16 @@ export default function Header() {
   return (
     <div className="sticky top-0 z-[100] flex flex-col w-full transition-all duration-300">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[var(--accent-blue)] to-[var(--accent-purple)] text-black text-xs sm:text-sm font-bold py-2.5 text-center px-4 tracking-wide relative z-[101]">
-        Tell a friend about Upfront & get a ₹500 coupon for next order!
+      <div 
+        onClick={handleSectionClick('announcementBar')}
+        className="bg-gradient-to-r from-[var(--accent-blue)] to-[var(--accent-purple)] text-black text-xs sm:text-sm font-bold py-2.5 text-center px-4 tracking-wide relative z-[101] hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+      >
+        {announcementText}
       </div>
 
       <header
-        className="glass relative z-[100] border-b border-white/10"
+        onClick={handleSectionClick('headerStyle')}
+        className="glass relative z-[100] border-b border-white/10 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
         style={{
           backgroundColor: 'var(--header-bg)',
           borderColor: 'var(--header-border)',
@@ -60,8 +76,9 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <div className="flex-shrink-0 mr-8 flex items-center">
-              <Link href="/" className="text-3xl font-extrabold tracking-tight" style={{ color: 'var(--header-text)' }}>
-                Upfront
+              <Link href="/" className="text-3xl font-extrabold tracking-tight flex items-center gap-2" style={{ color: 'var(--header-text)' }}>
+                {logoUrl ? <img src={logoUrl} alt={logoText} className="h-8 object-contain" /> : null}
+                {(!logoUrl || logoText) && logoText}
               </Link>
             </div>
 
@@ -109,37 +126,6 @@ export default function Header() {
             {/* Icons */}
             <div className="hidden md:flex items-center space-x-6">
 
-              <div
-                className="relative group h-full flex items-center"
-                onMouseEnter={() => setIsMenuOpen(false)}
-              >
-                <Link href="/profile?tab=wishlist" className="text-[var(--header-text-muted)] hover:text-[var(--accent-purple)] transition-colors py-4" aria-label="Wishlist">
-                  <div className="flex flex-col items-center gap-0.5">
-                    <svg className="w-6 h-6 hover-glow rounded-full p-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    <span className="text-[10px] font-bold">Wishlist</span>
-                  </div>
-                </Link>
-              </div>
-
-              <div
-                className="relative group h-full flex items-center"
-                onMouseEnter={() => setIsMenuOpen(false)} // Close mobile, keep specific hover logic if needed
-              >
-                <Link href="/profile" className="text-[var(--header-text-muted)] hover:text-[var(--accent-blue)] transition-colors py-4" aria-label="Account">
-                  <div className="flex flex-col items-center gap-0.5">
-                    <svg className="w-6 h-6 hover-glow rounded-full p-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span className="text-[10px] font-bold">Profile</span>
-                  </div>
-                </Link>
-                {/* Dropdown Container */}
-                <div className="absolute right-0 top-[100%] pt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
-                  <ProfileDropdown />
-                </div>
-              </div>
               <Link
                 href="/cart"
                 className="relative text-[var(--header-text-muted)] hover:text-[var(--accent-blue)] transition-colors group"
@@ -213,7 +199,6 @@ export default function Header() {
                     )}
                   </span>
                 </Link>
-                <Link href="/profile" className="block font-medium text-gray-600">Account</Link>
               </div>
             </div>
           )}

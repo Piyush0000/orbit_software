@@ -16,6 +16,19 @@
 **/.env.production
 **/.env.staging
 **/.envrc
+backend/uploads/
+orbit_admin_old/
+*.bat
+*.py
+*.js
+!backend/src/**/*.js
+!orbit_admin/src/**/*.js
+!apps/**/*.js
+!all_upfront/**/*.js
+!assign_ports.js
+!runner.js
+!test-supabase.js
+!list-themes.js
 
 # logs
 **/npm-debug.log*
@@ -77,3 +90,7 @@ templates/**/next-env.d.ts
 
 # Don't track git repos inside templates
 templates/**/.git/
+
+# Local data
+data/
+db/

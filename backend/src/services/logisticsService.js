@@ -27,6 +27,9 @@ class FShipService {
         'signature': signature
       }
     });
+    
+    // Store signature for endpoints that require prefix overrides
+    client._signature = signature;
 
     // Add request interceptor for debugging
     client.interceptors.request.use(

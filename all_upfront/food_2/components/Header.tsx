@@ -20,7 +20,10 @@ import { useCart } from "@/context/CartContext"
 import { products, Product } from "@/lib/data"
 import Image from "next/image"
 
+import { useStoreContext } from "@/context/store-context"
+
 export default function Header() {
+    const { customization, storeInfo } = useStoreContext()
     const [isOpen, setIsOpen] = useState(false)
     const [isCartOpen, setIsCartOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
@@ -29,6 +32,17 @@ export default function Header() {
 
     const pathname = usePathname()
     const { totalItems } = useCart()
+
+    const handleSectionClick = (sectionId: string) => (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId }, '*');
+        }
+    };
+
+    const logoText = customization?.headerStyle?.storeName || customization?.headerStyle?.logoText || storeInfo?.name || "Provision & Co.";
+    const logoUrl = customization?.headerStyle?.logoUrl;
+    const announcementText = customization?.announcementBar?.text;
 
     // Search logic
     useEffect(() => {
@@ -65,12 +79,26 @@ export default function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header 
+            onClick={handleSectionClick('headerStyle')}
+            className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+        >
+            {announcementText && (
+                <div 
+                    onClick={handleSectionClick('announcementBar')}
+                    className="bg-primary text-white text-[10px] font-bold py-2 text-center px-4 tracking-widest uppercase"
+                >
+                    {announcementText}
+                </div>
+            )}
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 {/* Brand Logo */}
                 <div className="flex items-center gap-2">
                     <Link href="/" className="flex items-center space-x-2">
-                        <span className="text-xl font-bold tracking-tight text-primary uppercase">Provision & Co.</span>
+                        {logoUrl ? <img src={logoUrl} alt={logoText} className="h-8 object-contain" /> : null}
+                        {(!logoUrl || logoText) && (
+                            <span className="text-xl font-bold tracking-tight text-primary uppercase">{logoText}</span>
+                        )}
                     </Link>
                 </div>
 
@@ -152,7 +180,7 @@ export default function Header() {
 
                 {/* Icons & Mobile Menu */}
                 <div className="flex items-center gap-2 md:gap-4">
-                    <!-- Auth buttons removed for agency checkout -->
+                    {/* Auth buttons removed for agency checkout */}
 
                     <Button
                         variant="ghost"
@@ -177,7 +205,7 @@ export default function Header() {
                         <SheetContent side="left" className="w-[300px] sm:w-[350px] p-6">
                             <SheetHeader className="text-left mb-8">
                                 <SheetTitle className="text-2xl font-black text-primary uppercase tracking-tighter">
-                                    Provision & Co.
+                                    {logoText}
                                 </SheetTitle>
                             </SheetHeader>
 
@@ -221,7 +249,7 @@ export default function Header() {
                                     </Link>
                                 </nav>
 
-                                <!-- Mobile auth buttons removed -->
+                                {/* Mobile auth buttons removed */}
 
                                 <div className="pt-2 text-center">
                                     <p className="text-sm text-zinc-400 font-medium">© 2026 Provision & Co.</p>

@@ -1,3 +1,4 @@
+import SRCheckoutButton from '@/components/SRCheckoutButton';
 
 "use client";
 
@@ -141,9 +142,7 @@ export default function CheckoutPage() {
                         </div>
                     </div>
 
-                    <Button type="submit" form="checkout-form" className="w-full py-6 text-lg" disabled={loading}>
-                        {loading ? "Processing..." : `Pay ₹${cartTotal.toLocaleString()}`}
-                    </Button>
+                    <SRCheckoutButton cartItems={cartItems} totalAmount={total} className="w-full py-6 text-lg" label="{loading ? "Processing..." : `Pay ₹${cartTotal.toLocaleString()}`}" />
 
                 </div>
 

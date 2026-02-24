@@ -1,3 +1,4 @@
+import SRCheckoutButton from '@/components/SRCheckoutButton';
 "use client";
 
 import { ArrowRight, Lock } from "lucide-react";

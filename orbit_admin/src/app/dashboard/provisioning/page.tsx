@@ -4,7 +4,13 @@ import { useState, useEffect } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,8 +39,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { createMerchant, getCategoryConfigs, getMerchantCredentials, getPendingMerchants, type MerchantCredential, type Store, type AdminUser } from "@/lib/admin-api";
-import { Eye, EyeOff, Copy, CheckCircle, ExternalLink, Plus, Key, Store as StoreIcon, Users, CreditCard } from "lucide-react";
+import {
+  createMerchant,
+  getCategoryConfigs,
+  getMerchantCredentials,
+  getPendingMerchants,
+  type MerchantCredential,
+  type Store,
+  type AdminUser,
+} from "@/lib/admin-api";
+import {
+  Eye,
+  EyeOff,
+  Copy,
+  CheckCircle,
+  ExternalLink,
+  Plus,
+  Key,
+  Store as StoreIcon,
+  Users,
+  CreditCard,
+} from "lucide-react";
 
 const CATEGORIES = [
   { value: "clothing", label: "Fashion / Clothing" },
@@ -49,39 +74,91 @@ const CATEGORIES = [
 
 const THEMES = [
   // Fashion
-  { value: "fashion_main", label: "Fashion Store - Classic", category: "clothing" },
-  { value: "fashion_alt", label: "Fashion Store - Modern", category: "clothing" },
-  
+  {
+    value: "fashion_main",
+    label: "Fashion Store - Classic",
+    category: "clothing",
+  },
+  {
+    value: "fashion_alt",
+    label: "Fashion Store - Modern",
+    category: "clothing",
+  },
+
   // Electronics
-  { value: "electronics_main", label: "Electronics Store - Modern Tech", category: "electronics" },
-  { value: "electronics_theme2", label: "Electronics Store - Pro", category: "electronics" },
-  
+  {
+    value: "electronics_main",
+    label: "Electronics Store - Modern Tech",
+    category: "electronics",
+  },
+  {
+    value: "electronics_theme2",
+    label: "Electronics Store - Pro",
+    category: "electronics",
+  },
+
   // Toys
   { value: "toys_main", label: "Toy Store - Main", category: "toys" },
   { value: "toys_alt1", label: "Toy Store - Fun", category: "toys" },
   { value: "toys_alt2", label: "Toy Store - Premium", category: "toys" },
-  
+
   // Footwear
-  { value: "footwear_main", label: "Footwear Style - Sport", category: "footwear" },
-  
+  {
+    value: "footwear_main",
+    label: "Footwear Style - Sport",
+    category: "footwear",
+  },
+
   // Jewellery
-  { value: "jewellery_main", label: "Jewellery Store - Luxury", category: "jewellery" },
-  { value: "jewellery_alt1", label: "Jewellery Store - Variant 1", category: "jewellery" },
-  { value: "jewellery_alt2", label: "Jewellery Store - Variant 2", category: "jewellery" },
-  { value: "jewellery_alt3", label: "Jewellery Store - Variant 3", category: "jewellery" },
-  
+  {
+    value: "jewellery_main",
+    label: "Jewellery Store - Luxury",
+    category: "jewellery",
+  },
+  {
+    value: "jewellery_alt1",
+    label: "Jewellery Store - Variant 1",
+    category: "jewellery",
+  },
+  {
+    value: "jewellery_alt2",
+    label: "Jewellery Store - Variant 2",
+    category: "jewellery",
+  },
+  {
+    value: "jewellery_alt3",
+    label: "Jewellery Store - Variant 3",
+    category: "jewellery",
+  },
+
   // Food
   { value: "food_main", label: "Gourmet Bites - Main", category: "food" },
   { value: "food_theme2", label: "Gourmet Bites - Theme 2", category: "food" },
   { value: "food_theme3", label: "Gourmet Bites - Theme 3", category: "food" },
-  
+
   // Perfume
-  { value: "perfume_main", label: "Fragrance Elite - Classic", category: "perfume" },
-  { value: "perfume_theme2", label: "Fragrance Elite - Elegant", category: "perfume" },
-  { value: "perfume_theme3", label: "Fragrance Elite - Luxury", category: "perfume" },
-  
+  {
+    value: "perfume_main",
+    label: "Fragrance Elite - Classic",
+    category: "perfume",
+  },
+  {
+    value: "perfume_theme2",
+    label: "Fragrance Elite - Elegant",
+    category: "perfume",
+  },
+  {
+    value: "perfume_theme3",
+    label: "Fragrance Elite - Luxury",
+    category: "perfume",
+  },
+
   // Cosmetics
-  { value: "beauty_main", label: "Beauty Glow - Upfront", category: "cosmetics" },
+  {
+    value: "beauty_main",
+    label: "Beauty Glow - Upfront",
+    category: "cosmetics",
+  },
 ];
 
 export default function ProvisioningPage() {
@@ -90,13 +167,17 @@ export default function ProvisioningPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
+  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>(
+    {},
+  );
   const [copiedField, setCopiedField] = useState("");
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [createdMerchant, setCreatedMerchant] = useState<any>(null);
   const [pendingMerchants, setPendingMerchants] = useState<any[]>([]);
   const [selectedPendingId, setSelectedPendingId] = useState<string>("");
-  const [categoryConfigs, setCategoryConfigs] = useState<Record<string, any>>({});
+  const [categoryConfigs, setCategoryConfigs] = useState<Record<string, any>>(
+    {},
+  );
   const [categoryConfigText, setCategoryConfigText] = useState<string>("");
   const [categoryConfigError, setCategoryConfigError] = useState<string>("");
 
@@ -115,10 +196,15 @@ export default function ProvisioningPage() {
 
   useEffect(() => {
     if (formData.category) {
-      setFilteredThemes(THEMES.filter(t => t.category === formData.category));
+      setFilteredThemes(THEMES.filter((t) => t.category === formData.category));
       // Reset theme if it doesn't match the new category
-      if (formData.theme && !THEMES.find(t => t.value === formData.theme && t.category === formData.category)) {
-        setFormData(prev => ({ ...prev, theme: "" }));
+      if (
+        formData.theme &&
+        !THEMES.find(
+          (t) => t.value === formData.theme && t.category === formData.category,
+        )
+      ) {
+        setFormData((prev) => ({ ...prev, theme: "" }));
       }
     } else {
       setFilteredThemes(THEMES);
@@ -179,8 +265,8 @@ export default function ProvisioningPage() {
       const data = await getCategoryConfigs();
       if (data.success) {
         const mapped: Record<string, any> = {};
-        data.configs.forEach((config) => {
-          if (config.category) {
+        data.configs.forEach((config: any) => {
+          if (config.category && typeof config.category === "string") {
             mapped[config.category] = config;
           }
         });
@@ -192,18 +278,19 @@ export default function ProvisioningPage() {
   };
 
   const generatePassword = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
     let password = "";
     for (let i = 0; i < 12; i++) {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    setFormData(prev => ({ ...prev, password }));
+    setFormData((prev) => ({ ...prev, password }));
   };
 
   const generateSubdomain = () => {
     const name = formData.merchantName.toLowerCase().replace(/[^a-z0-9]/g, "");
     const random = Math.floor(Math.random() * 1000);
-    setFormData(prev => ({ ...prev, subdomain: `${name}${random}` }));
+    setFormData((prev) => ({ ...prev, subdomain: `${name}${random}` }));
   };
 
   const handleSelectPending = (id: string) => {
@@ -225,12 +312,14 @@ export default function ProvisioningPage() {
       return;
     }
 
-    const merchant = pendingMerchants.find(m => m.id === id);
+    const merchant = pendingMerchants.find((m) => m.id === id);
     if (merchant) {
-      const cleanSubdomain = merchant.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const cleanSubdomain = merchant.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
       const random = Math.floor(Math.random() * 1000);
-      
-      setFormData(prev => ({
+
+      setFormData((prev) => ({
         ...prev,
         merchantName: merchant.name,
         email: merchant.user?.email || "",
@@ -260,11 +349,11 @@ export default function ProvisioningPage() {
 
       const result = await createMerchant({
         ...formData,
-        categoryConfig: parsedConfig
+        categoryConfig: parsedConfig,
       });
       setCreatedMerchant(result.merchant);
       setShowSuccessDialog(true);
-      
+
       // Reset form
       setFormData({
         merchantName: "",
@@ -287,7 +376,7 @@ export default function ProvisioningPage() {
   };
 
   const togglePasswordVisibility = (id: string) => {
-    setShowPasswords(prev => ({ ...prev, [id]: !prev[id] }));
+    setShowPasswords((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const copyToClipboard = async (text: string, field: string) => {
@@ -315,30 +404,44 @@ export default function ProvisioningPage() {
                 <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-100">
                   <CardHeader className="p-4">
                     <div className="flex items-center justify-between">
-                      <CardDescription className="text-xs font-medium text-blue-600">Total Provisioned</CardDescription>
+                      <CardDescription className="text-xs font-medium text-blue-600">
+                        Total Provisioned
+                      </CardDescription>
                       <StoreIcon className="w-4 h-4 text-blue-600" />
                     </div>
-                    <CardTitle className="text-2xl font-bold">{credentials.length}</CardTitle>
+                    <CardTitle className="text-2xl font-bold">
+                      {credentials.length}
+                    </CardTitle>
                   </CardHeader>
                 </Card>
                 <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-100">
                   <CardHeader className="p-4">
                     <div className="flex items-center justify-between">
-                      <CardDescription className="text-xs font-medium text-amber-600">Pending Onboarding</CardDescription>
+                      <CardDescription className="text-xs font-medium text-amber-600">
+                        Pending Onboarding
+                      </CardDescription>
                       <Users className="w-4 h-4 text-amber-600" />
                     </div>
-                    <CardTitle className="text-2xl font-bold">{pendingMerchants.length}</CardTitle>
+                    <CardTitle className="text-2xl font-bold">
+                      {pendingMerchants.length}
+                    </CardTitle>
                   </CardHeader>
                 </Card>
               </div>
 
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList>
-                  <TabsTrigger value="create" className="flex items-center gap-2">
+                  <TabsTrigger
+                    value="create"
+                    className="flex items-center gap-2"
+                  >
                     <Plus className="w-4 h-4" />
                     Create Merchant
                   </TabsTrigger>
-                  <TabsTrigger value="credentials" className="flex items-center gap-2">
+                  <TabsTrigger
+                    value="credentials"
+                    className="flex items-center gap-2"
+                  >
                     <Key className="w-4 h-4" />
                     View Credentials
                   </TabsTrigger>
@@ -349,7 +452,8 @@ export default function ProvisioningPage() {
                     <CardHeader>
                       <CardTitle>Create New Merchant</CardTitle>
                       <CardDescription>
-                        Set up a new merchant with Orbit-360 dashboard and storefront
+                        Set up a new merchant with Orbit-360 dashboard and
+                        storefront
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -361,7 +465,12 @@ export default function ProvisioningPage() {
                         )}
 
                         <div className="bg-muted/50 p-4 rounded-lg border border-dashed border-muted-foreground/20 mb-6">
-                          <Label htmlFor="pendingSelector" className="mb-2 block">Quick Select: Onboard Registered Merchant</Label>
+                          <Label
+                            htmlFor="pendingSelector"
+                            className="mb-2 block"
+                          >
+                            Quick Select: Onboard Registered Merchant
+                          </Label>
                           <Select
                             value={selectedPendingId}
                             onValueChange={handleSelectPending}
@@ -370,7 +479,9 @@ export default function ProvisioningPage() {
                               <SelectValue placeholder="Select a pending merchant to onboard" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="manual">-- Manual Entry (Fresh Merchant) --</SelectItem>
+                              <SelectItem value="manual">
+                                -- Manual Entry (Fresh Merchant) --
+                              </SelectItem>
                               {pendingMerchants.map((m) => (
                                 <SelectItem key={m.id} value={m.id}>
                                   {m.name} ({m.user?.email})
@@ -379,18 +490,26 @@ export default function ProvisioningPage() {
                             </SelectContent>
                           </Select>
                           <p className="text-xs text-muted-foreground mt-2">
-                            Selecting an existing merchant will pre-fill their name and email address.
+                            Selecting an existing merchant will pre-fill their
+                            name and email address.
                           </p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {/* Row 1: Merchant Name & Email */}
                           <div className="space-y-2">
-                            <Label htmlFor="merchantName">Merchant Name *</Label>
+                            <Label htmlFor="merchantName">
+                              Merchant Name *
+                            </Label>
                             <Input
                               id="merchantName"
                               value={formData.merchantName}
-                              onChange={(e) => setFormData(prev => ({ ...prev, merchantName: e.target.value }))}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  merchantName: e.target.value,
+                                }))
+                              }
                               placeholder="e.g., Fashion Store"
                               required
                             />
@@ -402,7 +521,12 @@ export default function ProvisioningPage() {
                               id="email"
                               type="email"
                               value={formData.email}
-                              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  email: e.target.value,
+                                }))
+                              }
                               placeholder="merchant@example.com"
                               required
                             />
@@ -413,7 +537,12 @@ export default function ProvisioningPage() {
                             <Label htmlFor="category">Store Category *</Label>
                             <Select
                               value={formData.category}
-                              onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                              onValueChange={(value) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  category: value,
+                                }))
+                              }
                               required
                             >
                               <SelectTrigger>
@@ -433,16 +562,30 @@ export default function ProvisioningPage() {
                             <Label htmlFor="theme">Website Theme *</Label>
                             <Select
                               value={formData.theme}
-                              onValueChange={(value) => setFormData(prev => ({ ...prev, theme: value }))}
+                              onValueChange={(value) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  theme: value,
+                                }))
+                              }
                               required
                               disabled={!formData.category}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder={formData.category ? "Select theme" : "Select category first"} />
+                                <SelectValue
+                                  placeholder={
+                                    formData.category
+                                      ? "Select theme"
+                                      : "Select category first"
+                                  }
+                                />
                               </SelectTrigger>
                               <SelectContent>
                                 {filteredThemes.map((theme) => (
-                                  <SelectItem key={theme.value} value={theme.value}>
+                                  <SelectItem
+                                    key={theme.value}
+                                    value={theme.value}
+                                  >
                                     {theme.label}
                                   </SelectItem>
                                 ))}
@@ -451,20 +594,28 @@ export default function ProvisioningPage() {
                           </div>
 
                           <div className="md:col-span-2 space-y-2">
-                            <Label htmlFor="categoryConfig">Category Config (JSON)</Label>
+                            <Label htmlFor="categoryConfig">
+                              Category Config (JSON)
+                            </Label>
                             <textarea
                               id="categoryConfig"
                               value={categoryConfigText}
-                              onChange={(e) => setCategoryConfigText(e.target.value)}
+                              onChange={(e) =>
+                                setCategoryConfigText(e.target.value)
+                              }
                               placeholder="Category config JSON"
                               className="w-full min-h-[180px] rounded-md border bg-background px-3 py-2 text-sm font-mono"
                               disabled={!formData.category}
                             />
                             {categoryConfigError ? (
-                              <p className="text-sm text-red-500">{categoryConfigError}</p>
+                              <p className="text-sm text-red-500">
+                                {categoryConfigError}
+                              </p>
                             ) : (
                               <p className="text-xs text-muted-foreground">
-                                Default config loads when category is selected. Edit to customize filters, variants, and attributes.
+                                Default config loads when category is selected.
+                                Edit to customize filters, variants, and
+                                attributes.
                               </p>
                             )}
                           </div>
@@ -477,12 +628,21 @@ export default function ProvisioningPage() {
                                 id="password"
                                 type="text"
                                 value={formData.password}
-                                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                                onChange={(e) =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    password: e.target.value,
+                                  }))
+                                }
                                 placeholder="Minimum 6 characters"
                                 required
                                 minLength={6}
                               />
-                              <Button type="button" variant="outline" onClick={generatePassword}>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={generatePassword}
+                              >
                                 Generate
                               </Button>
                             </div>
@@ -494,30 +654,49 @@ export default function ProvisioningPage() {
                               <Input
                                 id="subdomain"
                                 value={formData.subdomain}
-                                onChange={(e) => setFormData(prev => ({ ...prev, subdomain: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") }))}
+                                onChange={(e) =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    subdomain: e.target.value
+                                      .toLowerCase()
+                                      .replace(/[^a-z0-9-]/g, ""),
+                                  }))
+                                }
                                 placeholder="mystore"
                                 required
                               />
-                              <Button type="button" variant="outline" onClick={generateSubdomain} disabled={!formData.merchantName}>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={generateSubdomain}
+                                disabled={!formData.merchantName}
+                              >
                                 Generate
                               </Button>
                             </div>
                             <p className="text-sm text-muted-foreground">
-                              Public URL: {formData.subdomain || "subdomain"}.orbit360.com
+                              Public URL: {formData.subdomain || "subdomain"}
+                              .orbit360.com
                             </p>
                           </div>
 
                           {/* Row 4: Custom Domain */}
                           <div className="space-y-2">
-                            <Label htmlFor="customDomain">Custom Domain (Optional)</Label>
+                            <Label htmlFor="customDomain">
+                              Custom Domain (Optional)
+                            </Label>
                             <Input
                               id="customDomain"
                               value={formData.customDomain}
-                              onChange={(e) => setFormData(prev => ({ ...prev, customDomain: e.target.value }))}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  customDomain: e.target.value,
+                                }))
+                              }
                               placeholder="www.example.com"
                             />
                           </div>
-
                         </div>
 
                         <div className="flex justify-end gap-4">
@@ -558,8 +737,12 @@ export default function ProvisioningPage() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      {loading && <p className="text-center py-8">Loading credentials...</p>}
-                      
+                      {loading && (
+                        <p className="text-center py-8">
+                          Loading credentials...
+                        </p>
+                      )}
+
                       {!loading && credentials.length === 0 && (
                         <p className="text-center py-8 text-muted-foreground">
                           No merchants created yet
@@ -587,19 +770,28 @@ export default function ProvisioningPage() {
                               {credentials.map((cred, index) => (
                                 <TableRow key={cred.id}>
                                   <TableCell className="text-muted-foreground font-mono">
-                                    {(index + 1).toString().padStart(2, '0')}
+                                    {(index + 1).toString().padStart(2, "0")}
                                   </TableCell>
                                   <TableCell className="text-[10px] font-mono whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]">
                                     {cred.id}
                                   </TableCell>
-                                  <TableCell className="font-medium">{cred.merchantName}</TableCell>
+                                  <TableCell className="font-medium">
+                                    {cred.merchantName}
+                                  </TableCell>
                                   <TableCell>
                                     <div className="flex items-center gap-2">
-                                      <span className="text-sm">{cred.email}</span>
+                                      <span className="text-sm">
+                                        {cred.email}
+                                      </span>
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => copyToClipboard(cred.email, `email-${cred.id}`)}
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            cred.email,
+                                            `email-${cred.id}`,
+                                          )
+                                        }
                                       >
                                         {copiedField === `email-${cred.id}` ? (
                                           <CheckCircle className="w-4 h-4 text-green-500" />
@@ -612,12 +804,16 @@ export default function ProvisioningPage() {
                                   <TableCell>
                                     <div className="flex items-center gap-2">
                                       <code className="text-sm">
-                                        {showPasswords[cred.id] ? cred.password : "••••••••"}
+                                        {showPasswords[cred.id]
+                                          ? cred.password
+                                          : "••••••••"}
                                       </code>
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => togglePasswordVisibility(cred.id)}
+                                        onClick={() =>
+                                          togglePasswordVisibility(cred.id)
+                                        }
                                       >
                                         {showPasswords[cred.id] ? (
                                           <EyeOff className="w-4 h-4" />
@@ -628,9 +824,15 @@ export default function ProvisioningPage() {
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => copyToClipboard(cred.password, `password-${cred.id}`)}
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            cred.password,
+                                            `password-${cred.id}`,
+                                          )
+                                        }
                                       >
-                                        {copiedField === `password-${cred.id}` ? (
+                                        {copiedField ===
+                                        `password-${cred.id}` ? (
                                           <CheckCircle className="w-4 h-4 text-green-500" />
                                         ) : (
                                           <Copy className="w-4 h-4" />
@@ -640,15 +842,25 @@ export default function ProvisioningPage() {
                                   </TableCell>
                                   <TableCell>
                                     <div>
-                                      <div className="font-medium text-sm">{cred.storeName}</div>
-                                      <div className="text-xs text-muted-foreground">{cred.subdomain}</div>
+                                      <div className="font-medium text-sm">
+                                        {cred.storeName}
+                                      </div>
+                                      <div className="text-xs text-muted-foreground">
+                                        {cred.subdomain}
+                                      </div>
                                     </div>
                                   </TableCell>
                                   <TableCell>
-                                    <Badge variant="outline">{cred.theme}</Badge>
+                                    <Badge variant="outline">
+                                      {cred.theme}
+                                    </Badge>
                                   </TableCell>
                                   <TableCell>
-                                    <Badge variant={cred.isActive ? "default" : "secondary"}>
+                                    <Badge
+                                      variant={
+                                        cred.isActive ? "default" : "secondary"
+                                      }
+                                    >
                                       {cred.isActive ? "Active" : "Inactive"}
                                     </Badge>
                                   </TableCell>
@@ -657,7 +869,12 @@ export default function ProvisioningPage() {
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => window.open(cred.dashboardUrl, "_blank")}
+                                        onClick={() =>
+                                          window.open(
+                                            cred.dashboardUrl,
+                                            "_blank",
+                                          )
+                                        }
                                       >
                                         <StoreIcon className="w-4 h-4 mr-1" />
                                         Dashboard
@@ -665,7 +882,13 @@ export default function ProvisioningPage() {
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => window.open(cred.upfrontTemplateUrl || cred.storefrontUrl, "_blank")}
+                                        onClick={() =>
+                                          window.open(
+                                            cred.upfrontTemplateUrl ||
+                                              cred.storefrontUrl,
+                                            "_blank",
+                                          )
+                                        }
                                       >
                                         <ExternalLink className="w-4 h-4 mr-1" />
                                         Category Template
@@ -673,7 +896,9 @@ export default function ProvisioningPage() {
                                     </div>
                                   </TableCell>
                                   <TableCell className="text-sm text-muted-foreground">
-                                    {new Date(cred.createdAt).toLocaleDateString()}
+                                    {new Date(
+                                      cred.createdAt,
+                                    ).toLocaleDateString()}
                                   </TableCell>
                                 </TableRow>
                               ))}
@@ -687,7 +912,10 @@ export default function ProvisioningPage() {
               </Tabs>
 
               {/* Success Dialog */}
-              <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+              <Dialog
+                open={showSuccessDialog}
+                onOpenChange={setShowSuccessDialog}
+              >
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
@@ -695,7 +923,8 @@ export default function ProvisioningPage() {
                       Merchant Created Successfully!
                     </DialogTitle>
                     <DialogDescription>
-                      The merchant account has been provisioned with Orbit-360 dashboard and storefront.
+                      The merchant account has been provisioned with Orbit-360
+                      dashboard and storefront.
                     </DialogDescription>
                   </DialogHeader>
 
@@ -703,17 +932,28 @@ export default function ProvisioningPage() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
                         <div>
-                          <Label className="text-xs text-muted-foreground">Merchant Name</Label>
+                          <Label className="text-xs text-muted-foreground">
+                            Merchant Name
+                          </Label>
                           <p className="font-medium">{createdMerchant.name}</p>
                         </div>
                         <div>
-                          <Label className="text-xs text-muted-foreground">Email</Label>
+                          <Label className="text-xs text-muted-foreground">
+                            Email
+                          </Label>
                           <div className="flex items-center gap-2">
-                            <p className="font-medium">{createdMerchant.email}</p>
+                            <p className="font-medium">
+                              {createdMerchant.email}
+                            </p>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => copyToClipboard(createdMerchant.email, "dialog-email")}
+                              onClick={() =>
+                                copyToClipboard(
+                                  createdMerchant.email,
+                                  "dialog-email",
+                                )
+                              }
                             >
                               {copiedField === "dialog-email" ? (
                                 <CheckCircle className="w-4 h-4 text-green-500" />
@@ -724,13 +964,22 @@ export default function ProvisioningPage() {
                           </div>
                         </div>
                         <div>
-                          <Label className="text-xs text-muted-foreground">Password</Label>
+                          <Label className="text-xs text-muted-foreground">
+                            Password
+                          </Label>
                           <div className="flex items-center gap-2">
-                            <code className="font-medium">{createdMerchant.password}</code>
+                            <code className="font-medium">
+                              {createdMerchant.password}
+                            </code>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => copyToClipboard(createdMerchant.password, "dialog-password")}
+                              onClick={() =>
+                                copyToClipboard(
+                                  createdMerchant.password,
+                                  "dialog-password",
+                                )
+                              }
                             >
                               {copiedField === "dialog-password" ? (
                                 <CheckCircle className="w-4 h-4 text-green-500" />
@@ -741,18 +990,30 @@ export default function ProvisioningPage() {
                           </div>
                         </div>
                         <div>
-                          <Label className="text-xs text-muted-foreground">Subdomain</Label>
-                          <p className="font-medium">{createdMerchant.subdomain}</p>
+                          <Label className="text-xs text-muted-foreground">
+                            Subdomain
+                          </Label>
+                          <p className="font-medium">
+                            {createdMerchant.subdomain}
+                          </p>
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <Label>Dashboard URL</Label>
                         <div className="flex items-center gap-2">
-                          <Input value={createdMerchant.dashboardUrl} readOnly />
+                          <Input
+                            value={createdMerchant.dashboardUrl}
+                            readOnly
+                          />
                           <Button
                             variant="outline"
-                            onClick={() => window.open(createdMerchant.dashboardUrl, "_blank")}
+                            onClick={() =>
+                              window.open(
+                                createdMerchant.dashboardUrl,
+                                "_blank",
+                              )
+                            }
                           >
                             <ExternalLink className="w-4 h-4" />
                           </Button>
@@ -762,57 +1023,87 @@ export default function ProvisioningPage() {
                       <div className="space-y-2">
                         <Label>Storefront URL</Label>
                         <div className="flex items-center gap-2">
-                          <Input value={createdMerchant.storefrontUrl} readOnly />
+                          <Input
+                            value={createdMerchant.storefrontUrl}
+                            readOnly
+                          />
                           <Button
                             variant="outline"
-                            onClick={() => window.open(createdMerchant.storefrontUrl, "_blank")}
+                            onClick={() =>
+                              window.open(
+                                createdMerchant.storefrontUrl,
+                                "_blank",
+                              )
+                            }
                           >
                             <ExternalLink className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label>Category Template Preview</Label>
                         <div className="flex items-center gap-2">
-                          <Input value={createdMerchant.upfrontTemplateUrl} readOnly />
+                          <Input
+                            value={createdMerchant.upfrontTemplateUrl}
+                            readOnly
+                          />
                           <Button
                             variant="outline"
-                            onClick={() => window.open(createdMerchant.upfrontTemplateUrl, "_blank")}
+                            onClick={() =>
+                              window.open(
+                                createdMerchant.upfrontTemplateUrl,
+                                "_blank",
+                              )
+                            }
                           >
                             <ExternalLink className="w-4 h-4" />
                           </Button>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Preview the template design for {createdMerchant.category} category
+                          Preview the template design for{" "}
+                          {createdMerchant.category} category
                         </p>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label>Category Template Preview</Label>
                         <div className="flex items-center gap-2">
-                          <Input value={createdMerchant.upfrontTemplateUrl} readOnly />
+                          <Input
+                            value={createdMerchant.upfrontTemplateUrl}
+                            readOnly
+                          />
                           <Button
                             variant="outline"
-                            onClick={() => window.open(createdMerchant.upfrontTemplateUrl, "_blank")}
+                            onClick={() =>
+                              window.open(
+                                createdMerchant.upfrontTemplateUrl,
+                                "_blank",
+                              )
+                            }
                           >
                             <ExternalLink className="w-4 h-4" />
                           </Button>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Preview the template design for {createdMerchant.category} category
+                          Preview the template design for{" "}
+                          {createdMerchant.category} category
                         </p>
                       </div>
 
                       <Alert>
                         <AlertDescription>
-                          The merchant can now log in to Orbit-360 using the email and password above.
-                          The credentials are also saved in the "View Credentials" tab.
+                          The merchant can now log in to Orbit-360 using the
+                          email and password above. The credentials are also
+                          saved in the "View Credentials" tab.
                         </AlertDescription>
                       </Alert>
 
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setActiveTab("credentials")}>
+                        <Button
+                          variant="outline"
+                          onClick={() => setActiveTab("credentials")}
+                        >
                           View All Credentials
                         </Button>
                         <Button onClick={() => setShowSuccessDialog(false)}>

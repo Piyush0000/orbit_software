@@ -5,13 +5,30 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useStoreContext } from "@/context/store-context";
 
 export default function Hero() {
+    const { customization } = useStoreContext();
     const [currentSlide, setCurrentSlide] = useState(0)
+
+    const handleSectionClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId: 'heroSection' }, '*');
+        }
+    };
+
+    const headline = customization?.heroSection?.title || customization?.heroSection?.headline || "Fresh Food & Drinks Delivered.";
+    const subheadline = customization?.heroSection?.subtitle || customization?.heroSection?.subheadline || "Premium snacks, refreshing beverages & ready-to-eat meals. Sourced fresh, packed with care, delivered fast to your doorstep.";
+    const ctaText = customization?.heroSection?.ctaText || customization?.heroSection?.buttonText || "Order Now";
+    const bgImage = customization?.heroSection?.backgroundImage || "/hero.png";
+    const weeklySpecial = customization?.heroSection?.weeklySpecial || "Weekly Special";
+    const specialTitle = customization?.heroSection?.specialTitle || "Artisanal Combos";
+    const specialPrice = customization?.heroSection?.specialPrice || "Starting at $19.99";
 
     const slides = [
         {
-            src: "/hero.png",
+            src: bgImage,
             alt: "Premium Snacks and Beverages"
         },
         {
@@ -26,32 +43,38 @@ export default function Hero() {
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % slides.length)
+            setCurrentSlide((prev: number) => (prev + 1) % slides.length)
         }, 5000)
         return () => clearInterval(timer)
     }, [slides.length])
 
-    const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length)
-    const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
+    const nextSlide = () => setCurrentSlide((prev: number) => (prev + 1) % slides.length)
+    const prevSlide = () => setCurrentSlide((prev: number) => (prev - 1 + slides.length) % slides.length)
 
     return (
-        <section className="relative w-full overflow-hidden bg-background py-12 md:py-20 lg:py-28">
+        <section 
+            onClick={handleSectionClick}
+            className="relative w-full overflow-hidden bg-background py-12 md:py-20 lg:py-28 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+        >
             <div className="container mx-auto px-4 md:px-6">
                 <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
                     <div className="flex flex-col justify-center space-y-6 text-center lg:text-left">
                         <div className="space-y-4">
                             <h1 className="text-4xl font-black tracking-tighter sm:text-5xl md:text-6xl xl:text-8xl/none text-foreground uppercase leading-[0.9]">
-                                Fresh Food <br /> & Drinks <br />
-                                <span className="text-primary italic">Delivered.</span>
+                                {headline.split('.').map((part: string, i: number) => (
+                                    <span key={i}>
+                                        {part}{i < headline.split('.').length - 1 ? '.' : ''}
+                                        <br />
+                                    </span>
+                                ))}
                             </h1>
                             <p className="max-w-[550px] text-muted-foreground md:text-xl font-medium leading-relaxed mx-auto lg:mx-0">
-                                Premium snacks, refreshing beverages & ready-to-eat meals.
-                                Sourced fresh, packed with care, delivered fast to your doorstep.
+                                {subheadline}
                             </p>
                         </div>
                         <div className="flex flex-col gap-3 sm:flex-row justify-center lg:justify-start pt-4">
                             <Button size="lg" className="px-10 py-7 text-sm font-black uppercase tracking-[0.2em] h-auto rounded-none shadow-xl hover:translate-y-[-2px] transition-all">
-                                Order Now
+                                {ctaText}
                             </Button>
                             <Button size="lg" variant="outline" className="px-10 py-7 text-sm font-black uppercase tracking-[0.2em] h-auto bg-transparent border-2 border-border hover:bg-muted rounded-none transition-all">
                                 Browse Menu
@@ -115,9 +138,9 @@ export default function Hero() {
 
                         {/* Floating Badge */}
                         <div className="absolute -bottom-6 -left-6 bg-card p-6 shadow-2xl z-30 hidden md:block border border-border">
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-1">Weekly Special</p>
-                            <p className="text-xl font-black uppercase tracking-tighter text-primary">Artisanal Combos</p>
-                            <p className="text-xs font-bold text-muted-foreground mt-1">Starting at $19.99</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-1">{weeklySpecial}</p>
+                            <p className="text-xl font-black uppercase tracking-tighter text-primary">{specialTitle}</p>
+                            <p className="text-xs font-bold text-muted-foreground mt-1">{specialPrice}</p>
                         </div>
                     </div>
                 </div>

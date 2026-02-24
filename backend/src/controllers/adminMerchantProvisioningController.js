@@ -2,21 +2,35 @@ const { prisma } = require('../config/database');
 const bcrypt = require('bcryptjs');
 const { getDefaultCategoryConfig, normalizeCategory } = require('../utils/categoryConfigs');
 
-// Category to upfront template port mapping
-const CATEGORY_UPFRONT_PORTS = {
-  'Toys': 3004,
-  'Fashion': 3005,
-  'Electronics': 3006,
-  'Food': 3007,
-  'Footwear': 3008,
-  'Perfume': 3009,
-  'Beauty': 3010,
-  'Jewellery': 3017
-};
+// Helper to get upfront port dynamically from theme or category
+const getUpfrontPort = async (themeSlug, category) => {
+  try {
+    const theme = await prisma.theme.findUnique({
+      where: { slug: themeSlug },
+      select: { config: true }
+    });
+    
+    if (theme?.config && typeof theme.config === 'object' && theme.config.port) {
+      return theme.config.port;
+    }
 
-const getCategoryUpfrontPort = (category) => {
-  const normalizedCategory = normalizeCategory(category);
-  return CATEGORY_UPFRONT_PORTS[normalizedCategory] || 3004; // Default to toys port
+    // Fallback to CATEGORY_UPFRONT_PORTS if theme config is missing
+    const CATEGORY_UPFRONT_PORTS = {
+      'toys': 3023,
+      'fashion': 3014,
+      'electronics': 3011,
+      'food': 3017,
+      'footwear': 3004,
+      'perfume': 3020,
+      'beauty': 3008,
+      'jewellery': 3005
+    };
+    const normalizedCategory = normalizeCategory(category);
+    return CATEGORY_UPFRONT_PORTS[normalizedCategory] || 3004;
+  } catch (err) {
+    console.error('Error fetching theme port:', err);
+    return 3004;
+  }
 };
 
 /**
@@ -302,8 +316,8 @@ const createMerchant = async (req, res, next) => {
         dashboardUrl: `http://localhost:3003/login?email=${encodeURIComponent(email)}`,
         storefrontUrl: customDomain 
           ? `http://${customDomain}` 
-          : `http://${subdomain}.localhost:3000`,
-        upfrontTemplateUrl: `http://localhost:${getCategoryUpfrontPort(normalizedCategory)}`,
+          : `http://${subdomain}.localhost:${await getUpfrontPort(theme, normalizedCategory)}`,
+        upfrontTemplateUrl: `http://localhost:${await getUpfrontPort(theme, normalizedCategory)}`,
         createdAt: result.user.createdAt
       }
     });
@@ -374,7 +388,8 @@ const listMerchantCredentials = async (req, res, next) => {
           dashboardUrl: `http://localhost:3003/login?email=${encodeURIComponent(cred.email)}`,
           storefrontUrl: store?.customDomain 
             ? `http://${store.customDomain}` 
-            : `http://${store?.subdomain}.localhost:3000`,
+            : `http://${store?.subdomain}.localhost:${await getUpfrontPort(store?.theme, store?.category)}`,
+          upfrontTemplateUrl: `http://localhost:${await getUpfrontPort(store?.theme, store?.category)}`,
           createdAt: cred.createdAt,
           updatedAt: cred.updatedAt
         };
@@ -437,8 +452,8 @@ const getMerchantCredentials = async (req, res, next) => {
         dashboardUrl: `http://localhost:3003/login?email=${encodeURIComponent(credentials.email)}`,
         storefrontUrl: store?.customDomain 
           ? `http://${store.customDomain}` 
-          : `http://${store?.subdomain}.localhost:3000`,
-        upfrontTemplateUrl: `http://localhost:${getCategoryUpfrontPort(store?.category)}`,
+          : `http://${store?.subdomain}.localhost:${await getUpfrontPort(store?.theme, store?.category)}`,
+        upfrontTemplateUrl: `http://localhost:${await getUpfrontPort(store?.theme, store?.category)}`,
         createdAt: credentials.createdAt
       }
     });

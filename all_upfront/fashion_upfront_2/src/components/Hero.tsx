@@ -1,13 +1,32 @@
 'use client';
 
+import { useStoreContext } from '@/contexts/store-context';
+
 export default function Hero() {
+  const { customization } = useStoreContext();
+
+  const handleSectionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId: 'heroSection' }, '*');
+    }
+  };
+
+  const headline = customization?.heroSection?.title || customization?.heroSection?.headline || "Urban Momentum";
+  const subheadline = customization?.heroSection?.subtitle || customization?.heroSection?.subheadline || "Redefining streetwear with premium cuts and sustainable fabrics. Designed for those who move forward.";
+  const bgImage = customization?.heroSection?.backgroundImage || "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2670&auto=format&fit=crop";
+  const ctaText = customization?.heroSection?.ctaText || customization?.heroSection?.buttonText || "Shop Look";
+
   return (
-    <section className="relative w-full h-[85vh] overflow-hidden flex items-end pb-20 md:pb-32">
+    <section 
+      onClick={handleSectionClick}
+      className="relative w-full h-[85vh] overflow-hidden flex items-end pb-20 md:pb-32 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+    >
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0 transition-transform duration-[2000ms] hover:scale-105"
         style={{
-          backgroundImage: 'url("https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2670&auto=format&fit=crop")', // Urban fashion editorial
+          backgroundImage: `url("${bgImage}")`,
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -23,13 +42,11 @@ export default function Hero() {
           </div>
 
           <h1 className="text-6xl md:text-9xl font-heading font-medium leading-[0.9] text-white mb-8 uppercase tracking-tighter">
-            Urban <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400">Momentum</span>
+            {headline}
           </h1>
 
           <p className="text-lg md:text-2xl text-zinc-300 font-light tracking-wide max-w-xl mb-10 leading-relaxed">
-            Redefining streetwear with premium cuts and sustainable fabrics.
-            Designed for those who move forward.
+            {subheadline}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-5">
@@ -37,7 +54,7 @@ export default function Hero() {
               href="#products"
               className="px-12 py-4 bg-white text-black font-bold text-sm tracking-[0.15em] hover:bg-zinc-200 transition-colors uppercase text-center min-w-[200px]"
             >
-              Shop Look
+              {ctaText}
             </a>
             <a
               href="#featured"

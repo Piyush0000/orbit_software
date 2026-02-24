@@ -1,7 +1,7 @@
 const path = require('path');
 const dotenv = require('dotenv');
 
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -36,6 +36,11 @@ const env = {
   admin: {
     email: process.env.DEFAULT_ADMIN_EMAIL,
     password: process.env.DEFAULT_ADMIN_PASSWORD
+  },
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET
   }
 };
 

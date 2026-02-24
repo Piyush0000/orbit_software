@@ -51,8 +51,9 @@ const callback = async (req, res, next) => {
     } catch (err) {
       return res.status(400).json({ message: 'Invalid state' });
     }
-    const user = await User.findById(decoded.userId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const actor = await User.findById(decoded.userId);
+
+    if (!actor) return res.status(404).json({ message: 'User not found' });
 
     let tokenRes;
     try {
@@ -80,15 +81,28 @@ const callback = async (req, res, next) => {
     const accounts = await metaService.getAdAccounts();
     const adAccountIds = (accounts?.data || []).map((a) => a.id);
 
-    user.metaAccessToken = encrypted;
-    user.metaTokenExpiresAt = expiresAt;
-    user.metaAdAccounts = adAccountIds;
-    await user.save();
+    actor.metaAccessToken = encrypted;
+    actor.metaTokenExpiresAt = expiresAt;
+    actor.metaAdAccounts = adAccountIds;
+    await actor.save();
 
-    return res.json({ message: 'Meta connected', adAccounts: adAccountIds, expiresAt });
+    // Redirect back to integrations page on success
+    return res.redirect(`${env.frontendUrl}/integrations?meta=success`);
   } catch (err) {
     next(err);
   }
 };
 
-module.exports = { login, callback };
+const status = async (req, res) => {
+  const user = req.user;
+  if (!user) return res.status(401).json({ message: 'Unauthorized' });
+  
+  const connected = !!user.metaAccessToken;
+  return res.json({
+    connected,
+    adAccounts: user.metaAdAccounts || [],
+    expiresAt: user.metaTokenExpiresAt
+  });
+};
+
+module.exports = { login, callback, status };

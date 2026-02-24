@@ -24,11 +24,25 @@ const ANNOUNCEMENTS = [
     "Gift-Ready Packaging",
 ];
 
+import { useStoreContext } from "@/context/store-context";
+
 export default function Header() {
+    const { customization, storeInfo } = useStoreContext();
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [announcementIndex, setAnnouncementIndex] = useState(0);
     const { cartCount } = useCart();
+
+    const handleSectionClick = (sectionId: string) => (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId }, '*');
+        }
+    };
+
+    const logoText = customization?.headerStyle?.storeName || customization?.headerStyle?.logoText || storeInfo?.name || "PERFUME UPFRONT";
+    const logoUrl = customization?.headerStyle?.logoUrl;
+    const announcementText = customization?.announcementBar?.text || "100% Authentic Perfumes";
 
     // Handle scroll for sticky header proper styling
     useEffect(() => {
@@ -50,8 +64,9 @@ export default function Header() {
     return (
         <>
             <header
+                onClick={handleSectionClick('headerStyle')}
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+                    "fixed top-0 left-0 right-0 z-50 transition-all duration-300 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer",
                     isScrolled
                         ? "bg-contrast-black/95 backdrop-blur-md shadow-sm py-2 border-b border-gray-800"
                         : "bg-transparent py-3 border-b border-white/10"
@@ -62,7 +77,11 @@ export default function Header() {
                         {/* Logo */}
                         <div className="flex flex-col">
                             <Link href="/" className="text-2xl lg:text-3xl font-serif font-bold tracking-tight">
-                                PERFUME UPFRONT
+                                {logoUrl ? (
+                                    <img src={logoUrl} alt={logoText} className="h-10 object-contain" />
+                                ) : (
+                                    logoText
+                                )}
                             </Link>
                             <span className="text-[10px] uppercase tracking-widest text-gray-500 hidden sm:block">
                                 Signature Scents for Every Moment
@@ -124,13 +143,14 @@ export default function Header() {
 
             {/* Announcement Bar - Positioned below fixed header */}
             <div
+                onClick={handleSectionClick('announcementBar')}
                 className={cn(
-                    "fixed left-0 right-0 z-40 bg-black text-white text-center py-2 transition-all duration-300",
+                    "fixed left-0 right-0 z-40 bg-black text-white text-center py-2 transition-all duration-300 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer",
                     isScrolled ? "top-[60px]" : "top-[75px] lg:top-[85px]"
                 )}
             >
                 <p className="text-xs font-medium tracking-widest uppercase animate-fade-in">
-                    {ANNOUNCEMENTS[announcementIndex]}
+                    {customization?.announcementBar?.text || ANNOUNCEMENTS[announcementIndex]}
                 </p>
             </div>
 

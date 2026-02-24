@@ -1,6 +1,6 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-const { login, callback } = require('../controllers/metaOAuthController');
+const { login, callback, status } = require('../controllers/metaOAuthController');
 const { metaAuth } = require('../middleware/metaAuth');
 
 const router = express.Router();
@@ -11,5 +11,6 @@ const limiter = rateLimit({
 
 router.get('/login', metaAuth, limiter, login);
 router.get('/callback', callback);
+router.get('/status', metaAuth, status);
 
 module.exports = router;

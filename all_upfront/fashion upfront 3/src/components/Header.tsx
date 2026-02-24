@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ProductsDropdown from './ProductsDropdown';
 import MegaMenu from './MegaMenu';
-import ProfileDropdown from './ProfileDropdown';
 import { useCart } from '@/store/cartStore';
-import { useWishlist } from '@/store/wishlistStore';
+
+import { useStoreContext } from '@/contexts/store-context';
 
 export default function Header() {
+  const { customization, storeInfo } = useStoreContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -16,9 +17,18 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const productsRef = useRef<HTMLDivElement>(null);
   const { getTotalItems } = useCart();
-  const { wishlist } = useWishlist();
   const cartItemCount = getTotalItems();
-  const wishlistCount = wishlist.length;
+
+  const handleSectionClick = (sectionId: string) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId }, '*');
+    }
+  };
+
+  const announcementText = customization?.announcementBar?.text || "Complimentary Shipping on all orders";
+  const logoText = customization?.headerStyle?.storeName || customization?.headerStyle?.logoText || storeInfo?.name || "Upfront";
+  const logoUrl = customization?.headerStyle?.logoUrl;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,12 +74,16 @@ export default function Header() {
       className="flex flex-col w-full font-sans sticky top-0 z-50 transition-all duration-300"
       onMouseLeave={() => setActiveCategory(null)}
     >
-      <div className="bg-[var(--header-bg)] text-[var(--text-secondary)] border-b border-[var(--header-border)] text-[10px] font-medium py-2 text-center px-4 tracking-[0.2em] uppercase relative z-[51]">
-        Complimentary Shipping on all orders
+      <div 
+        onClick={handleSectionClick('announcementBar')}
+        className="bg-[var(--header-bg)] text-[var(--text-secondary)] border-b border-[var(--header-border)] text-[10px] font-medium py-2 text-center px-4 tracking-[0.2em] uppercase relative z-[51] hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+      >
+        {announcementText}
       </div>
 
       <header
-        className={`transition-all duration-700 border-b ${isScrolled
+        onClick={handleSectionClick('headerStyle')}
+        className={`transition-all duration-700 border-b hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer ${isScrolled
           ? 'bg-black/80 backdrop-blur-md border-white/5 py-2'
           : 'bg-transparent border-transparent py-6'
           }`}
@@ -78,8 +92,9 @@ export default function Header() {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <div className="flex-shrink-0 mr-16 flex items-center">
-              <Link href="/" className="text-3xl font-heading font-bold tracking-tight text-[var(--annotated-text-primary)] uppercase">
-                Upfront
+              <Link href="/" className="text-3xl font-heading font-bold tracking-tight text-[var(--annotated-text-primary)] uppercase flex items-center gap-2">
+                {logoUrl ? <img src={logoUrl} alt={logoText} className="h-8 object-contain" /> : null}
+                {(!logoUrl || logoText) && logoText}
               </Link>
             </div>
 
@@ -140,42 +155,6 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* Profile */}
-              <div
-                className="relative group hidden md:flex items-center"
-                onMouseEnter={() => setIsMenuOpen(false)}
-              >
-                <Link href="/profile" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-2" aria-label="Account">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </Link>
-                {/* Dropdown Container */}
-                <div className="absolute right-0 top-[100%] pt-6 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
-                  <div className="bg-[var(--card-bg)] border border-[var(--card-border)] shadow-2xl">
-                    <ProfileDropdown />
-                  </div>
-                </div>
-              </div>
-
-              {/* Wishlist */}
-              <Link
-                href="/wishlist"
-                className="relative text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors hidden md:block p-2"
-                aria-label="Wishlist"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                {wishlistCount > 0 && (
-                  <span
-                    className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center text-[9px] font-bold rounded-full bg-[var(--highlight)] text-black"
-                  >
-                    {wishlistCount}
-                  </span>
-                )}
-              </Link>
-
               {/* Cart */}
               <Link
                 href="/cart"
@@ -230,16 +209,6 @@ export default function Header() {
               </div>
 
               <div className="pt-8 border-t border-[var(--card-border)] space-y-4">
-                <Link
-                  href="/profile"
-                  className="block text-sm font-bold uppercase tracking-widest text-[var(--text-secondary)]"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  My Account
-                </Link>
-                <Link href="/wishlist" className="block text-sm font-bold uppercase tracking-widest text-[var(--text-secondary)]">
-                  Wishlist ({wishlistCount})
-                </Link>
                 <Link href="/cart" className="block text-sm font-bold uppercase tracking-widest text-[var(--text-secondary)]">
                   Cart ({cartItemCount})
                 </Link>

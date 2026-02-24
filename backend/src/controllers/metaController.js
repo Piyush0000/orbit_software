@@ -14,19 +14,20 @@ const respondNoPermission = (res) =>
     message: 'User does not have advertiser access to this ad account'
   });
 
-const ensureMetaToken = (user) => {
-  if (user?.metaAccessToken) {
-    if (!user.metaTokenExpiresAt) {
+const ensureMetaToken = (req) => {
+  const actor = req.user;
+  if (actor?.metaAccessToken) {
+    if (!actor.metaTokenExpiresAt) {
       const err = new Error('Meta account not connected');
       err.status = 400;
       throw err;
     }
-    if (new Date(user.metaTokenExpiresAt) < new Date()) {
+    if (new Date(actor.metaTokenExpiresAt) < new Date()) {
       const err = new Error('Meta token expired, please re-authenticate');
       err.status = 401;
       throw err;
     }
-    return decrypt(user.metaAccessToken);
+    return decrypt(actor.metaAccessToken);
   }
   if (env.meta.publicAccessToken) {
     return env.meta.publicAccessToken;
@@ -36,14 +37,14 @@ const ensureMetaToken = (user) => {
   throw err;
 };
 
-const withService = (user) => {
-  const token = ensureMetaToken(user);
+const withService = (req) => {
+  const token = ensureMetaToken(req);
   return new MetaApiService(token);
 };
 
 const getAdAccounts = async (req, res, next) => {
   try {
-    const service = withService(req.user);
+    const service = withService(req);
     const data = await service.getAdAccounts();
     const accounts = data.data || [];
 
@@ -84,7 +85,7 @@ const getCampaigns = async (req, res, next) => {
   try {
     const adAccountId = normalizeAdAccountId(req.query.adAccountId);
     if (!adAccountId) return res.status(400).json({ message: 'adAccountId required' });
-    const service = withService(req.user);
+    const service = withService(req);
     const hasAccess = await service.hasAccess(adAccountId);
     if (!hasAccess) return respondNoPermission(res);
     const data = await service.getCampaigns(adAccountId);
@@ -107,7 +108,7 @@ const createCampaign = async (req, res, next) => {
     if (!adAccountId || !name || !objective || !status) {
       return res.status(400).json({ message: 'adAccountId, name, objective, status required' });
     }
-    const service = withService(req.user);
+    const service = withService(req);
     const hasAccess = await service.hasAccess(adAccountId);
     if (!hasAccess) return respondNoPermission(res);
     const payload = {
@@ -125,7 +126,7 @@ const createCampaign = async (req, res, next) => {
 
 const pauseCampaign = async (req, res, next) => {
   try {
-    const service = withService(req.user);
+    const service = withService(req);
     const data = await service.updateCampaignStatus(req.params.id, 'PAUSED');
     res.json({ campaign: data });
   } catch (err) {
@@ -135,7 +136,7 @@ const pauseCampaign = async (req, res, next) => {
 
 const resumeCampaign = async (req, res, next) => {
   try {
-    const service = withService(req.user);
+    const service = withService(req);
     const data = await service.updateCampaignStatus(req.params.id, 'ACTIVE');
     res.json({ campaign: data });
   } catch (err) {
@@ -150,7 +151,7 @@ const getInsights = async (req, res, next) => {
     const metrics = ['impressions', 'clicks', 'spend', 'ctr', 'cpc', 'actions', 'action_values', 'purchase_roas'];
     const datePreset = req.query.datePreset || 'last_30d';
     const timeIncrement = req.query.timeIncrement || '1';
-    const service = withService(req.user);
+    const service = withService(req);
     const hasAccess = await service.hasAccess(adAccountId);
     if (!hasAccess) return respondNoPermission(res);
     const data = await service.getInsights(adAccountId, metrics, {
@@ -173,7 +174,7 @@ const getCreatives = async (req, res, next) => {
   try {
     const adAccountId = normalizeAdAccountId(req.query.adAccountId);
     if (!adAccountId) return res.status(400).json({ message: 'adAccountId required' });
-    const service = withService(req.user);
+    const service = withService(req);
     const hasAccess = await service.hasAccess(adAccountId);
     if (!hasAccess) return respondNoPermission(res);
     const data = await service.getCreatives(adAccountId);
@@ -188,7 +189,7 @@ const getCreativeInsights = async (req, res, next) => {
     const adAccountId = normalizeAdAccountId(req.query.adAccountId);
     if (!adAccountId) return res.status(400).json({ message: 'adAccountId required' });
     const datePreset = req.query.datePreset || 'last_30d';
-    const service = withService(req.user);
+    const service = withService(req);
     const hasAccess = await service.hasAccess(adAccountId);
     if (!hasAccess) return respondNoPermission(res);
     const data = await service.getAdsWithInsights(adAccountId, {
@@ -263,7 +264,7 @@ const getCreativePreview = async (req, res, next) => {
     if (!creativeId && !objectStoryId) {
       return res.status(400).json({ message: 'creativeId or objectStoryId required' });
     }
-    const service = withService(req.user);
+    const service = withService(req);
     const hasAccess = await service.hasAccess(adAccountId);
     if (!hasAccess) return respondNoPermission(res);
     const creativeSpec = creativeId
@@ -278,16 +279,16 @@ const getCreativePreview = async (req, res, next) => {
 
 const getStatus = async (req, res, next) => {
   try {
-    const user = req.user;
+    const actor = req.user;
     const publicToken = env.meta.publicAccessToken;
-    const connected = !!(user?.metaAccessToken && user?.metaTokenExpiresAt) || !!publicToken;
+    const connected = !!(actor?.metaAccessToken && actor?.metaTokenExpiresAt) || !!publicToken;
     const isExpired =
-      user?.metaTokenExpiresAt ? new Date(user.metaTokenExpiresAt) < new Date() : false;
+      actor?.metaTokenExpiresAt ? new Date(actor.metaTokenExpiresAt) < new Date() : false;
     
     res.json({
       connected: connected && !isExpired,
-      expiresAt: user?.metaTokenExpiresAt || null,
-      adAccounts: user?.metaAdAccounts || []
+      expiresAt: actor?.metaTokenExpiresAt || null,
+      adAccounts: actor?.metaAdAccounts || []
     });
   } catch (err) {
     next(err);

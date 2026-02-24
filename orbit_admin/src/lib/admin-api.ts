@@ -1,5 +1,4 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const ADMIN_TOKEN_KEY = "orbit_admin_token";
 
@@ -103,6 +102,8 @@ export type Store = {
     startedAt?: string | null;
     completedAt?: string | null;
   } | null;
+  description?: string | null;
+  user?: { email?: string; fullName?: string | null };
 };
 
 export type AdminUser = {
@@ -243,18 +244,18 @@ export const getBrands = (params?: { isActive?: boolean }) => {
   }
   const query = search.toString();
   return adminRequest<{ stores: Store[] }>(
-    `/api/admin/brands${query ? `?${query}` : ""}`
+    `/api/admin/brands${query ? `?${query}` : ""}`,
   );
 };
 
 export const getBrandOnboardingDetails = (brandId: string) =>
   adminRequest<BrandOnboardingDetails>(
-    `/api/admin/brands/${brandId}/onboarding/details`
+    `/api/admin/brands/${brandId}/onboarding/details`,
   );
 
 export const getBrandActivity = (brandId: string) =>
   adminRequest<{ logs: Array<{ action: string; createdAt: string }> }>(
-    `/api/admin/brands/${brandId}/activity`
+    `/api/admin/brands/${brandId}/activity`,
   );
 
 export const getPlatformMetrics = () =>
@@ -262,7 +263,7 @@ export const getPlatformMetrics = () =>
 
 export const getBrandMetrics = (brandId: string) =>
   adminRequest<{ metrics: Record<string, unknown> }>(
-    `/api/admin/analytics/brands/${brandId}`
+    `/api/admin/analytics/brands/${brandId}`,
   );
 
 export const getPlatformAggregates = (params?: {
@@ -276,18 +277,18 @@ export const getPlatformAggregates = (params?: {
   if (params?.end) search.set("end", params.end);
   const query = search.toString();
   return adminRequest<{ aggregates: Array<Record<string, unknown>> }>(
-    `/api/admin/analytics/aggregates${query ? `?${query}` : ""}`
+    `/api/admin/analytics/aggregates${query ? `?${query}` : ""}`,
   );
 };
 
 export const getOnboardingFunnel = () =>
   adminRequest<{ metrics: OnboardingFunnelMetrics }>(
-    "/api/admin/analytics/onboarding-funnel"
+    "/api/admin/analytics/onboarding-funnel",
   );
 
 export const getInactiveOnboarding = (days = 7) =>
   adminRequest<{ stores: Store[]; inactivityDays: number }>(
-    `/api/admin/onboarding/inactive?days=${days}`
+    `/api/admin/onboarding/inactive?days=${days}`,
   );
 
 export const getBrandDetail = (storeId: string) =>
@@ -311,7 +312,7 @@ export const getTickets = (params?: {
     search.set("assignedAdminId", params.assignedAdminId);
   const query = search.toString();
   return adminRequest<{ tickets: SupportTicket[] }>(
-    `/api/admin/tickets${query ? `?${query}` : ""}`
+    `/api/admin/tickets${query ? `?${query}` : ""}`,
   );
 };
 
@@ -323,10 +324,13 @@ export const getTicket = (ticketId: string) =>
   }>(`/api/admin/tickets/${ticketId}`);
 
 export const respondToTicket = (ticketId: string, message: string) =>
-  adminRequest<{ ticket: SupportTicket }>(`/api/admin/tickets/${ticketId}/respond`, {
-    method: "POST",
-    body: { message },
-  });
+  adminRequest<{ ticket: SupportTicket }>(
+    `/api/admin/tickets/${ticketId}/respond`,
+    {
+      method: "POST",
+      body: { message },
+    },
+  );
 
 export const addTicketNote = (ticketId: string, note: string) =>
   adminRequest<{ note: TicketNote }>(`/api/admin/tickets/${ticketId}/notes`, {
@@ -335,13 +339,16 @@ export const addTicketNote = (ticketId: string, note: string) =>
   });
 
 export const resolveTicket = (ticketId: string) =>
-  adminRequest<{ ticket: SupportTicket }>(`/api/admin/tickets/${ticketId}/resolve`, {
-    method: "POST",
-  });
+  adminRequest<{ ticket: SupportTicket }>(
+    `/api/admin/tickets/${ticketId}/resolve`,
+    {
+      method: "POST",
+    },
+  );
 
 export const getBrandCommunications = (brandId: string) =>
   adminRequest<{ communications: CommunicationLog[] }>(
-    `/api/admin/brands/${brandId}/communications`
+    `/api/admin/brands/${brandId}/communications`,
   );
 
 export const getBrandCalls = (brandId: string) =>
@@ -349,19 +356,19 @@ export const getBrandCalls = (brandId: string) =>
 
 export const createBrandCommunication = (
   brandId: string,
-  payload: { channel: string; summary: string }
+  payload: { channel: string; summary: string },
 ) =>
   adminRequest<{ communication: CommunicationLog }>(
     `/api/admin/brands/${brandId}/communications`,
     {
       method: "POST",
       body: payload,
-    }
+    },
   );
 
 export const createBrandCall = (
   brandId: string,
-  payload: { channel: string; notes: string }
+  payload: { channel: string; notes: string },
 ) =>
   adminRequest<{ call: CallLog }>(`/api/admin/brands/${brandId}/calls`, {
     method: "POST",
@@ -376,7 +383,7 @@ export const provisionBrand = (
     subdomain: string;
     category: string;
     domain?: string;
-  }
+  },
 ) =>
   adminRequest<{
     success: boolean;
@@ -389,36 +396,40 @@ export const provisionBrand = (
 
 export const getThemes = () =>
   adminRequest<{ themes: Array<{ id: string; name: string; slug: string }> }>(
-    "/api/admin/themes"
+    "/api/admin/themes",
   );
 
 export const getPlans = () =>
   adminRequest<{ plans: Array<{ id: string; name: string; slug: string }> }>(
-    "/api/admin/plans"
+    "/api/admin/plans",
   );
 
 // Provisioning APIs
 export const getPendingMerchants = () =>
-  adminRequest<{ 
-    success: boolean; 
-    merchants: Array<Store & { user: AdminUser; onboarding: unknown }> 
+  adminRequest<{
+    success: boolean;
+    merchants: Array<Store & { user: AdminUser; onboarding: unknown }>;
   }>("/api/admin/provisioning/pending");
 
 export const getProvisioningDetails = (storeId: string) =>
-  adminRequest<{ 
-    success: boolean; 
-    store: Store & { 
-      user: AdminUser; 
-      theme: unknown; 
+  adminRequest<{
+    success: boolean;
+    store: Store & {
+      user: AdminUser;
+      theme: unknown;
       websiteCustomization: unknown;
       onboarding: unknown;
       plan: unknown;
-    } 
+    };
   }>(`/api/admin/provisioning/${storeId}`);
 
 export const provisionMerchant = (
   storeId: string,
-  payload: { themeId: string; planId?: string; categoryConfig?: Record<string, unknown> }
+  payload: {
+    themeId: string;
+    planId?: string;
+    categoryConfig?: Record<string, unknown>;
+  },
 ) =>
   adminRequest<{
     success: boolean;
@@ -430,7 +441,7 @@ export const provisionMerchant = (
       storefront: string;
       dashboard: string;
       themeId: string;
-      provisioningStatus: 'COMPLETED' | 'PENDING' | 'IN_PROGRESS' | 'FAILED';
+      provisioningStatus: "COMPLETED" | "PENDING" | "IN_PROGRESS" | "FAILED";
     };
   }>(`/api/admin/provisioning/${storeId}/provision`, {
     method: "POST",
@@ -439,7 +450,7 @@ export const provisionMerchant = (
 
 export const updateMerchantDomain = (
   storeId: string,
-  payload: { customDomain?: string }
+  payload: { customDomain?: string },
 ) =>
   adminRequest<{
     success: boolean;
@@ -528,7 +539,7 @@ export const getStoreCategoryConfig = (storeId: string) =>
 
 export const updateStoreCategoryConfig = (
   storeId: string,
-  payload: { category: string; config: Record<string, unknown> }
+  payload: { category: string; config: Record<string, unknown> },
 ) =>
   adminRequest<{
     success: boolean;
@@ -573,12 +584,15 @@ export const getAdminOrders = (params?: {
   if (params?.storeId) search.set("storeId", params.storeId);
   if (params?.status) search.set("status", params.status);
   if (params?.paymentStatus) search.set("paymentStatus", params.paymentStatus);
-  if (params?.fulfillmentStatus) search.set("fulfillmentStatus", params.fulfillmentStatus);
-  if (typeof params?.limit === "number") search.set("limit", String(params.limit));
-  if (typeof params?.offset === "number") search.set("offset", String(params.offset));
+  if (params?.fulfillmentStatus)
+    search.set("fulfillmentStatus", params.fulfillmentStatus);
+  if (typeof params?.limit === "number")
+    search.set("limit", String(params.limit));
+  if (typeof params?.offset === "number")
+    search.set("offset", String(params.offset));
   const query = search.toString();
   return adminRequest<{ orders: Order[]; pagination: Record<string, unknown> }>(
-    `/api/admin/orders${query ? `?${query}` : ""}`
+    `/api/admin/orders${query ? `?${query}` : ""}`,
   );
 };
 
@@ -588,32 +602,48 @@ export const getAdminOrder = (orderId: string) =>
 export const updateAdminOrderStatus = (orderId: string, status: string) =>
   adminRequest<{ order: Order }>(`/api/admin/orders/${orderId}/status`, {
     method: "PUT",
-    body: { status }
+    body: { status },
   });
 
-export const updateAdminOrderFulfillment = (orderId: string, fulfillmentStatus: string) =>
+export const updateAdminOrderFulfillment = (
+  orderId: string,
+  fulfillmentStatus: string,
+) =>
   adminRequest<{ order: Order }>(`/api/admin/orders/${orderId}/fulfillment`, {
     method: "PUT",
-    body: { fulfillmentStatus }
+    body: { fulfillmentStatus },
   });
 
-export const updateAdminPaymentStatus = (orderId: string, paymentStatus: string) =>
+export const updateAdminPaymentStatus = (
+  orderId: string,
+  paymentStatus: string,
+) =>
   adminRequest<{ order: Order }>(`/api/admin/orders/${orderId}/payment`, {
     method: "PUT",
-    body: { paymentStatus }
+    body: { paymentStatus },
   });
 
 export const getAdminProducts = (storeId: string) =>
-  adminRequest<{ products: ProductItem[] }>(`/api/admin/products?storeId=${storeId}`);
+  adminRequest<{ products: ProductItem[] }>(
+    `/api/admin/products?storeId=${storeId}`,
+  );
 
 export const updateAdminProductStock = (productId: string, stock: number) =>
-  adminRequest<{ product: ProductItem }>(`/api/admin/products/${productId}/stock`, {
-    method: "PUT",
-    body: { stock }
-  });
+  adminRequest<{ product: ProductItem }>(
+    `/api/admin/products/${productId}/stock`,
+    {
+      method: "PUT",
+      body: { stock },
+    },
+  );
 
 export const updateAdminVariantStock = (variantId: string, stock: number) =>
-  adminRequest<{ variant: ProductVariant }>(`/api/admin/variants/${variantId}/stock`, {
-    method: "PUT",
-    body: { stock }
-  });
+  adminRequest<{ variant: ProductVariant }>(
+    `/api/admin/variants/${variantId}/stock`,
+    {
+      method: "PUT",
+      body: { stock },
+    },
+  );
+
+

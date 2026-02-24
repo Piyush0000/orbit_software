@@ -21,7 +21,7 @@ router.get(
   '/',
   auth,
   rbac([ROLES.MERCHANT, ROLES.ADMIN]),
-  cache((req) => `store:products:user:${req.user?.id || 'unknown'}:dashboard`, 60),
+  cache((req) => `store:products:user:${req.user?.id || 'unknown'}:storeId:${req.query.storeId || 'default'}:dashboard`, 60),
   listProducts
 );
 

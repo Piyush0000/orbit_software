@@ -42,3 +42,13 @@
     justify-content: center;
     flex-wrap: wrap;
 }
+
+.editorSection {
+    cursor: pointer;
+    transition: outline 0.2s;
+}
+
+.editorSection:hover {
+    outline: 2px solid #3b82f6;
+    outline-offset: -2px;
+}

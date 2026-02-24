@@ -3,7 +3,21 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/a
 
 // Utility functions for storefront API
 export class StorefrontAPI {
-  static subdomain = process.env.NEXT_PUBLIC_SUBDOMAIN || 'fashion-store-2';
+  static get subdomain(): string {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const parts = hostname.split('.');
+      
+      if (hostname.includes('localhost')) {
+        if (parts.length >= 2 && parts[0] !== 'localhost') {
+          return parts[0];
+        }
+      } else if (parts.length > 2) {
+        return parts[0];
+      }
+    }
+    return process.env.NEXT_PUBLIC_SUBDOMAIN || 'fashion-store-2';
+  }
 
   // Get store information
   static async getStoreInfo() {
@@ -124,7 +138,7 @@ export class StorefrontAPI {
       });
       const data = await response.json();
       if (!data.success) throw new Error(data.message || 'Failed to create order');
-      return data.data;
+      return data;
     } catch (error) {
       console.error('Error creating order:', error);
       throw error;
@@ -156,7 +170,7 @@ import { useState, useEffect } from 'react';
 // Hook for store context
 export function useStore() {
   const [storeInfo, setStoreInfo] = useState(null);
-  const [customization, setCustomization] = useState(null);
+  const [customization, setCustomization] = useState<any>(null);
   const [sections, setSections] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -182,6 +196,20 @@ export function useStore() {
     };
 
     fetchData();
+  }, []);
+
+  // Hot reload from editor parent message
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'ORBIT_CUSTOMIZATION_UPDATE') {
+        setCustomization((prev: any) => ({
+           ...(prev || {}),
+           ...e.data.data
+        }));
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   return {

@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ProductsDropdown from './ProductsDropdown';
 import MegaMenu from './MegaMenu';
-import ProfileDropdown from './ProfileDropdown';
 import { useCart } from '@/store/cartStore';
-import { useWishlist } from '@/store/wishlistStore';
+
+import { useStoreContext } from '@/contexts/store-context';
 
 export default function Header() {
+  const { customization, storeInfo } = useStoreContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -16,9 +17,18 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const productsRef = useRef<HTMLDivElement>(null);
   const { getTotalItems } = useCart();
-  const { wishlist } = useWishlist();
   const cartItemCount = getTotalItems();
-  const wishlistCount = wishlist.length;
+
+  const handleSectionClick = (sectionId: string) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId }, '*');
+    }
+  };
+
+  const announcementText = customization?.announcementBar?.text || "Free Shipping on all orders over ₹500 | Use Code: UPFRONT20";
+  const logoText = customization?.headerStyle?.storeName || customization?.headerStyle?.logoText || storeInfo?.name || "Upfront";
+  const logoUrl = customization?.headerStyle?.logoUrl;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,20 +72,25 @@ export default function Header() {
       onMouseLeave={() => setActiveCategory(null)}
     >
       {/* Top Banner - Premium Minimalist */}
-      <div className="bg-zinc-950 text-white text-[10px] md:text-xs font-bold py-2.5 text-center px-4 tracking-[0.15em] uppercase relative z-[51]">
-        Free Shipping on all orders over ₹500 | Use Code: <span className="text-highlight">UPFRONT20</span>
+      <div 
+        onClick={handleSectionClick('announcementBar')}
+        className="bg-zinc-950 text-white text-[10px] md:text-xs font-bold py-2.5 text-center px-4 tracking-[0.15em] uppercase relative z-[51] hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+      >
+        {announcementText}
       </div>
 
       <header
-        className={`bg-white transition-shadow duration-300 ${isScrolled ? 'shadow-md' : 'border-b border-transparent'
+        onClick={handleSectionClick('headerStyle')}
+        className={`bg-white transition-shadow duration-300 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer ${isScrolled ? 'shadow-md' : 'border-b border-transparent'
           }`}
       >
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center justify-between h-20 md:h-24">
             {/* Logo */}
             <div className="flex-shrink-0 mr-12 flex items-center">
-              <Link href="/" className="text-4xl font-heading font-medium tracking-tighter text-black uppercase">
-                Upfront
+              <Link href="/" className="text-4xl font-heading font-medium tracking-tighter text-black uppercase flex items-center gap-2">
+                {logoUrl ? <img src={logoUrl} alt={logoText} className="h-10 object-contain" /> : null}
+                {(!logoUrl || logoText) && logoText}
               </Link>
             </div>
 
@@ -133,42 +148,6 @@ export default function Header() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-
-              {/* Profile */}
-              <div
-                className="relative group hidden md:flex items-center"
-                onMouseEnter={() => setIsMenuOpen(false)}
-              >
-                <Link href="/profile" className="text-zinc-800 hover:text-black transition-colors" aria-label="Account">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </Link>
-                {/* Dropdown Container */}
-                <div className="absolute right-0 top-[100%] pt-4 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
-                  <div className="bg-white border border-zinc-100 shadow-xl p-2">
-                    <ProfileDropdown />
-                  </div>
-                </div>
-              </div>
-
-              {/* Wishlist */}
-              <Link
-                href="/wishlist"
-                className="relative text-zinc-800 hover:text-black transition-colors hidden md:block" // Hidden on mobile initially to avoid crowding, or can be added to mobile menu
-                aria-label="Wishlist"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                {wishlistCount > 0 && (
-                  <span
-                    className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center text-[10px] font-bold rounded-full bg-highlight text-black"
-                  >
-                    {wishlistCount}
-                  </span>
-                )}
-              </Link>
 
               {/* Cart */}
               <Link
@@ -235,10 +214,6 @@ export default function Header() {
               </div>
 
               <div className="pt-6 border-t border-zinc-100 space-y-4">
-                <Link href="/profile" className="block text-sm font-bold uppercase tracking-widest text-zinc-500">My Account</Link>
-                <Link href="/wishlist" className="block text-sm font-bold uppercase tracking-widest text-zinc-500">
-                  Wishlist ({wishlistCount})
-                </Link>
                 <Link href="/cart" className="block text-sm font-bold uppercase tracking-widest text-zinc-500">
                   Cart ({cartItemCount})
                 </Link>

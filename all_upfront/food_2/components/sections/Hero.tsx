@@ -1,15 +1,31 @@
 "use client"
 
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useStoreContext } from "@/context/store-context"
 
 export default function Hero() {
+    const { customization } = useStoreContext()
     const [currentSlide, setCurrentSlide] = useState(0)
 
-    const slides = [
+    const handleSectionClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId: 'heroSection' }, '*');
+        }
+    };
+
+    const headline = customization?.heroSection?.title || customization?.heroSection?.headline || "Fresh Food & Drinks";
+    const subheadline = customization?.heroSection?.subtitle || customization?.heroSection?.subheadline || "Delivered.";
+    const description = customization?.heroSection?.description || "Premium snacks, refreshing beverages & ready-to-eat meals. Sourced fresh, packed with care, delivered fast to your doorstep.";
+    const ctaText = customization?.heroSection?.ctaText || customization?.heroSection?.buttonText || "Order Now";
+    const weeklySpecial = customization?.heroSection?.weeklySpecial || "Artisanal Combos";
+    const specialPrice = customization?.heroSection?.specialPrice || "$19.99";
+
+    const defaultSlides = [
         {
             src: "/hero.png",
             alt: "Premium Snacks and Beverages"
@@ -24,6 +40,8 @@ export default function Hero() {
         }
     ]
 
+    const slides = customization?.heroSection?.slides || defaultSlides;
+
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % slides.length)
@@ -35,23 +53,25 @@ export default function Hero() {
     const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
 
     return (
-        <section className="relative w-full overflow-hidden bg-background py-12 md:py-20 lg:py-28">
+        <section 
+            onClick={handleSectionClick}
+            className="relative w-full overflow-hidden bg-background py-12 md:py-20 lg:py-28 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+        >
             <div className="container mx-auto px-4 md:px-6">
                 <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
                     <div className="flex flex-col justify-center space-y-6 text-center lg:text-left">
                         <div className="space-y-4">
                             <h1 className="text-4xl font-black tracking-tighter sm:text-5xl md:text-6xl xl:text-8xl/none text-foreground uppercase leading-[0.9]">
-                                Fresh Food <br /> & Drinks <br />
-                                <span className="text-primary italic">Delivered.</span>
+                                {headline} <br />
+                                <span className="text-primary italic">{subheadline}</span>
                             </h1>
                             <p className="max-w-[550px] text-muted-foreground md:text-xl font-medium leading-relaxed mx-auto lg:mx-0">
-                                Premium snacks, refreshing beverages & ready-to-eat meals.
-                                Sourced fresh, packed with care, delivered fast to your doorstep.
+                                {description}
                             </p>
                         </div>
                         <div className="flex flex-col gap-3 sm:flex-row justify-center lg:justify-start pt-4">
                             <Button size="lg" className="px-10 py-7 text-sm font-black uppercase tracking-[0.2em] h-auto rounded-none shadow-xl hover:translate-y-[-2px] transition-all">
-                                Order Now
+                                {ctaText}
                             </Button>
                             <Button size="lg" variant="outline" className="px-10 py-7 text-sm font-black uppercase tracking-[0.2em] h-auto bg-transparent border-2 border-border hover:bg-muted rounded-none transition-all">
                                 Browse Menu
@@ -60,7 +80,7 @@ export default function Hero() {
 
                         {/* Slide Indicators for mobile/below-image context */}
                         <div className="flex items-center justify-center lg:justify-start gap-2 pt-4">
-                            {slides.map((_, idx) => (
+                            {slides.map((_: any, idx: number) => (
                                 <button
                                     key={idx}
                                     onClick={() => setCurrentSlide(idx)}
@@ -74,7 +94,7 @@ export default function Hero() {
 
                     <div className="relative mx-auto w-full max-w-[600px] lg:max-w-none group">
                         <div className="relative aspect-square overflow-hidden rounded-none shadow-[40px_40px_0px_0px_rgba(244,244,245,1)]">
-                            {slides.map((slide, idx) => (
+                            {slides.map((slide: any, idx: number) => (
                                 <div
                                     key={idx}
                                     className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${currentSlide === idx ? "opacity-100 z-10" : "opacity-0 z-0"

@@ -7,6 +7,9 @@ exports.testConnection = async (req, res, next) => {
     const result = await logisticsService.testConnection(storeId);
     res.json({ success: true, result });
   } catch (err) {
+    if (err.response?.data) {
+      err.message = typeof err.response.data === 'string' ? err.response.data : JSON.stringify(err.response.data);
+    }
     next(err);
   }
 };
@@ -28,6 +31,9 @@ exports.trackShipment = async (req, res, next) => {
     const tracking = await logisticsService.trackOrder(storeId, waybill);
     res.json({ success: true, tracking });
   } catch (err) {
+    if (err.response?.data) {
+      err.message = typeof err.response.data === 'string' ? err.response.data : JSON.stringify(err.response.data);
+    }
     next(err);
   }
 };

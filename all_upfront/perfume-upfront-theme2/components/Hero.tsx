@@ -3,9 +3,28 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { useStoreContext } from "@/context/store-context";
+
 export default function Hero() {
+    const { customization } = useStoreContext();
+
+    const handleSectionClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId: 'heroSection' }, '*');
+        }
+    };
+
+    const headline = customization?.heroSection?.title || customization?.heroSection?.headline || "Discover Elegance in Every Drop";
+    const subheadline = customization?.heroSection?.subtitle || customization?.heroSection?.subheadline || "Experience the essence of sophistication with our curated collection. Find the scent that defines your presence.";
+    const ctaText = customization?.heroSection?.ctaText || customization?.heroSection?.buttonText || "Shop Now";
+    const bgImage = customization?.heroSection?.backgroundImage;
+
     return (
-        <section className="relative w-full min-h-[90vh] flex items-center overflow-hidden bg-contrast-black">
+        <section 
+            onClick={handleSectionClick}
+            className="relative w-full min-h-[90vh] flex items-center overflow-hidden bg-contrast-black hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+        >
             {/* Background with luxury texture overlay - Reduced Opacity for Clean Look */}
             <div className="absolute inset-0 opacity-40">
                 {/* Abstract gradient flow */}
@@ -25,12 +44,17 @@ export default function Hero() {
                     </div>
 
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white font-thin leading-[1.05] tracking-tight">
-                        Discover <span className="block italic text-gold-200 font-light opacity-90">Elegance</span>
-                        in Every Drop
+                        {headline.includes("Elegance") ? (
+                            <>
+                                {headline.split("Elegance")[0]}
+                                <span className="block italic text-gold-200 font-light opacity-90">Elegance</span>
+                                {headline.split("Elegance")[1]}
+                            </>
+                        ) : headline}
                     </h1>
 
                     <p className="text-gray-400 max-w-lg text-lg font-light leading-relaxed border-l border-gold-500/50 pl-6 py-1">
-                        Experience the essence of sophistication with our curated collection. Find the scent that defines your presence.
+                        {subheadline}
                     </p>
 
                     <div className="flex flex-wrap gap-5 pt-2">
@@ -46,6 +70,12 @@ export default function Hero() {
                         >
                             Shop Women
                         </Link>
+                        <Link
+                            href="/luxury"
+                            className="w-40 py-4 bg-gold-500 text-white text-xs uppercase tracking-widest font-bold hover:bg-gold-600 transition-all duration-500 rounded-full text-center flex items-center justify-center"
+                        >
+                            {ctaText}
+                        </Link>
                     </div>
                 </div>
 
@@ -55,7 +85,7 @@ export default function Hero() {
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-[3rem] border border-white/5 backdrop-blur-sm transform rotate-1 flex items-center justify-center overflow-hidden z-0">
                         <div className="absolute inset-0 bg-black/50 z-10" />
                         <Image
-                            src="https://images.unsplash.com/photo-1594035910387-fea4779426e9?q=80&w=1000&auto=format&fit=crop"
+                            src={bgImage || "https://images.unsplash.com/photo-1594035910387-fea4779426e9?q=80&w=1000&auto=format&fit=crop"}
                             alt="Luxury Perfume"
                             fill
                             className="object-cover opacity-60 grayscale-[30%]"
@@ -64,7 +94,7 @@ export default function Hero() {
                     </div>
                     <div className="absolute inset-6 bg-black/30 rounded-[2.5rem] border border-white/10 backdrop-blur-xl transform -rotate-1 flex items-center justify-center overflow-hidden shadow-2xl z-20 hover:scale-[1.02] transition-transform duration-700">
                         <Image
-                            src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1000&auto=format&fit=crop"
+                            src={bgImage || "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1000&auto=format&fit=crop"}
                             alt="Scent of the Year"
                             fill
                             className="object-cover opacity-90 transition-transform duration-700 hover:scale-105"

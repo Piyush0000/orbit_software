@@ -4,19 +4,29 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ProductsDropdown from './ProductsDropdown';
 import MegaMenu from './MegaMenu';
-import ProfileDropdown from './ProfileDropdown';
 import { useCart } from '@/store/cartStore';
-import { useAuth } from '@/store/authStore';
+import { useStoreContext } from '@/contexts/store-context';
 
 export default function Header() {
+  const { customization, storeInfo } = useStoreContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
   const productsRef = useRef<HTMLDivElement>(null);
   const { getTotalItems } = useCart();
-  const isAuthenticated = useAuth((state) => state.isAuthenticated);
   const cartItemCount = getTotalItems();
+
+  const handleSectionClick = (sectionId: string) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId }, '*');
+    }
+  };
+
+  const announcementText = customization?.announcementBar?.text || "FLAT ₹500 OFF ON YOUR FIRST ORDER! USE CODE: NEW500";
+  const logoText = customization?.headerStyle?.storeName || customization?.headerStyle?.logoText || storeInfo?.name || "UPFRONT";
+  const logoUrl = customization?.headerStyle?.logoUrl;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,12 +62,16 @@ export default function Header() {
       onMouseLeave={() => setActiveCategory(null)}
     >
       {/* Top Banner - Myntra style minimalist or soft gradient */}
-      <div className="bg-gradient-to-r from-pink-500 to-orange-400 text-white text-xs sm:text-sm font-bold py-2 text-center px-4 tracking-wide relative z-[51]">
-        FLAT ₹500 OFF ON YOUR FIRST ORDER! USE CODE: NEW500
+      <div 
+        onClick={handleSectionClick('announcementBar')}
+        className="bg-gradient-to-r from-pink-500 to-orange-400 text-white text-xs sm:text-sm font-bold py-2 text-center px-4 tracking-wide relative z-[51] hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+      >
+        {announcementText}
       </div>
 
       <header
-        className="border-b bg-white shadow-sm"
+        onClick={handleSectionClick('headerStyle')}
+        className="border-b bg-white shadow-sm hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
         style={{
           borderColor: 'var(--header-border)',
         }}
@@ -66,8 +80,9 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <div className="flex-shrink-0 mr-8 flex items-center">
-              <Link href="/" className="text-3xl font-extrabold tracking-tight text-black">
-                UPFRONT
+              <Link href="/" className="text-3xl font-extrabold tracking-tight text-black flex items-center gap-2">
+                {logoUrl ? <img src={logoUrl} alt={logoText} className="h-8 object-contain" /> : null}
+                {(!logoUrl || logoText) && logoText}
               </Link>
             </div>
 
@@ -122,33 +137,6 @@ export default function Header() {
             {/* Icons */}
             <div className="hidden md:flex items-center space-x-6">
 
-              <div className="relative group h-full flex items-center">
-                {isAuthenticated ? (
-                  <>
-                    <Link href="/profile" className="text-gray-600 hover:text-black transition-colors py-4" aria-label="Account">
-                      <div className="flex flex-col items-center gap-0.5">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span className="text-[10px] font-bold">Profile</span>
-                      </div>
-                    </Link>
-                    {/* Dropdown Container */}
-                    <div className="absolute right-0 top-[100%] pt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
-                      <ProfileDropdown />
-                    </div>
-                  </>
-                ) : (
-                  <Link href="/auth/login" className="text-gray-600 hover:text-black transition-colors py-4" aria-label="Login">
-                    <div className="flex flex-col items-center gap-0.5">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                      </svg>
-                      <span className="text-[10px] font-bold">Login</span>
-                    </div>
-                  </Link>
-                )}
-              </div>
               <Link
                 href="/cart"
                 className="relative text-gray-600 hover:text-black transition-colors group"
@@ -222,7 +210,6 @@ export default function Header() {
                     )}
                   </span>
                 </Link>
-                <Link href="/profile" className="block font-medium text-gray-600">Account</Link>
               </div>
             </div>
           )}

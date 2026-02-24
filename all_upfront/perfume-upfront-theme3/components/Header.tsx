@@ -22,11 +22,25 @@ const ANNOUNCEMENTS = [
     "Free samples with every purchase",
 ];
 
+import { useStoreContext } from "@/context/store-context";
+
 export default function Header() {
+    const { customization, storeInfo } = useStoreContext();
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [announcementIndex, setAnnouncementIndex] = useState(0);
     const { cartCount } = useCart();
+
+    const handleSectionClick = (sectionId: string) => (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId }, '*');
+        }
+    };
+
+    const logoText = customization?.headerStyle?.storeName || customization?.headerStyle?.logoText || storeInfo?.name || "SCENTARIS";
+    const logoUrl = customization?.headerStyle?.logoUrl;
+    const announcementText = customization?.announcementBar?.text || ANNOUNCEMENTS[announcementIndex];
 
     useEffect(() => {
         const handleScroll = () => {
@@ -46,13 +60,17 @@ export default function Header() {
     return (
         <>
             {/* Elegant Announcement Bar - Fixed height to ensure alignment */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-[#F5F1E8] text-[#5D554A] text-[10px] uppercase tracking-[0.2em] font-medium text-center h-[32px] flex items-center justify-center border-b border-[#EAE5D8]">
-                <p className="animate-fade-in">{ANNOUNCEMENTS[announcementIndex]}</p>
+            <div 
+                onClick={handleSectionClick('announcementBar')}
+                className="fixed top-0 left-0 right-0 z-50 bg-[#F5F1E8] text-[#5D554A] text-[10px] uppercase tracking-[0.2em] font-medium text-center h-[32px] flex items-center justify-center border-b border-[#EAE5D8] hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer"
+            >
+                <p className="animate-fade-in">{announcementText}</p>
             </div>
 
             <header
+                onClick={handleSectionClick('headerStyle')}
                 className={cn(
-                    "fixed left-0 right-0 z-40 transition-all duration-500",
+                    "fixed left-0 right-0 z-40 transition-all duration-500 hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer",
                     // Adjusted top position to exactly match announcement bar height
                     "top-[32px]",
                     isScrolled
@@ -64,12 +82,18 @@ export default function Header() {
                     <div className="flex items-center justify-between">
                         {/* Logo */}
                         <Link href="/" className="flex flex-col group items-center lg:items-start z-50">
-                            <h1 className="text-2xl lg:text-3xl font-serif text-[#2C2621] tracking-widest leading-none">
-                                SCENTARIS
-                            </h1>
-                            <span className="text-[9px] uppercase tracking-[0.4em] text-[#5D554A] mt-1 group-hover:text-[#2C2621] transition-colors">
-                                Nude et Signature
-                            </span>
+                            {logoUrl ? (
+                                <img src={logoUrl} alt={logoText} className="h-10 object-contain" />
+                            ) : (
+                                <>
+                                    <h1 className="text-2xl lg:text-3xl font-serif text-[#2C2621] tracking-widest leading-none">
+                                        {logoText}
+                                    </h1>
+                                    <span className="text-[9px] uppercase tracking-[0.4em] text-[#5D554A] mt-1 group-hover:text-[#2C2621] transition-colors">
+                                        Nude et Signature
+                                    </span>
+                                </>
+                            )}
                         </Link>
 
                         {/* Desktop Navigation */}

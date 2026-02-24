@@ -146,6 +146,15 @@ exports.getStoreCustomization = async (req, res) => {
       }
     };
 
+    // Parse headerStyle back to object if it was stringified in DB
+    if (customization.headerStyle && typeof customization.headerStyle === 'string') {
+        try {
+            customization.headerStyle = JSON.parse(customization.headerStyle);
+        } catch (error) {
+            console.error('Failed to parse headerStyle in customization:', error);
+        }
+    }
+
     res.json({ 
       success: true, 
       data: customization 
@@ -449,6 +458,14 @@ exports.resolveStoreByDomain = async (req, res) => {
       }
     });
     
+    // Parse headerStyle if it was stringified
+    let processedCustomization = store.websiteCustomization;
+    if (processedCustomization && typeof processedCustomization.headerStyle === 'string') {
+        try {
+            processedCustomization.headerStyle = JSON.parse(processedCustomization.headerStyle);
+        } catch (e) {}
+    }
+
     res.json({
       success: true,
       store: {
@@ -457,7 +474,7 @@ exports.resolveStoreByDomain = async (req, res) => {
         subdomain: store.subdomain,
         customDomain: store.customDomain,
         theme: store.themeTemplate?.slug || store.theme || 'general',
-        customization: store.websiteCustomization,
+        customization: processedCustomization,
         category: store.category,
         description: store.description,
         enabledGateways

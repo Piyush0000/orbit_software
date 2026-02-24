@@ -19,7 +19,13 @@ router.post('/submit', auth, submitOnboarding);
 
 router.post('/logo', auth, upload.single('logo'), (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'Logo file required' });
-  res.json({ url: `/uploads/${req.file.filename}` });
+  
+  // Use the remote URL (Cloudinary) if it exists, otherwise use local path
+  const url = req.file.path && req.file.path.startsWith('http') 
+    ? req.file.path 
+    : `/uploads/${req.file.filename}`;
+    
+  res.json({ url });
 });
 
 module.exports = router;

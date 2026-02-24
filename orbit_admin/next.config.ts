@@ -5,13 +5,12 @@ const nextConfig: NextConfig = {
   // Configure Turbopack to use this directory as root to avoid workspace detection issues
   turbopack: {
     resolveAlias: {
-      '@/*': ['./src/*'],
+      "@/*": ["./src/*"],
     },
   },
   // Additional optimizations for parallel execution
   experimental: {
-    // Reduce memory usage during development
-    turbonet: false,
+    // Other experimental options can go here if needed
   },
 };
 

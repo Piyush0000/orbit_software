@@ -8,11 +8,25 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 
+import { useStoreContext } from "@/context/store-context";
+
 export function Header() {
+    const { customization, storeInfo } = useStoreContext();
     const [isScrolled, setIsScrolled] = useState(false);
     const { cartCount, setIsCartOpen } = useCart();
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+    const handleSectionClick = (sectionId: string) => (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'ORBIT_SECTION_CLICK', sectionId }, '*');
+        }
+    };
+
+    const logoText = customization?.headerStyle?.storeName || customization?.headerStyle?.logoText || storeInfo?.name || "LUMIÈRE";
+    const logoUrl = customization?.headerStyle?.logoUrl;
+    const announcementText = customization?.announcementBar?.text;
 
     // Add scroll event listener
     useEffect(() => {
@@ -31,7 +45,18 @@ export function Header() {
     ];
 
     return (
-        <header className={`sticky top-0 z-50 w-full transition-all duration-500 border-b border-transparent ${isScrolled ? "bg-background/80 backdrop-blur-xl border-border/50 shadow-md" : "bg-transparent"}`}>
+        <header 
+            onClick={handleSectionClick('headerStyle')}
+            className={`sticky top-0 z-50 w-full transition-all duration-500 border-b border-transparent ${isScrolled ? "bg-background/80 backdrop-blur-xl border-border/50 shadow-md" : "bg-transparent"} hover:outline hover:outline-2 hover:outline-blue-500/50 cursor-pointer`}
+        >
+            {announcementText && (
+                <div 
+                    onClick={handleSectionClick('announcementBar')}
+                    className="bg-primary text-primary-foreground text-[10px] font-bold py-2 text-center px-4 tracking-widest uppercase"
+                >
+                    {announcementText}
+                </div>
+            )}
             <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-24">
@@ -47,7 +72,7 @@ export function Header() {
                             <SheetContent side="left" className="w-[300px] flex flex-col p-6 bg-background border-r border-border">
                                 <SheetHeader className="text-left px-0">
                                     <SheetTitle className="font-serif text-3xl font-bold tracking-tight">
-                                        LUMIÈRE<span className="text-primary">.</span>
+                                        {logoText}
                                     </SheetTitle>
                                     <SheetDescription className="text-xs text-muted-foreground uppercase tracking-widest">
                                         Premium Beauty & Skincare
@@ -76,8 +101,9 @@ export function Header() {
 
                     {/* Logo */}
                     <div className="flex-1 flex items-center justify-center md:justify-start md:flex-none">
-                        <Link href="/" className="text-3xl font-serif font-bold tracking-tighter text-foreground group">
-                            LUMIÈRE<span className="text-primary group-hover:text-foreground transition-colors">.</span>
+                        <Link href="/" className="text-3xl font-serif font-bold tracking-tighter text-foreground group flex items-center gap-2">
+                            {logoUrl ? <img src={logoUrl} alt={logoText} className="h-8 object-contain" /> : null}
+                            {(!logoUrl || logoText) && logoText}
                         </Link>
                     </div>
 

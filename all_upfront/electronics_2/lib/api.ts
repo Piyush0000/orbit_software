@@ -39,7 +39,15 @@ export class StorefrontAPI {
       const response = await fetch(`${API_BASE_URL}/${this.subdomain}/customization`);
       const data = await response.json();
       if (!data.success) throw new Error(data.message || 'Failed to fetch customization');
-      return data.data;
+      let customData = data.data;
+      if (customData && typeof customData.headerStyle === 'string') {
+        try {
+          customData.headerStyle = JSON.parse(customData.headerStyle);
+        } catch (e) {
+          console.error("Failed to parse headerStyle", e);
+        }
+      }
+      return customData;
     } catch (error) {
       console.error('Error fetching customization:', error);
       // Return default values if API fails
@@ -171,7 +179,7 @@ import { useState, useEffect } from 'react';
 // Hook for store context
 export function useStore() {
   const [storeInfo, setStoreInfo] = useState(null);
-  const [customization, setCustomization] = useState(null);
+  const [customization, setCustomization] = useState<any>(null);
   const [sections, setSections] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -197,6 +205,39 @@ export function useStore() {
     };
 
     fetchData();
+
+    // 🔴 Live-preview: listen for real-time edits from the Storefront Editor
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'ORBIT_CUSTOMIZATION_UPDATE') {
+        const { sectionId, field, value } = event.data;
+        if (sectionId && field !== undefined && value !== undefined) {
+          setCustomization((prev: any) => ({
+            ...prev,
+            [sectionId]: {
+              ...(prev?.[sectionId] || {}),
+              [field]: value,
+            },
+          }));
+        } else if (event.data.customization || event.data.data) {
+          // Full customization object update
+          let newCustomization = event.data.customization || event.data.data;
+          
+          if (typeof newCustomization.headerStyle === 'string') {
+            try {
+              newCustomization = {
+                ...newCustomization,
+                headerStyle: JSON.parse(newCustomization.headerStyle)
+              };
+            } catch (e) {}
+          }
+          
+          setCustomization(newCustomization);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   return {
