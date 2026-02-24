@@ -62,7 +62,7 @@ export default function NavigationPage() {
                    <span className="text-xs text-muted-foreground ml-auto bg-muted px-2 py-0.5 rounded-full">Link: /products</span>
                 </div>
              </div>
-             <Button variant="ghost" size="sm" className="mt-2 w-full border-dashed border justify-start text-primary" variant="outline">
+             <Button size="sm" className="mt-2 w-full border-dashed border justify-start text-primary" variant="outline">
                 <Plus className="size-4 mr-2" /> Add menu item
              </Button>
           </CardContent>
