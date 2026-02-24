@@ -1,154 +1,34 @@
 {
   "tableData": [
     {
-      "id": 1,
-      "header": "Q1 Performance Review",
-      "type": "Narrative",
-      "status": "Done",
-      "target": "100",
-      "limit": "80",
-      "reviewer": "Eddie Lake",
-      "value": 450
+      "id": "1",
+      "orderNumber": "1084",
+      "customerName": "Aarav Sharma",
+      "customerEmail": "aarav.sharma@example.com",
+      "total": 4500,
+      "status": "Delivered",
+      "paymentStatus": "Paid",
+      "createdAt": "2024-02-24T10:30:00Z"
     },
     {
-      "id": 2,
-      "header": "Social Media Strategy",
-      "type": "Technical content",
-      "status": "In Process",
-      "target": "85",
-      "limit": "90",
-      "reviewer": "Jamik Tashpulatov",
-      "value": 320
+      "id": "2",
+      "orderNumber": "1083",
+      "customerName": "Priya Patel",
+      "customerEmail": "priya.p@example.com",
+      "total": 12500,
+      "status": "Processing",
+      "paymentStatus": "Paid",
+      "createdAt": "2024-02-24T09:15:00Z"
     },
     {
-      "id": 3,
-      "header": "Ad Spend Optimization",
-      "type": "Financial",
-      "status": "Done",
-      "target": "95",
-      "limit": "95",
-      "reviewer": "Emily Whalen",
-      "value": 560
-    },
-    {
-      "id": 4,
-      "header": "Influencer Outreach",
-      "type": "Narrative",
-      "status": "Not Started",
-      "target": "50",
-      "limit": "60",
-      "reviewer": "Assign reviewer",
-      "value": 210
-    },
-    {
-      "id": 5,
-      "header": "Email Campaign Audit",
-      "type": "Research",
-      "status": "Done",
-      "target": "100",
-      "limit": "100",
-      "reviewer": "Eddie Lake",
-      "value": 390
-    },
-    {
-      "id": 6,
-      "header": "SEO Analysis Report",
-      "type": "Technical content",
-      "status": "In Process",
-      "target": "70",
-      "limit": "75",
-      "reviewer": "Jamik Tashpulatov",
-      "value": 480
-    },
-    {
-      "id": 7,
-      "header": "Content Calendar Q2",
-      "type": "Planning",
-      "status": "Done",
-      "target": "100",
-      "limit": "90",
-      "reviewer": "Emily Whalen",
-      "value": 300
-    },
-    {
-      "id": 8,
-      "header": "Competitor Benchmarking",
-      "type": "Research",
-      "status": "In Process",
-      "target": "60",
-      "limit": "60",
-      "reviewer": "Assign reviewer",
-      "value": 275
-    },
-    {
-      "id": 9,
-      "header": "Brand Guidelines Update",
-      "type": "Visual",
-      "status": "Done",
-      "target": "100",
-      "limit": "100",
-      "reviewer": "Eddie Lake",
-      "value": 410
-    },
-    {
-      "id": 10,
-      "header": "Video Ads Production",
-      "type": "Visual",
-      "status": "In Process",
-      "target": "40",
-      "limit": "50",
-      "reviewer": "Jamik Tashpulatov",
-      "value": 350
-    },
-    {
-      "id": 11,
-      "header": "Customer Feedback Loop",
-      "type": "Narrative",
-      "status": "Not Started",
-      "target": "20",
-      "limit": "40",
-      "reviewer": "Assign reviewer",
-      "value": 180
-    },
-    {
-      "id": 12,
-      "header": "Website Conversion Rate",
-      "type": "Technical content",
-      "status": "Done",
-      "target": "98",
-      "limit": "95",
-      "reviewer": "Emily Whalen",
-      "value": 600
-    },
-    {
-      "id": 13,
-      "header": "PPC Campaign Setup",
-      "type": "Financial",
-      "status": "Done",
-      "target": "100",
-      "limit": "100",
-      "reviewer": "Eddie Lake",
-      "value": 520
-    },
-    {
-      "id": 14,
-      "header": "Community Engagement",
-      "type": "Narrative",
-      "status": "In Process",
-      "target": "75",
-      "limit": "80",
-      "reviewer": "Jamik Tashpulatov",
-      "value": 290
-    },
-    {
-      "id": 15,
-      "header": "Referral Program Launch",
-      "type": "Planning",
-      "status": "Not Started",
-      "target": "10",
-      "limit": "30",
-      "reviewer": "Assign reviewer",
-      "value": 150
+      "id": "3",
+      "orderNumber": "1082",
+      "customerName": "Vikram Singh",
+      "customerEmail": "v.singh@example.com",
+      "total": 890,
+      "status": "Shipped",
+      "paymentStatus": "Paid",
+      "createdAt": "2024-02-23T16:45:00Z"
     }
   ],
   "barChartData": [

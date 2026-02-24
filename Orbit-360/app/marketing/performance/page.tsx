@@ -42,7 +42,7 @@ export default function Page() {
             </ChartContainer>
             <ChartAreaInteractive />
           </div>
-          <DataTable data={data.tableData} />
+          <DataTable orders={data.tableData} />
         </div>
       </div>
     </div>
