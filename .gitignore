@@ -91,6 +91,8 @@ templates/**/next-env.d.ts
 # Don't track git repos inside templates
 templates/**/.git/
 
-# Local data
-data/
-db/
+# Local data (root-level only)
+/data/
+/db/
+# Allow theme data folders
+!all_upfront/**/data/
