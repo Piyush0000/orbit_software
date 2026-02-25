@@ -1,0 +1,240 @@
+/* Global Section Styling for Editorial Feel */
+.section {
+    padding: 10rem 0;
+    position: relative;
+    background-color: var(--background);
+    border-top: 1px solid var(--glass-border);
+}
+
+.heading {
+    text-align: center;
+    margin-bottom: 6rem;
+    color: var(--text-primary);
+    font-family: var(--font-playfair);
+    font-size: 3rem;
+    font-weight: 500;
+    position: sticky;
+    top: 100px;
+    z-index: 10;
+    background: linear-gradient(to bottom, var(--background) 80%, transparent);
+    padding: 1rem 0;
+    pointer-events: none;
+    /* Let clicks pass through */
+}
+
+/* Gift Collections Grid - Mosaic Style */
+.giftGrid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(2, 400px);
+    gap: 2rem;
+}
+
+.giftCard {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 4px;
+    /* Sharper corners for editorial look */
+}
+
+/* Asymmetrical Layout */
+.giftCardLarge {
+    grid-column: span 8;
+    grid-row: span 2;
+}
+
+/* The other two cards will automatically fill the remaining space if we target them properly or use nth-child in React, 
+   but since we can't easily change the HTML classes without React changes, let's assume the standard grid behavior 
+   or target specific children if possible. 
+   Actually, the HTML structure is: Large Card, Card 2, Card 3.
+   We can make the Large Card take 8 columns and 2 rows.
+   The other two cards can take 4 columns and 1 row each, stacked vertically.
+*/
+
+.giftCard:nth-child(2) {
+    grid-column: span 4;
+    grid-row: span 1;
+}
+
+.giftCard:nth-child(3) {
+    grid-column: span 4;
+    grid-row: span 1;
+}
+
+
+.giftImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.giftCard:hover .giftImage {
+    transform: scale(1.05);
+}
+
+.giftOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    transition: background 0.5s ease;
+    padding: 2rem;
+}
+
+.giftCard:hover .giftOverlay {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.giftTitle {
+    font-family: var(--font-playfair);
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    transform: translateY(20px);
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.giftCard:hover .giftTitle {
+    transform: translateY(0);
+}
+
+.giftBtn {
+    background: white;
+    color: var(--text-primary);
+    padding: 1rem 2.5rem;
+    border: none;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s;
+}
+
+.giftCard:hover .giftBtn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Brand Story - Editorial Layout */
+.storySection {
+    padding: 12rem 0;
+    background-color: #FAF9F6;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative background text */
+.storySection::before {
+    content: 'LUMIÈRE';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-playfair);
+    font-size: 20vw;
+    color: rgba(0, 0, 0, 0.03);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+}
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 4rem;
+    flex-wrap: wrap;
+    margin-top: 8rem;
+    position: relative;
+    z-index: 1;
+}
+
+.feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 250px;
+    text-align: center;
+}
+
+.iconWrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid var(--accent-taupe);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    background: transparent;
+    transition: all 0.4s ease;
+}
+
+.feature:hover .iconWrapper {
+    background: var(--accent-rose);
+    border-color: var(--accent-rose);
+    color: white;
+    transform: rotate(360deg);
+}
+
+.featureTitle {
+    font-size: 1.1rem;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.featureDesc {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+@media (max-width: 1024px) {
+    .giftGrid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .giftCardLarge,
+    .giftCard:nth-child(2),
+    .giftCard:nth-child(3) {
+        grid-column: span 1;
+        grid-row: span 1;
+        height: 400px;
+    }
+
+    .storySection::before {
+        font-size: 30vw;
+    }
+
+    .heading {
+        font-size: 2.5rem;
+        position: static;
+        background: transparent;
+    }
+}
+
+.editorSection {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editorSection:hover {
+    outline: 2px solid rgba(124, 45, 18, 0.5);
+    outline-offset: -2px;
+}

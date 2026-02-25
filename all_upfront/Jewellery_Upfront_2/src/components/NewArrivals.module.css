@@ -1,0 +1,87 @@
+.section {
+    padding: 6rem 0;
+    background-color: #FAF9F6;
+    /* Slightly lighter ivory for contrast */
+    overflow: hidden;
+}
+
+.headingWrapper {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.heading {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.subHeading {
+    font-family: var(--font-inter);
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.subHeading::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 1px;
+    background-color: var(--accent-gold);
+}
+
+.carousel {
+    display: flex;
+    gap: 2.5rem;
+    overflow-x: auto;
+    padding: 1rem 5vw 4rem;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.carouselItem {
+    flex: 0 0 300px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.controlBtn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--accent-taupe);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.controlBtn:hover {
+    border-color: var(--accent-gold);
+    color: #FFFFFF;
+    background-color: var(--accent-gold);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}

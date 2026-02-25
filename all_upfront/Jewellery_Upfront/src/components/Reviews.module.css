@@ -1,0 +1,159 @@
+.section {
+    padding: 4rem 0;
+    border-top: 1px solid #eee;
+    margin-top: 4rem;
+}
+
+.title {
+    font-family: var(--font-playfair);
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 4rem;
+}
+
+/* Summary Column */
+.summary {
+    background: #faf9f6;
+    padding: 2rem;
+    border-radius: 4px;
+}
+
+.statsTitle {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.averageRating {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--foreground);
+}
+
+.writeBtn {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--foreground);
+    color: white;
+    border: none;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 2rem;
+    cursor: pointer;
+}
+
+/* Review List Column */
+.reviewList {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.reviewItem {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 2rem;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+}
+
+.reviewerName {
+    font-weight: 600;
+}
+
+.reviewDate {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.stars {
+    color: var(--gold-primary);
+    margin-bottom: 0.8rem;
+}
+
+.comment {
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.reviewPhoto {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.helpfulBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+    padding: 0;
+}
+
+.helpfulBtn:hover {
+    color: var(--foreground);
+}
+
+/* Form Styles */
+.form {
+    background: white;
+    padding: 2rem;
+    border: 1px solid #eee;
+    margin-bottom: 2rem;
+}
+
+.formGroup {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.input,
+.textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: var(--font-inter);
+}
+
+.fileInput {
+    margin-top: 0.5rem;
+}
+
+.cancelBtn {
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #666;
+    margin-left: 1rem;
+}
+
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}

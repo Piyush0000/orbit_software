@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/* Electronics Store Theme - Midnight Tech */
+:root,
+[data-theme="light"] {
+  /* We are forcing a dark theme for this "premium tech" look, but keeping variables for structure */
+  --page-bg: #0B0C10;
+  --header-bg: rgba(11, 12, 16, 0.95);
+  --header-border: #1F2833;
+  --header-text: #C5C6C7;
+  --header-text-muted: #66FCF1;
+  
+  --section-alt: #1F2833;
+  --card-bg: #1F2833;
+  --card-border: #45A29E;
+  
+  --text: #C5C6C7;
+  --text-muted: #8892b0;
+  --text-highlight: #ffffff;
+  
+  --hero-bg: radial-gradient(circle at center, #1F2833 0%, #0B0C10 100%);
+  --hero-text: #66FCF1;
+  
+  --btn-primary-bg: #66FCF1;
+  --btn-primary-text: #0B0C10;
+  --btn-primary-hover: #45A29E;
+  
+  --banner-bg: linear-gradient(90deg, #0B0C10 0%, #1F2833 100%);
+  
+  --footer-bg: #050608;
+  --footer-text: #8892b0;
+  
+  --accent-cyan: #66FCF1;
+  --accent-teal: #45A29E;
+}
+
+@theme inline {
+  --color-background: var(--page-bg);
+  --color-foreground: var(--text);
+  --color-primary: var(--btn-primary-bg);
+  --color-primary-foreground: var(--btn-primary-text);
+  
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
+}
+
+body {
+  background-color: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-highlight);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+/* Custom Utilities for Tech Look */
+.glass-panel {
+  background: rgba(31, 40, 51, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(102, 252, 241, 0.1);
+}
+
+.neon-text {
+  text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+}
+
+.tech-border {
+  border: 1px solid var(--card-border);
+  box-shadow: 0 0 15px rgba(69, 162, 158, 0.1);
+}
+

@@ -1,0 +1,81 @@
+.section {
+    padding: 5rem 0;
+    background-color: #faf9f6;
+    /* Ivory/Warm Light */
+    overflow: hidden;
+}
+
+.headingWrapper {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.heading {
+    margin-bottom: 0.5rem;
+    color: var(--foreground);
+}
+
+.subHeading {
+    font-family: var(--font-inter);
+    color: var(--gold-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.carousel {
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+    padding: 1rem 5vw 3rem;
+    /* Extra padding for shadow and peek */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.carouselItem {
+    flex: 0 0 280px;
+    /* Fixed width cards */
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.controlBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.controlBtn:hover {
+    border-color: var(--gold-primary);
+    color: var(--gold-primary);
+}
+
+.editorSection {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editorSection:hover {
+    outline: 2px solid rgba(124, 45, 18, 0.5);
+    outline-offset: -2px;
+}

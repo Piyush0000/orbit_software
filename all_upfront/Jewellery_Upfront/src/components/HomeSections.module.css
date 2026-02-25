@@ -1,0 +1,158 @@
+.section {
+    padding: 6rem 0;
+    background-color: var(--background);
+}
+
+.heading {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.giftGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 300px);
+    gap: 1.5rem;
+}
+
+.giftCard {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.giftCardLarge {
+    grid-row: span 2;
+}
+
+.giftImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.giftCard:hover .giftImage {
+    transform: scale(1.05);
+}
+
+.giftOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.giftCard:hover .giftOverlay {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.giftTitle {
+    font-family: var(--font-playfair);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.giftBtn {
+    background: white;
+    color: var(--foreground);
+    padding: 0.8rem 1.5rem;
+    border: none;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    margin-top: 1rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.giftCard:hover .giftBtn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Brand Story */
+.storySection {
+    padding: 6rem 0;
+    background-color: #faf9f6;
+    text-align: center;
+}
+
+.features {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+}
+
+.feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 200px;
+}
+
+.iconWrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+    color: var(--gold-primary);
+}
+
+.featureTitle {
+    font-size: 1.1rem;
+    font-family: var(--font-playfair);
+    margin-bottom: 0.5rem;
+}
+
+.featureDesc {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .giftGrid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .giftCardLarge {
+        grid-row: span 1;
+        height: 300px;
+    }
+
+    .features {
+        gap: 2rem;
+    }
+}
+
+.editorSection {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editorSection:hover {
+    outline: 2px solid rgba(124, 45, 18, 0.5);
+    outline-offset: -2px;
+}

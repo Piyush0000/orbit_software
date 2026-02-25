@@ -1,0 +1,212 @@
+.section {
+    padding: 6rem 0;
+    border-top: 1px solid var(--glass-border);
+    background-color: var(--background);
+    position: relative;
+}
+
+.title {
+    font-family: var(--font-playfair);
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 4rem;
+}
+
+/* Summary Column */
+.summary {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2.5rem;
+    border-radius: var(--radius-md);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+    border: 1px solid var(--glass-border);
+}
+
+.statsTitle {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-playfair);
+    color: var(--text-primary);
+}
+
+.averageRating {
+    font-size: 3.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-family: var(--font-playfair);
+}
+
+.writeBtn {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--text-primary);
+    color: var(--background);
+    border: none;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: var(--radius-sm);
+}
+
+.writeBtn:hover {
+    background-color: var(--accent-gold);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Review List Column */
+.reviewList {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.reviewItem {
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 2.5rem;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+}
+
+.reviewerName {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+}
+
+.reviewDate {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.stars {
+    color: var(--accent-gold);
+    margin-bottom: 0.8rem;
+    display: flex;
+    gap: 2px;
+}
+
+.comment {
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.reviewPhoto {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 1px solid var(--glass-border);
+}
+
+.reviewPhoto:hover {
+    transform: scale(1.05);
+}
+
+.helpfulBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.helpfulBtn:hover {
+    color: var(--text-primary);
+}
+
+/* Form Styles */
+.form {
+    background: var(--background);
+    padding: 2.5rem;
+    border: 1px solid var(--glass-border);
+    margin-bottom: 3rem;
+    border-radius: var(--radius-md);
+}
+
+.formGroup {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.input,
+.textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-inter);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-primary);
+    transition: all 0.2s;
+    outline: none;
+}
+
+.input:focus,
+.textarea:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.fileInput {
+    margin-top: 0.5rem;
+}
+
+.cancelBtn {
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--text-secondary);
+    margin-left: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.cancelBtn:hover {
+    color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .summary {
+        position: static;
+    }
+}

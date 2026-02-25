@@ -1,0 +1,100 @@
+.page {
+    padding-top: var(--header-height);
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background);
+}
+
+.container {
+    background: var(--card-bg);
+    padding: 3rem;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.title {
+    font-family: var(--font-playfair);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: left;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.input {
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 2px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background-color: var(--background);
+    color: var(--text-primary);
+}
+
+.input:focus {
+    border-color: var(--accent-gold);
+    outline: none;
+}
+
+.submitBtn {
+    background-color: var(--text-primary);
+    color: var(--background);
+    padding: 1rem;
+    border: none;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 1rem;
+}
+
+.submitBtn:hover {
+    background-color: var(--accent-gold);
+}
+
+.toggleContainer {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.toggleBtn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}

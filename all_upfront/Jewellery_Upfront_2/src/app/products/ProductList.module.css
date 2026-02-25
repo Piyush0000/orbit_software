@@ -1,0 +1,156 @@
+.page {
+    padding-top: var(--header-height);
+    min-height: 100vh;
+    background-color: var(--background);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    animation: fadeIn 0.8s ease-out;
+    padding: 4rem 0 3rem;
+    text-align: center;
+    background: linear-gradient(to bottom, #faf9f6 0%, #ffffff 100%);
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 2px;
+    background-color: var(--gold-primary);
+    margin: 1.5rem auto 0;
+}
+
+.title {
+    font-family: var(--font-playfair);
+    font-size: 3.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--foreground);
+    letter-spacing: -0.02em;
+}
+
+.breadcrumbs {
+    font-family: var(--font-inter);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #888;
+    margin-top: 1rem;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 3rem;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px 4rem;
+}
+
+.sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+    height: fit-content;
+}
+
+.filterGroup {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.filterTitle {
+    font-family: var(--font-playfair);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.filterList {
+    list-style: none;
+}
+
+.filterItem {
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.filterItem:hover {
+    color: var(--gold-primary);
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox.active {
+    background-color: var(--foreground);
+    border-color: var(--foreground);
+}
+
+.mainContent {
+    width: 100%;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.sortSelect {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    background: white;
+    font-family: var(--font-inter);
+    color: var(--foreground);
+    outline: none;
+}
+
+.productGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;
+        /* Mobile filters would be a separate modal/drawer */
+    }
+}

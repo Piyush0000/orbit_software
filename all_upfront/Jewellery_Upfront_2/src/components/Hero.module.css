@@ -1,0 +1,258 @@
+.hero {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    margin-top: calc(var(--header-height) * -1);
+    background-color: var(--background);
+    padding-top: 100px;
+    /* Space from top */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    height: 80vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+}
+
+/* Layered Typography */
+.textLayer {
+    z-index: 10;
+    position: relative;
+    mix-blend-mode: normal;
+    color: var(--foreground);
+}
+
+.subheadline {
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    margin-bottom: 2rem;
+    color: var(--accent-taupe);
+    text-transform: uppercase;
+    font-weight: 600;
+    padding-left: 5px;
+}
+
+.headline {
+    font-family: var(--font-playfair);
+    font-weight: 500;
+    line-height: 0.9;
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+}
+
+.line1 {
+    font-size: clamp(4rem, 8vw, 9rem);
+    margin-left: -0.05em;
+    letter-spacing: -0.03em;
+}
+
+.line2 {
+    font-size: clamp(4rem, 8vw, 9rem);
+    margin-left: 1.5em;
+    /* Check indentation */
+    font-style: italic;
+    color: var(--accent-gold);
+    z-index: 10;
+    position: relative;
+}
+
+.description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 3rem 0;
+    max-width: 350px;
+    margin-left: 5px;
+}
+
+.ctaGroup {
+    display: flex;
+    gap: 1.5rem;
+    margin-left: 5px;
+}
+
+.primaryBtn {
+    padding: 1rem 2.5rem;
+    background-color: var(--accent-gold);
+    color: var(--background);
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+    border-radius: 0;
+    /* Sharp corners for editorial look */
+}
+
+.primaryBtn:hover {
+    background-color: var(--text-primary);
+    color: var(--background);
+    transform: translateY(-3px);
+}
+
+.secondaryBtn {
+    padding: 1rem 2.5rem;
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--text-primary);
+    cursor: pointer;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+}
+
+.secondaryBtn:hover {
+    background-color: var(--text-primary);
+    color: var(--background);
+}
+
+/* Image Layering */
+.imageLayer {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+
+.mainImageWrapper {
+    position: absolute;
+    top: 5%;
+    right: 0;
+    width: 85%;
+    height: 85%;
+    overflow: hidden;
+    /* border-radius: 200px 200px 0 0;  Arch shape */
+}
+
+.img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.mainImageWrapper:hover .img {
+    transform: scale(1.05);
+}
+
+.secondaryImageWrapper {
+    position: absolute;
+    bottom: 0;
+    left: -10%;
+    width: 250px;
+    height: 300px;
+    overflow: hidden;
+    z-index: 5;
+    border: 8px solid var(--background);
+    /* Creates a frame effect */
+    box-shadow: var(--shadow-xl);
+}
+
+/* Animations */
+.hero {
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 1024px) {
+    .container {
+        grid-template-columns: 1fr;
+        height: auto;
+        padding-bottom: 4rem;
+        padding-top: 2rem;
+    }
+
+    .textLayer {
+        order: 2;
+        margin-top: 1.5rem;
+        text-align: center;
+        z-index: 20;
+    }
+
+    .headline {
+        align-items: center;
+    }
+
+    .line1 {
+        font-size: clamp(3rem, 12vw, 5rem);
+    }
+
+    .line2 {
+        margin-left: 0;
+        font-size: clamp(3rem, 12vw, 5rem);
+    }
+
+    .description {
+        margin: 1.5rem auto;
+        max-width: 90%;
+        font-size: 1rem;
+    }
+
+    .ctaGroup {
+        margin-left: auto;
+        margin-right: auto;
+        justify-content: center;
+    }
+
+    .imageLayer {
+        order: 1;
+        height: 45vh;
+        /* Slightly reduced height for better fold visibility */
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+    .mainImageWrapper {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        right: auto;
+        top: auto;
+        border-radius: 0;
+        /* Full bleed feel */
+    }
+
+    .img {
+        object-position: top center;
+    }
+
+    .secondaryImageWrapper {
+        display: none;
+    }
+}
+
+.editorSection {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editorSection:hover {
+    outline: 2px solid rgba(124, 45, 18, 0.5);
+    outline-offset: -2px;
+}

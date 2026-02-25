@@ -1,0 +1,54 @@
+.section {
+    padding: 6rem 0;
+    background-color: var(--background);
+    border-top: 1px solid var(--glass-border);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 5rem;
+}
+
+.trustBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.03);
+    padding: 0.6rem 1.25rem;
+    border-radius: 50px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+}
+
+.stars {
+    color: var(--accent-gold);
+    display: flex;
+    gap: 2px;
+}
+
+.trustText {
+    font-family: var(--font-inter);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent-taupe);
+    letter-spacing: 0.02em;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2.5rem;
+    margin-top: 4rem;
+}
+
+.editorSection {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editorSection:hover {
+    outline: 2px solid rgba(124, 45, 18, 0.5);
+    outline-offset: -2px;
+}
