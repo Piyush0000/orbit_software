@@ -67,7 +67,7 @@ app.use(errorHandler);
 
 const start = async () => {
   try {
-    await connectMongo();
+    // await connectMongo();
     
     // Create HTTP server
     const server = http.createServer(app);

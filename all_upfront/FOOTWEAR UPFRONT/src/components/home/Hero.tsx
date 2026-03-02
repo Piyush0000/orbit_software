@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '../ui/Button';
 import styles from './Hero.module.css';
-import { useStoreContext } from '../../../context/store-context';
+import { useStoreContext } from '@/context/store-context';
 
 export function Hero() {
     const { customization } = useStoreContext();

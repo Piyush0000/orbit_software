@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { HeaderActions } from './HeaderActions';
 import styles from './Header.module.css';
-import { useStoreContext } from '../../../context/store-context';
+import { useStoreContext } from '@/context/store-context';
 
 export function Header() {
     const { customization, storeInfo } = useStoreContext();

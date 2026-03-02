@@ -65,9 +65,6 @@ export default function SRCheckoutButton({
     } catch (err) {
       console.error('Checkout error:', err);
       // alert('Failed to initiate checkout. Please try again.');
-        if ((window as any).HeadlessCheckout && token) {
-             (window as any).HeadlessCheckout.addToCart(e.nativeEvent, token);
-        }
     } finally {
       setLoading(false);
     }
