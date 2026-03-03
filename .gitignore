@@ -96,3 +96,7 @@ templates/**/.git/
 /db/
 # Allow theme data folders
 !all_upfront/**/data/
+
+# FShip / Logistics (sensitive — contains API keys)
+fship_flow.md
+logistics_config.json

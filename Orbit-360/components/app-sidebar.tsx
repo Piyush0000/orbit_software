@@ -126,6 +126,14 @@ const data = {
           url: "/logistics/tracking",
         },
         {
+          title: "Rate Calculator",
+          url: "/logistics/rate-calculator",
+        },
+        {
+          title: "Pincode Check",
+          url: "/logistics/pincode",
+        },
+        {
           title: "Returns",
           url: "/logistics/returns",
         },
