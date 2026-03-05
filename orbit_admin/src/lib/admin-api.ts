@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5002";
 
 const ADMIN_TOKEN_KEY = "orbit_admin_token";
 
@@ -647,13 +647,13 @@ export const updateAdminVariantStock = (variantId: string, stock: number) =>
   );
 
 // Meta Ads Integration
-export const getMetaStatus = () => 
+export const getMetaStatus = () =>
   adminRequest<{ connected: boolean; email?: string }>("/api/meta/status");
 
-export const getMetaAdAccounts = () => 
+export const getMetaAdAccounts = () =>
   adminRequest<{ adAccounts: any[] }>("/api/meta/ad-accounts");
 
-export const getMetaCampaigns = (adAccountId: string) => 
+export const getMetaCampaigns = (adAccountId: string) =>
   adminRequest<{ campaigns: any[] }>(`/api/meta/ad-accounts/${adAccountId}/campaigns`);
 
 export const getMetaInsights = (adAccountId: string, params: any) => {

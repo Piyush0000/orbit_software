@@ -55,11 +55,15 @@ const data = {
       items: [
         {
           title: "Leads",
-          url: "/dashboard/crm",
+          url: "/dashboard/leads",
         },
         {
           title: "Pipeline",
-          url: "/dashboard/crm/pipeline",
+          url: "/dashboard/pipeline",
+        },
+        {
+          title: "Companion",
+          url: "/dashboard/companion",
         },
       ],
     },

@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 
-export type LeadStatus = "leads" | "contacted" | "won" | "lost";
+export type LeadStatus = "leads" | "contacted" | "won" | "lost" | "LEADS" | "CONTACTED" | "WON" | "LOST";
 
 export interface LeadData {
   id: string;
@@ -21,4 +21,7 @@ export interface LeadData {
   budget?: string;
   goals?: string;
   message?: string;
+  companyName?: string;
+  target?: string;
+  platform?: string;
 }
