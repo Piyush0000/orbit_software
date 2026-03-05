@@ -554,3 +554,34 @@ model MerchantCredentials {
   @@index([email])
   @@index([storeId])
 }
+
+enum LeadStatus {
+  LEADS
+  CONTACTED
+  WON
+  LOST
+}
+
+model Lead {
+  id            String     @id @default(uuid())
+  name          String     @default("Unnamed")
+  email         String?
+  phoneNumber   String?
+  workEmail     String?
+  formType      String     @default("General")
+  category      String?
+  revenueRange  String?
+  website       String?
+  budget        String?
+  dailyBudget   String?
+  goals         String?
+  message       String?
+  companyName   String?
+  platform      String?
+  target        String?
+  status        LeadStatus @default(LEADS)
+  collection    String?
+  metadata      Json?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}

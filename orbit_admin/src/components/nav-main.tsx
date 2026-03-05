@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -72,7 +73,7 @@ export function NavMain({
                       className={cn(
                         "group/btn w-full justify-between transition-all duration-200 hover:bg-blue-600/10",
                         isActive &&
-                          "bg-blue-600/5 text-blue-600 font-semibold shadow-sm ring-1 ring-blue-600/10",
+                        "bg-blue-600/5 text-blue-600 font-semibold shadow-sm ring-1 ring-blue-600/10",
                       )}
                     >
                       <div className="flex items-center gap-3">
@@ -107,7 +108,7 @@ export function NavMain({
                           return (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton asChild>
-                                <a
+                                <Link
                                   href={subItem.url}
                                   className={cn(
                                     "flex items-center gap-2 rounded-md px-3 py-1.5 transition-colors duration-200",
@@ -125,7 +126,7 @@ export function NavMain({
                                     )}
                                   />
                                   <span>{subItem.title}</span>
-                                </a>
+                                </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           );
@@ -140,10 +141,10 @@ export function NavMain({
                     className={cn(
                       "group/btn transition-all duration-200 hover:bg-blue-600/10",
                       isActive &&
-                        "bg-blue-600/5 text-blue-600 font-semibold shadow-sm ring-1 ring-blue-600/10",
+                      "bg-blue-600/5 text-blue-600 font-semibold shadow-sm ring-1 ring-blue-600/10",
                     )}
                   >
-                    <a href={item.url} className="flex items-center gap-3">
+                    <Link href={item.url} className="flex items-center gap-3">
                       {item.icon && (
                         <item.icon
                           className={cn(
@@ -155,7 +156,7 @@ export function NavMain({
                         />
                       )}
                       <span className="text-sm">{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 )}
               </SidebarMenuItem>

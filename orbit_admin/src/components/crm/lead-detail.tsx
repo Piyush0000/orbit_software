@@ -148,11 +148,10 @@ export function LeadDetail({
                         onStatusChange(lead.id, option.value);
                         onClose();
                       }}
-                      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${
-                        lead.status === option.value
+                      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${lead.status?.toLowerCase() === option.value
                           ? getStatusBadgeClass(option.value)
                           : "bg-white text-muted-foreground border-border hover:bg-accent"
-                      }`}
+                        }`}
                     >
                       {option.label}
                     </button>
@@ -194,11 +193,10 @@ export function LeadDetail({
                     Form Type
                   </label>
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                      lead.formType === "book-demo"
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${lead.formType === "book-demo"
                         ? "bg-white text-orange-600 border-orange-400"
                         : "bg-white text-orange-700 border-orange-500"
-                    }`}
+                      }`}
                   >
                     {lead.formType === "book-demo" ? "Book Demo" : "Contact"}
                   </span>

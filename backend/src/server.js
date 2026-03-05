@@ -27,6 +27,7 @@ const publicRoutes = require('./routes/public');
 const websiteCustomizationRoutes = require('./routes/websiteCustomization');
 const storefrontPublicRoutes = require('./routes/storefrontPublic');
 const logisticsRoutes = require('./routes/logistics');
+const leadRoutes = require('./routes/leads');
 
 
 const app = express();
@@ -58,6 +59,7 @@ app.use('/api/public', publicRoutes);
 app.use('/api/website', websiteCustomizationRoutes);
 app.use('/api/storefront/public', storefrontPublicRoutes);
 app.use('/api/logistics', logisticsRoutes);
+app.use('/api/leads', leadRoutes);
 
 app.use('/uploads', express.static(env.upload.path));
 
@@ -68,13 +70,13 @@ app.use(errorHandler);
 const start = async () => {
   try {
     // await connectMongo();
-    
+
     // Create HTTP server
     const server = http.createServer(app);
-    
+
     // Initialize WebSocket service
     const websocketService = new WebSocketService(server);
-    
+
     // Start listening
     server.listen(env.port, () => {
       console.log(`Server running on port ${env.port}`);
