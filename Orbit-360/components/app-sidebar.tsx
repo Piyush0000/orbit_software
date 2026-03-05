@@ -73,6 +73,10 @@ const data = {
           url: "/storefront/navigation",
         },
         {
+          title: "Coupons & Discounts",
+          url: "/storefront/coupons",
+        },
+        {
           title: "Preview Store",
           url: "/storefront/preview",
         }
