@@ -555,33 +555,26 @@ model MerchantCredentials {
   @@index([storeId])
 }
 
-enum LeadStatus {
-  LEADS
-  CONTACTED
-  WON
-  LOST
+enum DiscountType {
+  PERCENTAGE
+  FIXED
 }
 
-model Lead {
-  id            String     @id @default(uuid())
-  name          String     @default("Unnamed")
-  email         String?
-  phoneNumber   String?
-  workEmail     String?
-  formType      String     @default("General")
-  category      String?
-  revenueRange  String?
-  website       String?
-  budget        String?
-  dailyBudget   String?
-  goals         String?
-  message       String?
-  companyName   String?
-  platform      String?
-  target        String?
-  status        LeadStatus @default(LEADS)
-  collection    String?
-  metadata      Json?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+model Coupon {
+  id            String       @id @default(uuid())
+  storeId       String
+  code          String
+  type          DiscountType
+  value         Float
+  minOrderValue Float?
+  maxUses       Int?
+  usedCount     Int          @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([storeId, code])
+  @@index([storeId])
+  @@index([code])
 }

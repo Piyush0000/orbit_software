@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SectionCards } from "@/components/section-cards";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { DashboardCharts } from "@/components/dashboard-charts";
 import { DataTable } from "@/components/data-table";
 import { useAuth } from "@/contexts/AuthContext";
 import { getStoreAnalytics, getStoreOrders } from "@/lib/api";
@@ -18,31 +18,23 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       if (!user?.stores?.[0]?.id) return;
-      
       try {
         setLoading(true);
         const storeId = user.stores[0].id;
-        
-        // Fetch real data from backend
         const [analyticData, rawOrderData] = await Promise.all([
           getStoreAnalytics(storeId),
-          getStoreOrders(storeId)
+          getStoreOrders(storeId),
         ]);
-        
         setAnalytics(analyticData);
         setOrders(Array.isArray(rawOrderData) ? rawOrderData : (rawOrderData.orders || []));
       } catch (error: any) {
         console.error("Dashboard fetch error:", error);
-        // Fallback or toast error
-        toast.error("Failed to fetch real-time data from backend");
+        toast.error("Failed to fetch data from backend");
       } finally {
         setLoading(false);
       }
     }
-
-    if (!authLoading) {
-      fetchData();
-    }
+    if (!authLoading) fetchData();
   }, [user, authLoading]);
 
   if (authLoading || loading) {
@@ -56,11 +48,13 @@ export default function Home() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <SectionCards analytics={analytics} />
-          <div className="px-4 lg:px-6">
-            <ChartAreaInteractive />
-          </div>
+        <div className="flex flex-col gap-6 py-4 md:py-6">
+          <SectionCards analytics={analytics?.overview} />
+          <DashboardCharts
+            salesTrend={analytics?.salesTrend}
+            logistics={analytics?.logistics}
+            products={analytics?.products}
+          />
           <DataTable orders={orders} />
         </div>
       </div>
