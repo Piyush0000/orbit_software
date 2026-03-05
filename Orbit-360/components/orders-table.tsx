@@ -97,6 +97,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ShipOrderModal } from "@/components/ship-order-modal";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const orderSchema = z.object({
   id: z.string(),
@@ -246,28 +248,39 @@ const columns: ColumnDef<z.infer<typeof orderSchema>>[] = [
   },
   {
     id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>View Details</DropdownMenuItem>
-          <DropdownMenuItem>Invoice</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">
-            Cancel Order
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+    cell: ({ row, table }) => {
+      const meta = table.options.meta as any;
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+              size="icon"
+            >
+              <IconDotsVertical />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem>View Details</DropdownMenuItem>
+            <DropdownMenuItem>Invoice</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-blue-600 focus:text-blue-600"
+              onClick={() => meta?.onShip?.(row.original)}
+            >
+              <IconTruckDelivery className="size-4 mr-2" />
+              Ship Order
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive">
+              Cancel Order
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
   },
 ];
 
@@ -298,9 +311,12 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof orderSchema>> }) {
 
 export function OrdersTable({
   data: initialData,
+  onRefresh,
 }: {
   data: z.infer<typeof orderSchema>[];
+  onRefresh?: () => void;
 }) {
+  const { user } = useAuth();
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -313,6 +329,8 @@ export function OrdersTable({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [shipModalOpen, setShipModalOpen] = React.useState(false);
+  const [selectedOrder, setSelectedOrder] = React.useState<any>(null);
   const sortableId = React.useId();
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
@@ -348,6 +366,12 @@ export function OrdersTable({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    meta: {
+      onShip: (order: any) => {
+        setSelectedOrder(order);
+        setShipModalOpen(true);
+      },
+    },
   });
 
   function handleDragEnd(event: DragEndEvent) {
@@ -362,7 +386,16 @@ export function OrdersTable({
   }
 
   return (
-    <Tabs defaultValue="all" className="w-full flex-col justify-start gap-6">
+    <>
+      {selectedOrder && (
+        <ShipOrderModal
+          open={shipModalOpen}
+          onOpenChange={setShipModalOpen}
+          order={selectedOrder}
+          onSuccess={() => { setShipModalOpen(false); onRefresh?.(); }}
+        />
+      )}
+      <Tabs defaultValue="all" className="w-full flex-col justify-start gap-6">
       <div className="flex items-center justify-between px-4 lg:px-6">
         <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
           <TabsTrigger value="all">All Orders</TabsTrigger>
@@ -563,6 +596,7 @@ export function OrdersTable({
         </div>
       </TabsContent>
     </Tabs>
+    </>
   );
 }
 

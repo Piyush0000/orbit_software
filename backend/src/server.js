@@ -27,6 +27,7 @@ const publicRoutes = require('./routes/public');
 const websiteCustomizationRoutes = require('./routes/websiteCustomization');
 const storefrontPublicRoutes = require('./routes/storefrontPublic');
 const logisticsRoutes = require('./routes/logistics');
+const couponRoutes = require('./routes/coupons');
 
 
 const app = express();
@@ -58,6 +59,8 @@ app.use('/api/public', publicRoutes);
 app.use('/api/website', websiteCustomizationRoutes);
 app.use('/api/storefront/public', storefrontPublicRoutes);
 app.use('/api/logistics', logisticsRoutes);
+app.use('/api/coupons', couponRoutes);
+
 
 app.use('/uploads', express.static(env.upload.path));
 
@@ -66,23 +69,23 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.use(errorHandler);
 
 const start = async () => {
+  // ── MongoDB ────────────────────────────────────────────────────────────────
   try {
-    // await connectMongo();
-    
-    // Create HTTP server
-    const server = http.createServer(app);
-    
-    // Initialize WebSocket service
-    const websocketService = new WebSocketService(server);
-    
-    // Start listening
-    server.listen(env.port, () => {
-      console.log(`Server running on port ${env.port}`);
-    });
+    await connectMongo();
+    console.log('✅ MongoDB connected successfully');
   } catch (err) {
-    console.error('Startup failed', err);
-    process.exit(1);
+    console.error('❌ MongoDB connection FAILED:', err.message);
+    console.error('   Logistics features will not work until MongoDB is connected.');
+    // Don't exit — Prisma routes (orders, products, etc.) still work without Mongo
   }
+
+  // ── HTTP Server ───────────────────────────────────────────────────────────
+  const server = http.createServer(app);
+  const websocketService = new WebSocketService(server);
+
+  server.listen(env.port, () => {
+    console.log(`✅ Server running on port ${env.port}`);
+  });
 };
 
 start();

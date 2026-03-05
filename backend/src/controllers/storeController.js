@@ -203,10 +203,27 @@ const deleteStore = async (req, res, next) => {
 
 const getSettings = async (req, res, next) => {
   try {
-    const settings = await prisma.storeSettings.findUnique({
-      where: { storeId: req.params.id }
+    const storeId = req.params.id;
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      include: { settings: true }
     });
-    res.json({ settings });
+    
+    if (!store) return res.status(404).json({ message: 'Store not found' });
+    
+    // Flatten the response for easier frontend consumption
+    const response = {
+      ...store.settings,
+      name: store.name,
+      subdomain: store.subdomain,
+      category: store.category,
+      description: store.description,
+      logo: store.logo,
+      customDomain: store.customDomain,
+      industry: store.category // Mapping for industry field
+    };
+
+    res.json(response);
   } catch (err) {
     next(err);
   }
@@ -215,21 +232,55 @@ const getSettings = async (req, res, next) => {
 const updateSettings = async (req, res, next) => {
   try {
     const data = req.body;
-    const settings = await prisma.storeSettings.upsert({
-      where: { storeId: req.params.id },
-      update: data,
-      create: { ...data, storeId: req.params.id }
+    const storeId = req.params.id;
+
+    // Define which fields belong to which model
+    const storeFields = ['name', 'category', 'description', 'logo', 'customDomain'];
+    const settingsFields = [
+      'currency', 'timezone', 'seoTitle', 'seoDescription', 
+      'socialImage', 'contactEmail', 'contactPhone', 
+      'shippingMethods', 'paymentMethods'
+    ];
+
+    const storeUpdate = {};
+    const settingsUpdate = {};
+
+    Object.keys(data).forEach(key => {
+      if (storeFields.includes(key)) storeUpdate[key] = data[key];
+      if (settingsFields.includes(key)) settingsUpdate[key] = data[key];
     });
-    res.json({ settings });
+
+    // Update Store model if needed
+    if (Object.keys(storeUpdate).length > 0) {
+      await prisma.store.update({
+        where: { id: storeId },
+        data: storeUpdate
+      });
+    }
+
+    // Upsert StoreSettings model if needed
+    let settings = null;
+    if (Object.keys(settingsUpdate).length > 0) {
+      settings = await prisma.storeSettings.upsert({
+        where: { storeId },
+        update: settingsUpdate,
+        create: { ...settingsUpdate, storeId }
+      });
+    } else {
+      settings = await prisma.storeSettings.findUnique({ where: { storeId } });
+    }
+
+    res.json({ success: true, settings });
   } catch (err) {
+    console.error('Update settings error:', err);
     next(err);
   }
 };
 
 const storeAnalytics = async (req, res, next) => {
   try {
-    const metrics = await getStoreAnalytics(req.params.id);
-    res.json({ metrics });
+    const data = await getStoreAnalytics(req.params.id);
+    res.json(data);
   } catch (err) {
     next(err);
   }

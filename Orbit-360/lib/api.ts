@@ -119,3 +119,81 @@ export async function deleteStoreProduct(productId: string) {
     method: "DELETE",
   });
 }
+
+// ─── Logistics: Shipment Management ──────────────────────────────────────────
+
+export async function createShipment(storeId: string, orderData: any) {
+  return fetcher(`/logistics/${storeId}/create-order`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(orderData),
+  });
+}
+
+export async function cancelShipment(storeId: string, waybill: string, reason?: string) {
+  return fetcher(`/logistics/${storeId}/cancel-order`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ waybill, reason }),
+  });
+}
+
+export async function registerPickup(storeId: string, waybills: string[]) {
+  return fetcher(`/logistics/${storeId}/register-pickup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ waybills }),
+  });
+}
+
+export async function getShippingLabel(storeId: string, waybill: string) {
+  return fetcher(`/logistics/${storeId}/label`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ waybill }),
+  });
+}
+
+export async function reattemptShipment(storeId: string, data: any) {
+  return fetcher(`/logistics/${storeId}/reattempt`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+// ─── Logistics: Tools ─────────────────────────────────────────────────────────
+
+export async function calculateRate(storeId: string, rateData: any) {
+  return fetcher(`/logistics/${storeId}/rate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(rateData),
+  });
+}
+
+export async function checkPincodeServiceability(storeId: string, source_Pincode: string, destination_Pincode: string) {
+  return fetcher(`/logistics/${storeId}/pincode`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ source_Pincode, destination_Pincode }),
+  });
+}
+
+// ─── Logistics: Warehouses ────────────────────────────────────────────────────
+
+export async function addWarehouse(storeId: string, data: any) {
+  return fetcher(`/logistics/${storeId}/warehouse`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateWarehouse(storeId: string, data: any) {
+  return fetcher(`/logistics/${storeId}/warehouse`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}

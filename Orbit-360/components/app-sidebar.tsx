@@ -73,6 +73,10 @@ const data = {
           url: "/storefront/navigation",
         },
         {
+          title: "Coupons & Discounts",
+          url: "/storefront/coupons",
+        },
+        {
           title: "Preview Store",
           url: "/storefront/preview",
         }
@@ -124,6 +128,14 @@ const data = {
         {
           title: "Tracking",
           url: "/logistics/tracking",
+        },
+        {
+          title: "Rate Calculator",
+          url: "/logistics/rate-calculator",
+        },
+        {
+          title: "Pincode Check",
+          url: "/logistics/pincode",
         },
         {
           title: "Returns",

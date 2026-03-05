@@ -1,4 +1,4 @@
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
+import { IconTrendingDown, IconTrendingUp, IconCircleCheckFilled } from "@tabler/icons-react"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -15,19 +15,23 @@ interface SectionCardsProps {
 }
 
 export const SectionCards: React.FC<SectionCardsProps> = ({ analytics }) => {
-  const stats = analytics?.stats || {
+  const stats = analytics || {
     revenue: 0,
     customers: 0,
     orders: 0,
-    growth: 0
+    revenueGrowth: 0,
+    orderGrowth: 0,
+    avgOrderValue: 0
   };
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-    }).format(val);
+    }).format(val || 0);
   };
+
+  const aov = stats.avgOrderValue || (stats.orders > 0 ? (stats.revenue / stats.orders) : 0);
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
@@ -35,84 +39,87 @@ export const SectionCards: React.FC<SectionCardsProps> = ({ analytics }) => {
         <CardHeader>
           <CardDescription>Total Revenue</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {formatCurrency(stats.revenue || 0)}
+            {formatCurrency(stats.revenue)}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <IconTrendingUp />
-              +{analytics?.revenueGrowth || 0}%
+              {stats.revenueGrowth >= 0 ? <IconTrendingUp /> : <IconTrendingDown />}
+              {stats.revenueGrowth >= 0 ? "+" : ""}{stats.revenueGrowth}%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Real-time revenue <IconTrendingUp className="size-4" />
+            Recent performance {stats.revenueGrowth >= 0 ? <IconTrendingUp className="size-4" /> : <IconTrendingDown className="size-4" />}
           </div>
           <div className="text-muted-foreground">
-            Based on completed orders
+            Compared to previous 30 days
           </div>
         </CardFooter>
       </Card>
+      
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Total Orders</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.orders || 0}
+            {stats.orders}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <IconTrendingUp />
-              +{analytics?.orderGrowth || 0}%
+              {stats.orderGrowth >= 0 ? <IconTrendingUp /> : <IconTrendingDown />}
+              {stats.orderGrowth >= 0 ? "+" : ""}{stats.orderGrowth}%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Order volume <IconTrendingUp className="size-4" />
+             Volume tracking {stats.orderGrowth >= 0 ? <IconTrendingUp className="size-4" /> : <IconTrendingDown className="size-4" />}
           </div>
           <div className="text-muted-foreground">
-            Lifetime across all categories
+            Daily order flow
           </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Total Customers</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.customers || 0}
+            {stats.customers}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <IconTrendingUp />
-              +10%
+              <IconCircleCheckFilled className="size-3.5" />
+              Real
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Merchant network <IconTrendingUp className="size-4" />
+            Active audience <IconTrendingUp className="size-4" />
           </div>
-          <div className="text-muted-foreground">Unique checkout users</div>
+          <div className="text-muted-foreground text-xs">Unique registered shoppers</div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Average Order Value</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {formatCurrency(stats.revenue / (stats.orders || 1))}
+            {formatCurrency(aov)}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
               <IconTrendingUp />
-              +4.5%
+              Healthy
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance <IconTrendingUp className="size-4" />
+            Basket size <IconTrendingUp className="size-4" />
           </div>
-          <div className="text-muted-foreground">AOV across store</div>
+          <div className="text-muted-foreground text-xs">AOV performance indicator</div>
         </CardFooter>
       </Card>
     </div>

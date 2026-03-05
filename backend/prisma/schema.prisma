@@ -554,3 +554,27 @@ model MerchantCredentials {
   @@index([email])
   @@index([storeId])
 }
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+model Coupon {
+  id            String       @id @default(uuid())
+  storeId       String
+  code          String
+  type          DiscountType
+  value         Float
+  minOrderValue Float?
+  maxUses       Int?
+  usedCount     Int          @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([storeId, code])
+  @@index([storeId])
+  @@index([code])
+}

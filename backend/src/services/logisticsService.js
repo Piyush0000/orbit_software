@@ -1,21 +1,58 @@
 const axios = require('axios');
-const LogisticsProvider = require('../models/mongoose/LogisticsProvider');
+const fs = require('fs');
+const path = require('path');
 
 const STAGING_URL = 'https://capi-qc.fship.in';
 const PROD_URL = 'https://capi.fship.in';
 
+// ─── File-based config store (no MongoDB needed) ─────────────────────────────
+// Stores API keys in: backend/logistics_config.json
+const CONFIG_FILE = path.join(__dirname, '../../..', 'logistics_config.json');
+
+function readConfig() {
+  try {
+    if (fs.existsSync(CONFIG_FILE)) {
+      return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+    }
+  } catch (e) {
+    console.error('[FShip] Failed to read config file:', e.message);
+  }
+  return {};
+}
+
+function writeConfig(data) {
+  try {
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[FShip] Failed to write config file:', e.message);
+    throw e;
+  }
+}
+
+function getProviderConfig(storeId) {
+  const all = readConfig();
+  return all[storeId] || null;
+}
+
+function saveProviderConfig(storeId, apiKey, isStaging) {
+  const all = readConfig();
+  all[storeId] = { apiKey, isStaging, isActive: true, updatedAt: new Date().toISOString() };
+  writeConfig(all);
+  return all[storeId];
+}
+
 class FShipService {
   async getClient(storeId) {
-    const provider = await LogisticsProvider.findOne({ storeId, provider: 'FSHIP', isActive: true });
-    if (!provider) {
+    const provider = getProviderConfig(storeId);
+    if (!provider || !provider.isActive) {
       throw new Error('FShip logistics provider not configured or inactive for this store');
     }
 
-    const baseUrl = provider.config.isStaging ? STAGING_URL : PROD_URL;
+    const baseUrl = provider.isStaging ? STAGING_URL : PROD_URL;
     const signature = provider.apiKey;
 
     console.log(`[FShip Service] Store ID: ${storeId}`);
-    console.log(`[FShip Service] Environment: ${provider.config.isStaging ? 'Staging' : 'Production'}`);
+    console.log(`[FShip Service] Environment: ${provider.isStaging ? 'Staging' : 'Production'}`);
     console.log(`[FShip Service] Base URL: ${baseUrl}`);
     console.log(`[FShip Service] API Key length: ${signature?.length || 0}`);
     console.log(`[FShip Service] API Key (last 10 chars): ${signature ? '***' + signature.slice(-10) : 'NONE'}`);
@@ -27,18 +64,12 @@ class FShipService {
         'signature': signature
       }
     });
-    
-    // Store signature for endpoints that require prefix overrides
+
     client._signature = signature;
 
-    // Add request interceptor for debugging
     client.interceptors.request.use(
       config => {
         console.log(`[FShip Request] ${config.method?.toUpperCase()} ${config.url}`);
-        console.log(`[FShip Request] Headers:`, {
-          'Content-Type': config.headers['Content-Type'],
-          'signature': config.headers['signature'] ? '***' + config.headers['signature'].slice(-10) : 'NONE'
-        });
         return config;
       },
       error => {
@@ -47,7 +78,6 @@ class FShipService {
       }
     );
 
-    // Add response interceptor for debugging
     client.interceptors.response.use(
       response => {
         console.log(`[FShip API] ${response.config.method?.toUpperCase()} ${response.config.url} - Status: ${response.status}`);
@@ -63,34 +93,44 @@ class FShipService {
     return client;
   }
 
+  // ─── Provider Management (file-based, no MongoDB) ──────────────────────────
+
+  getStatus(storeId) {
+    const provider = getProviderConfig(storeId);
+    return {
+      success: true,
+      configured: !!provider,
+      active: provider?.isActive || false,
+      settings: provider ? {
+        apiKey: provider.apiKey,
+        isStaging: provider.isStaging ?? true
+      } : null
+    };
+  }
+
+  configure(storeId, apiKey, isStaging) {
+    const result = saveProviderConfig(storeId, apiKey, isStaging);
+    return { success: true, provider: result };
+  }
+
+  // ─── FShip API Methods ──────────────────────────────────────────────────────
+
   async getAllCouriers(storeId) {
     const client = await this.getClient(storeId);
     try {
       const response = await client.get('/api/getallcourier');
       console.log('[FShip] Couriers response:', JSON.stringify(response.data, null, 2));
-      console.log('[FShip] Response status:', response.status);
-      console.log('[FShip] Response headers:', response.headers);
-      
-      // Handle different response formats
       let couriersData;
       if (Array.isArray(response.data)) {
-        // Direct array response
         couriersData = { courier: response.data };
       } else if (response.data.courier) {
-        // Already in expected format
         couriersData = response.data;
       } else {
-        // Unexpected format
-        console.log('[FShip] Unexpected response format:', typeof response.data, response.data);
         couriersData = { courier: [] };
       }
-      
-      console.log('[FShip] Processed couriers data:', couriersData);
       return couriersData;
     } catch (error) {
       console.error('[FShip] Failed to fetch couriers:', error.response?.data || error.message);
-      console.error('[FShip] Error status:', error.response?.status);
-      console.error('[FShip] Error headers:', error.response?.headers);
       throw error;
     }
   }
@@ -98,21 +138,18 @@ class FShipService {
   async testConnection(storeId) {
     const client = await this.getClient(storeId);
     try {
-      // Test with a simple endpoint first
-      console.log('[FShip] Testing connection with rate calculator...');
       const testResponse = await client.post('/api/ratecalculator', {
-        "source_Pincode": "110001",
-        "destination_Pincode": "400001",
-        "payment_Mode": "PREPAID",
-        "amount": 1000,
-        "express_Type": "surface",
-        "shipment_Weight": 1,
-        "shipment_Length": 10,
-        "shipment_Width": 10,
-        "shipment_Height": 10,
-        "volumetric_Weight": 1
+        source_Pincode: '110001',
+        destination_Pincode: '400001',
+        payment_Mode: 'PREPAID',
+        amount: 1000,
+        express_Type: 'surface',
+        shipment_Weight: 1,
+        shipment_Length: 10,
+        shipment_Width: 10,
+        shipment_Height: 10,
+        volumetric_Weight: 1
       });
-      console.log('[FShip] Rate calculator test response:', testResponse.data);
       return { success: true, data: testResponse.data };
     } catch (error) {
       console.error('[FShip] Connection test failed:', error.response?.data || error.message);
@@ -160,6 +197,86 @@ class FShipService {
       return response.data;
     } catch (error) {
       console.error('[FShip] Failed to cancel order:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  async registerPickup(storeId, waybills) {
+    const client = await this.getClient(storeId);
+    try {
+      const response = await client.post('/api/registerpickup', { waybills });
+      return response.data;
+    } catch (error) {
+      console.error('[FShip] Failed to register pickup:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  async getShippingLabel(storeId, waybill) {
+    const client = await this.getClient(storeId);
+    try {
+      const response = await client.post('/api/shippinglabel', { waybill });
+      return response.data;
+    } catch (error) {
+      console.error('[FShip] Failed to get shipping label:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  async calculateRate(storeId, rateData) {
+    const client = await this.getClient(storeId);
+    try {
+      const response = await client.post('/api/ratecalculator', rateData);
+      return response.data;
+    } catch (error) {
+      console.error('[FShip] Failed to calculate rate:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  async checkPincodeServiceability(storeId, source_Pincode, destination_Pincode) {
+    const client = await this.getClient(storeId);
+    try {
+      const response = await client.post('/api/pincodeserviceability', {
+        source_Pincode,
+        destination_Pincode
+      });
+      return response.data;
+    } catch (error) {
+      console.error('[FShip] Failed to check pincode serviceability:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  async reattemptOrder(storeId, reattemptData) {
+    const client = await this.getClient(storeId);
+    try {
+      const response = await client.post('/api/reattemptorder', reattemptData);
+      return response.data;
+    } catch (error) {
+      console.error('[FShip] Failed to reattempt order:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  async addWarehouse(storeId, warehouseData) {
+    const client = await this.getClient(storeId);
+    try {
+      const response = await client.post('/api/AddWarehouse', warehouseData);
+      return response.data;
+    } catch (error) {
+      console.error('[FShip] Failed to add warehouse:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  async updateWarehouse(storeId, warehouseData) {
+    const client = await this.getClient(storeId);
+    try {
+      const response = await client.post('/api/UpdateWarehouse', warehouseData);
+      return response.data;
+    } catch (error) {
+      console.error('[FShip] Failed to update warehouse:', error.response?.data || error.message);
       throw error;
     }
   }
