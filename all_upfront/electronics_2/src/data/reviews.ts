@@ -69,12 +69,12 @@ export const reviews: Review[] = [
 ];
 
 // Helper to get reviews by product ID
-export const getReviewsByProductId = (productId: number) => {
+export const getReviewsByProductId = (productId: string | number) => {
     return reviews.filter(review => review.productId === productId);
 };
 
 // Helper to get rating stats
-export const getRatingStats = (productId: number) => {
+export const getRatingStats = (productId: string | number) => {
     const productReviews = getReviewsByProductId(productId);
     const total = productReviews.length;
     if (total === 0) return { average: 0, total: 0, breakdown: [0, 0, 0, 0, 0] };

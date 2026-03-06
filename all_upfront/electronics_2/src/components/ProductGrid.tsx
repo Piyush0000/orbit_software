@@ -87,7 +87,7 @@ export default function ProductGrid() {
       name: product.name,
       price: typeof product.price === 'string' ? product.price : `₹${product.price.toLocaleString()}`,
       priceNum: priceInINRNum,
-      image: product.image,
+      image: product.image || (product.images && product.images[0]) || 'https://via.placeholder.com/600',
       shortDescription: product.description,
     }, 1);
   };

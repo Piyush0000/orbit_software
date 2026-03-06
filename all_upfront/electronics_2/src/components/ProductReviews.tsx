@@ -5,7 +5,7 @@ import ReviewList from './reviews/ReviewList';
 import ProductQnA from './reviews/ProductQnA';
 
 interface ProductReviewsProps {
-    productId: number;
+    productId: string | number;
 }
 
 export default function ProductReviews({ productId }: ProductReviewsProps) {

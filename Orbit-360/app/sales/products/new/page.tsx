@@ -22,7 +22,7 @@ export default function NewProductPage() {
     name: "",
     description: "",
     price: "",
-    compareAtPrice: "",
+    sku: "",
     stock: "10",
     category: "",
     image: "",
@@ -48,7 +48,6 @@ export default function NewProductPage() {
       await createStoreProduct(activeStore.id, {
          ...formData,
          price: parseFloat(formData.price),
-         compareAtPrice: formData.compareAtPrice ? parseFloat(formData.compareAtPrice) : null,
          stock: parseInt(formData.stock, 10),
       });
       toast.success("Product created successfully!");
@@ -87,7 +86,7 @@ export default function NewProductPage() {
                 <Label htmlFor="name">Title *</Label>
                 <Input 
                    id="name" name="name" 
-                   value={formData.name} onChange={handleChange} 
+                   value={formData.name || ""} onChange={handleChange} 
                    placeholder="e.g. Vintage Leather Jacket" 
                 />
               </div>
@@ -95,7 +94,7 @@ export default function NewProductPage() {
                 <Label htmlFor="description">Description (optional)</Label>
                 <Textarea 
                    id="description" name="description" 
-                   value={formData.description} onChange={handleChange} 
+                   value={formData.description || ""} onChange={handleChange} 
                    placeholder="Write a detailed description..." 
                    rows={6}
                 />
@@ -114,16 +113,16 @@ export default function NewProductPage() {
                   <Label htmlFor="price">Price (₹) *</Label>
                   <Input 
                      id="price" name="price" type="number" 
-                     value={formData.price} onChange={handleChange} 
+                     value={formData.price || ""} onChange={handleChange} 
                      placeholder="0.00" 
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="compareAtPrice">Compare at Price (₹)</Label>
+                  <Label htmlFor="sku">SKU</Label>
                   <Input 
-                     id="compareAtPrice" name="compareAtPrice" type="number" 
-                     value={formData.compareAtPrice} onChange={handleChange} 
-                     placeholder="0.00" 
+                     id="sku" name="sku" 
+                     value={formData.sku || ""} onChange={handleChange} 
+                     placeholder="e.g. PROD-001" 
                   />
                 </div>
               </div>
@@ -140,7 +139,7 @@ export default function NewProductPage() {
                 <Label htmlFor="image">Image URL</Label>
                 <Input 
                    id="image" name="image" 
-                   value={formData.image} onChange={handleChange} 
+                   value={formData.image || ""} onChange={handleChange} 
                    placeholder="https://example.com/image.jpg" 
                 />
                 <p className="text-[10px] text-muted-foreground">Paste a direct link to your product image.</p>
@@ -159,7 +158,7 @@ export default function NewProductPage() {
                 <Label htmlFor="stock">Quantity in Stock *</Label>
                 <Input 
                    id="stock" name="stock" type="number" 
-                   value={formData.stock} onChange={handleChange} 
+                   value={formData.stock || ""} onChange={handleChange} 
                 />
               </div>
             </CardContent>
@@ -174,7 +173,7 @@ export default function NewProductPage() {
                 <Label htmlFor="category">Category *</Label>
                 <Input 
                    id="category" name="category" 
-                   value={formData.category} onChange={handleChange} 
+                   value={formData.category || ""} onChange={handleChange} 
                    placeholder="e.g. Clothing" 
                 />
               </div>

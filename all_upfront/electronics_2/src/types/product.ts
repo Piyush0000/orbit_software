@@ -1,5 +1,5 @@
 export interface Product {
-    id: number;
+    id: string | number;
     name: string;
     price: string;
     priceNum: number;
@@ -27,8 +27,8 @@ export interface Product {
 }
 
 export interface Review {
-    id: number;
-    productId: number;
+    id: string | number;
+    productId: string | number;
     userName: string;
     rating: number; // 1-5
     title: string;
@@ -41,15 +41,15 @@ export interface Review {
 }
 
 export interface Answer {
-    id: number;
+    id: string | number;
     user: string; // "Seller" or user name
     text: string;
     date: Date;
 }
 
 export interface Question {
-    id: number;
-    productId: number;
+    id: string | number;
+    productId: string | number;
     user: string;
     text: string;
     date: Date;
@@ -57,7 +57,7 @@ export interface Question {
 }
 
 export interface CartItem {
-    id: number;
+    id: string | number;
     name: string;
     price: string;
     priceNum: number; // Numeric price for calculations

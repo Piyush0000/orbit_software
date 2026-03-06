@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useStoreContext } from '@/contexts/store-context';
 import { StorefrontAPI } from '@/lib/api';
 
@@ -143,25 +145,36 @@ export default function FeaturedProducts() {
                    </div>
                 )}
 
-                <img
+                <Image
                   src={product.image || (product.images && product.images[0]) || 'https://via.placeholder.com/600'}
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text)' }}>{product.name}</h3>
+                <Link href={`/products/${product.id}`} onClick={(e) => isEditor && e.preventDefault()}>
+                  <h3 className="text-xl font-semibold mb-2 hover:text-[var(--accent-blue)] transition-colors" style={{ color: 'var(--text)' }}>
+                    {product.name}
+                  </h3>
+                </Link>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-2xl font-bold neon-text-blue" style={{ color: 'var(--text)' }}>
-                    ₹{product.price?.toLocaleString()}
+                    ₹{typeof product.price === 'number' ? product.price.toLocaleString() : product.price}
                   </span>
                   {product.originalPrice && (
-                    <span className="text-sm line-through text-gray-500">₹{product.originalPrice?.toLocaleString()}</span>
+                    <span className="text-sm line-through text-gray-500">
+                      ₹{typeof product.originalPrice === 'number' ? product.originalPrice.toLocaleString() : product.originalPrice}
+                    </span>
                   )}
                 </div>
-                <button className="w-full px-6 py-3 rounded font-bold transition-all hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:scale-[1.02] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)]">
+                <Link 
+                  href={`/products/${product.id}`}
+                  onClick={(e) => isEditor && e.preventDefault()}
+                  className="block w-full px-6 py-3 rounded font-bold text-center transition-all hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:scale-[1.02] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)]"
+                >
                   Shop Now
-                </button>
+                </Link>
               </div>
             </div>
           ))}

@@ -51,6 +51,6 @@ export const questions: Question[] = [
     }
 ];
 
-export const getQuestionsByProductId = (productId: number) => {
+export const getQuestionsByProductId = (productId: string | number) => {
     return questions.filter(q => q.productId === productId);
 };

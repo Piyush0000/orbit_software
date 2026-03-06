@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/store/cartStore';
 import ProductReviews from '@/components/ProductReviews';
 import { StorefrontAPI } from '@/lib/api';
@@ -87,7 +88,7 @@ export default function ProductDetail({ productId }: { productId: number | strin
       name: product.name,
       price: displayPrice,
       priceNum: priceNum,
-      image: product.images ? product.images[0] : product.image,
+      image: (product.images && product.images.length > 0) ? product.images[0] : (product.image || 'https://via.placeholder.com/600'),
       shortDescription: product.shortDescription,
     }, quantity);
 
@@ -128,10 +129,11 @@ export default function ProductDetail({ productId }: { productId: number | strin
             <div className="mb-6 rounded-2xl overflow-hidden border relative group shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,240,255,0.1)]" style={{ borderColor: 'var(--card-border)' }}>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05),_transparent_70%)] z-0 pointer-events-none"></div>
               <div className="aspect-square bg-black relative z-10">
-                <img
-                  src={product.images ? product.images[selectedImageIndex] : product.image}
+                <Image
+                  src={(product.images && product.images.length > 0) ? product.images[selectedImageIndex] : (product.image || 'https://via.placeholder.com/600')}
                   alt={`${product.name} - View ${selectedImageIndex + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
             </div>
@@ -158,10 +160,11 @@ export default function ProductDetail({ productId }: { productId: number | strin
 
                 >
                   <div className="w-20 h-20 sm:w-24 sm:h-24">
-                    <img
-                      src={image}
+                    <Image
+                      src={image || 'https://via.placeholder.com/600'}
                       alt={`${product.name} thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   </div>
                 </button>
