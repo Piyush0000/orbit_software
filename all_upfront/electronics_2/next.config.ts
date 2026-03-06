@@ -25,6 +25,22 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'i.pravatar.cc',
       },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'encrypted-tbn0.gstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'm.media-amazon.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'rukminim2.flixcart.com',
+      },
     ],
   },
 };

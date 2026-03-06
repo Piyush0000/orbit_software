@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { ChevronLeft, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 export default function NewProductPage() {
   const { activeStore } = useAuth();
@@ -24,6 +25,8 @@ export default function NewProductPage() {
     compareAtPrice: "",
     stock: "10",
     category: "",
+    image: "",
+    isFeatured: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -44,6 +47,9 @@ export default function NewProductPage() {
     try {
       await createStoreProduct(activeStore.id, {
          ...formData,
+         price: parseFloat(formData.price),
+         compareAtPrice: formData.compareAtPrice ? parseFloat(formData.compareAtPrice) : null,
+         stock: parseInt(formData.stock, 10),
       });
       toast.success("Product created successfully!");
       router.push("/sales/products");
@@ -123,6 +129,24 @@ export default function NewProductPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Media</CardTitle>
+              <CardDescription>Product images and visuals</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="image">Image URL</Label>
+                <Input 
+                   id="image" name="image" 
+                   value={formData.image} onChange={handleChange} 
+                   placeholder="https://example.com/image.jpg" 
+                />
+                <p className="text-[10px] text-muted-foreground">Paste a direct link to your product image.</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-6">
@@ -152,6 +176,26 @@ export default function NewProductPage() {
                    id="category" name="category" 
                    value={formData.category} onChange={handleChange} 
                    placeholder="e.g. Clothing" 
+                />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between space-x-2">
+                <Label htmlFor="isFeatured" className="flex flex-col space-y-1">
+                  <span>Featured Product</span>
+                  <span className="font-normal text-xs text-muted-foreground">
+                    Display this product in your storefront's featured section.
+                  </span>
+                </Label>
+                <Switch 
+                  id="isFeatured" 
+                  checked={formData.isFeatured}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isFeatured: checked }))}
                 />
               </div>
             </CardContent>
