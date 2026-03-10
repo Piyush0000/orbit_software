@@ -11,7 +11,7 @@ export function SiteHeader() {
   // Helper function to generate title from pathname
   const getTitle = (path: string) => {
     // Handle root path
-    if (path === "/" || path === "") return "Dashboard";
+    if (path === "/" || path === "") return "Summary";
 
     // Remove query params if any
     const pathWithoutQuery = path.split("?")[0];
@@ -21,7 +21,7 @@ export function SiteHeader() {
       .split("/")
       .filter((segment) => segment.length > 0);
 
-    if (segments.length === 0) return "Dashboard";
+    if (segments.length === 0) return "Summary";
 
     // Get the last segment
     const lastSegment = segments[segments.length - 1];
