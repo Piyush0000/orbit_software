@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
 import { Product } from '@/types/product';
 import { usdToInr, parseINRToNumber } from '@/lib/utils';
-import { products as allProducts } from '@/data/products';
+import { StorefrontAPI } from '@/lib/api';
+import { Loader2 } from 'lucide-react';
 
 // Define filter state locally
 interface FilterState {
@@ -18,6 +19,8 @@ interface FilterState {
 }
 
 export default function ProductGrid() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     category: [],
     brand: [],
@@ -30,8 +33,31 @@ export default function ProductGrid() {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
-  const categories = ['Audio', 'Wearables', 'Accessories', 'Computers'];
-  const brands = ['Premium', 'Smart', 'Wireless', 'Pro', 'Elite'];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await StorefrontAPI.getProducts({ limit: 100 });
+        setProducts(data.products || []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const categories = useMemo(() => {
+    const cats = new Set(products.map(p => p.category));
+    return Array.from(cats).filter(Boolean);
+  }, [products]);
+
+  const brands = useMemo(() => {
+    const b = new Set(products.map(p => p.brand));
+    return Array.from(b).filter(Boolean);
+  }, [products]);
+
   const prices = ['₹0 - ₹4,000', '₹4,000 - ₹8,000', '₹8,000 - ₹16,000', '₹16,000+'];
   const availability = ['In Stock', 'Out of Stock'];
 
@@ -55,20 +81,20 @@ export default function ProductGrid() {
   };
 
   const handleAddToCart = (product: Product) => {
-    const priceInINRNum = parseINRToNumber(product.price);
+    const priceInINRNum = typeof product.price === 'number' ? product.price : parseINRToNumber(product.price);
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: typeof product.price === 'string' ? product.price : `₹${product.price.toLocaleString()}`,
       priceNum: priceInINRNum,
-      image: product.image,
+      image: product.image || (product.images && product.images[0]) || 'https://via.placeholder.com/600',
       shortDescription: product.description,
     }, 1);
   };
 
   // Derive filtered and sorted products
   const displayedProducts = useMemo(() => {
-    let filtered = [...allProducts];
+    let filtered = [...products];
 
     // 1. Search Filtering
     if (searchQuery.trim()) {
@@ -76,8 +102,8 @@ export default function ProductGrid() {
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(query) ||
         product.description.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query) ||
-        product.brand.toLowerCase().includes(query)
+        product.category?.toLowerCase().includes(query) ||
+        product.brand?.toLowerCase().includes(query)
       );
     }
 
@@ -102,7 +128,7 @@ export default function ProductGrid() {
     // Price
     if (activeFilters.price.length > 0) {
       filtered = filtered.filter(p => {
-        const priceInINR = usdToInr(p.priceNum);
+        const priceInINR = typeof p.price === 'number' ? p.price : parseINRToNumber(p.price);
         return activeFilters.price.some(range => {
           if (range === '₹0 - ₹4,000') return priceInINR <= 4000;
           if (range === '₹4,000 - ₹8,000') return priceInINR > 4000 && priceInINR <= 8000;
@@ -115,13 +141,16 @@ export default function ProductGrid() {
 
     // 3. Sorting
     filtered.sort((a, b) => {
+      const priceA = typeof a.price === 'number' ? a.price : parseINRToNumber(a.price);
+      const priceB = typeof b.price === 'number' ? b.price : parseINRToNumber(b.price);
+      
       switch (sortBy) {
         case 'price_low':
-          return a.priceNum - b.priceNum;
+          return priceA - priceB;
         case 'price_high':
-          return b.priceNum - a.priceNum;
+          return priceB - priceA;
         case 'newest':
-          return (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);
+          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
         case 'popular':
         default:
           return (b.popularity || 0) - (a.popularity || 0);
@@ -129,7 +158,31 @@ export default function ProductGrid() {
     });
 
     return filtered;
-  }, [activeFilters, searchQuery, sortBy]);
+  }, [products, activeFilters, searchQuery, sortBy]);
+
+  const isEditor = typeof window !== 'undefined' && window.parent !== window;
+
+  const handleImageClick = (e: React.MouseEvent, productId: any) => {
+    if (isEditor) {
+      e.preventDefault();
+      e.stopPropagation();
+      window.parent.postMessage({ type: 'ORBIT_PRODUCT_IMAGE_CLICK', productId }, '*');
+    }
+  };
+
+  const handleAddProduct = () => {
+    if (isEditor) {
+      window.parent.postMessage({ type: 'ORBIT_ADD_PRODUCT_CLICK', sectionId: 'productGrid' }, '*');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-20 flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-10 w-10 animate-spin text-[var(--accent-blue)]" />
+      </div>
+    );
+  }
 
   return (
     <section
@@ -147,6 +200,7 @@ export default function ProductGrid() {
           </p>
 
           {/* Search, Sort, and Filter Controls */}
+          {/* ... existing controls ... */}
           <div className="flex flex-col gap-4 mb-8">
             <div className="flex flex-col md:flex-row gap-4">
               {/* Search Bar */}
@@ -322,7 +376,7 @@ export default function ProductGrid() {
 
         {/* Product Grid - Full Width */}
         <div className="w-full">
-          {displayedProducts.length === 0 ? (
+          {displayedProducts.length === 0 && !isEditor ? (
             <div className="text-center py-20 rounded-lg border border-dashed glass" style={{ borderColor: 'var(--card-border)' }}>
               <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -340,91 +394,124 @@ export default function ProductGrid() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {displayedProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="rounded-xl overflow-hidden hover:shadow-[0_0_20px_rgba(0,240,255,0.15)] transition-all duration-300 border flex flex-col group relative glass"
-                  style={{ borderColor: 'var(--card-border)' }}
-                >
-                  <Link href={`/products/${product.id}`}>
-                    <div className="aspect-square bg-[#050505] overflow-hidden cursor-pointer relative">
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              {displayedProducts.map((product) => {
+                const displayPrice = typeof product.price === 'string' ? product.price : `₹${Number(product.price).toLocaleString()}`;
+                const displayOriginalPrice = product.originalPrice ? (typeof product.originalPrice === 'string' ? product.originalPrice : `₹${Number(product.originalPrice).toLocaleString()}`) : null;
+                
+                return (
+                  <div
+                    key={product.id}
+                    className="rounded-xl overflow-hidden hover:shadow-[0_0_20px_rgba(0,240,255,0.15)] transition-all duration-300 border flex flex-col group relative glass"
+                    style={{ borderColor: 'var(--card-border)' }}
+                  >
+                    <Link href={`/products/${product.id}`} onClick={(e) => isEditor && e.preventDefault()}>
+                      <div className="aspect-square bg-[#050505] overflow-hidden cursor-pointer relative" onClick={(e) => isEditor && handleImageClick(e, product.id)}>
+                        <Image
+                          src={product.image || (product.images && product.images[0]) || 'https://via.placeholder.com/600'}
+                          alt={product.name}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                      {!product.stock && (
-                        <div className="absolute top-2 right-2 bg-red-600/90 backdrop-blur text-white text-xs font-bold px-2 py-1 rounded z-10">
-                          OUT OF STOCK
-                        </div>
-                      )}
-                      {product.discount && (
-                        <div className="absolute top-2 left-2 bg-[var(--accent-green)] text-black text-xs font-bold px-2 py-1 rounded z-10 shadow-[0_0_10px_rgba(0,255,148,0.5)]">
-                          {product.discount}% OFF
-                        </div>
-                      )}
+                        {isEditor && (
+                          <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                             <button className="bg-[var(--accent-blue)] text-black px-4 py-2 text-xs font-bold rounded uppercase tracking-tighter shadow-lg">
+                                Change Image
+                             </button>
+                          </div>
+                        )}
 
-                      {/* Quick Actions Overlay */}
-                      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                        {!product.stock && (
+                          <div className="absolute top-2 right-2 bg-red-600/90 backdrop-blur text-white text-xs font-bold px-2 py-1 rounded z-10">
+                            OUT OF STOCK
+                          </div>
+                        )}
+                        {product.discount && (
+                          <div className="absolute top-2 left-2 bg-[var(--accent-green)] text-black text-xs font-bold px-2 py-1 rounded z-10 shadow-[0_0_10px_rgba(0,255,148,0.5)]">
+                            {product.discount}% OFF
+                          </div>
+                        )}
+
+                        {/* Quick Actions Overlay */}
+                        {!isEditor && (
+                          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (isInWishlist(product.id)) {
+                                  removeFromWishlist(product.id);
+                                } else {
+                                  addToWishlist(product);
+                                }
+                              }}
+                              className="p-2 bg-black/50 backdrop-blur text-white rounded-full hover:bg-[var(--accent-purple)] hover:text-white transition-colors border border-white/10"
+                              title="Add to Wishlist"
+                            >
+                              <svg
+                                className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-[var(--accent-purple)] text-[var(--accent-purple)]' : ''}`}
+                                fill={isInWishlist(product.id) ? "currentColor" : "none"}
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                    <div className="p-5 flex-grow flex flex-col">
+                      <div className="mb-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded bg-white/5 text-[var(--accent-cyan)] border border-white/5">
+                          {product.category}
+                        </span>
+                      </div>
+                      <Link href={`/products/${product.id}`} onClick={(e) => isEditor && e.preventDefault()}>
+                        <h3 className="text-lg font-bold mb-1 hover:text-[var(--accent-blue)] transition-colors cursor-pointer line-clamp-1" style={{ color: 'var(--text)' }}>{product.name}</h3>
+                      </Link>
+                      <div className="flex items-center gap-1 mb-3">
+                        <div className="flex items-center text-[var(--accent-purple)]">
+                          <span className="text-sm">★</span>
+                          <span className="text-xs font-medium text-[var(--text-muted)] ml-1">{product.rating || 'N/A'}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between gap-2 mt-auto pt-4 border-t border-white/5">
+                        <div className="flex flex-col">
+                          <span className="text-xl font-bold neon-text-blue" style={{ color: 'var(--text)' }}>{displayPrice}</span>
+                          {displayOriginalPrice && <span className="text-xs line-through text-[var(--text-muted)]">{displayOriginalPrice}</span>}
+                        </div>
                         <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (isInWishlist(product.id)) {
-                              removeFromWishlist(product.id);
-                            } else {
-                              addToWishlist(product);
-                            }
-                          }}
-                          className="p-2 bg-black/50 backdrop-blur text-white rounded-full hover:bg-[var(--accent-purple)] hover:text-white transition-colors border border-white/10"
-                          title="Add to Wishlist"
+                          onClick={() => !isEditor && handleAddToCart(product)}
+                          disabled={!product.stock || isEditor}
+                          className="px-4 py-2 rounded font-bold transition-all hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:scale-105 text-sm disabled:opacity-50 disabled:cursor-not-allowed bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)]"
                         >
-                          <svg
-                            className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-[var(--accent-purple)] text-[var(--accent-purple)]' : ''}`}
-                            fill={isInWishlist(product.id) ? "currentColor" : "none"}
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                          </svg>
+                          {isEditor ? 'Product Card' : 'Add'}
                         </button>
                       </div>
                     </div>
-                  </Link>
-                  <div className="p-5 flex-grow flex flex-col">
-                    <div className="mb-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded bg-white/5 text-[var(--accent-cyan)] border border-white/5">
-                        {product.category}
-                      </span>
-                    </div>
-                    <Link href={`/products/${product.id}`}>
-                      <h3 className="text-lg font-bold mb-1 hover:text-[var(--accent-blue)] transition-colors cursor-pointer line-clamp-1" style={{ color: 'var(--text)' }}>{product.name}</h3>
-                    </Link>
-                    <div className="flex items-center gap-1 mb-3">
-                      <div className="flex items-center text-[var(--accent-purple)]">
-                        <span className="text-sm">★</span>
-                        <span className="text-xs font-medium text-[var(--text-muted)] ml-1">{product.rating}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-2 mt-auto pt-4 border-t border-white/5">
-                      <div className="flex flex-col">
-                        <span className="text-xl font-bold neon-text-blue" style={{ color: 'var(--text)' }}>{product.price}</span>
-                        {product.originalPrice && <span className="text-xs line-through text-[var(--text-muted)]">{product.originalPrice}</span>}
-                      </div>
-                      <button
-                        onClick={() => handleAddToCart(product)}
-                        disabled={!product.stock}
-                        className="px-4 py-2 rounded font-bold transition-all hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:scale-105 text-sm disabled:opacity-50 disabled:cursor-not-allowed bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)]"
-                      >
-                        Add
-                      </button>
-                    </div>
                   </div>
+                );
+              })}
+
+              {/* Add Product Placeholder for Editor */}
+              {isEditor && (
+                <div 
+                  onClick={handleAddProduct}
+                  className="rounded-xl border-2 border-dashed border-white/20 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center justify-center p-8 group cursor-pointer aspect-square sm:aspect-auto h-full min-h-[300px]"
+                >
+                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center mb-6 group-hover:border-[var(--accent-blue)] group-hover:scale-110 transition-all">
+                     <span className="text-4xl text-white/40 group-hover:text-[var(--accent-blue)] transition-colors">+</span>
+                  </div>
+                  <h3 className="text-lg font-bold uppercase tracking-widest text-white/40 group-hover:text-white transition-colors text-center">
+                    Add New Product
+                  </h3>
+                  <p className="text-xs text-white/30 text-center mt-2 group-hover:text-white/60 transition-colors">
+                    Click to add a product to your inventory
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
           )}
           {/* Results Count */}

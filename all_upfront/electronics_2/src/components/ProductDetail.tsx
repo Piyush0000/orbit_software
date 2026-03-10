@@ -1,17 +1,53 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/store/cartStore';
-import { products } from '@/data/products';
 import ProductReviews from '@/components/ProductReviews';
+import { StorefrontAPI } from '@/lib/api';
+import { Product } from '@/types/product';
+import { parseINRToNumber } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
-export default function ProductDetail({ productId }: { productId: number }) {
-  const product = products.find(p => p.id === productId);
-
-  // Move hooks before the early return to comply with Rules of Hooks
+export default function ProductDetail({ productId }: { productId: number | string }) {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [showCartMessage, setShowCartMessage] = useState(false);
+
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        setLoading(true);
+        const data = await StorefrontAPI.getProduct(productId);
+        setProduct(data);
+
+        // Fetch related products (same category)
+        if (data?.category) {
+          const related = await StorefrontAPI.getProducts({ 
+            category: data.category,
+            limit: 5 
+          });
+          setRelatedProducts(related.products.filter((p: Product) => p.id !== data.id).slice(0, 4));
+        }
+      } catch (error) {
+        console.error('Error loading product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProduct();
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-[var(--accent-blue)]" />
+      </div>
+    );
+  }
 
   // Safety check
   if (!product) {
@@ -28,9 +64,14 @@ export default function ProductDetail({ productId }: { productId: number }) {
     );
   }
 
-  // Extract numeric price from string (remove ₹ and commas)
-  // Handle cases like "₹3,999" -> 3999, "₹12,449" -> 12449
-  const priceNum = parseInt(product.price.replace(/[₹,\s]/g, ''), 10) || 0;
+  // Extract numeric price
+  const priceNum = typeof product.price === 'number' 
+    ? product.price 
+    : (parseInt(product.price?.toString().replace(/[₹,\s]/g, ''), 10) || 0);
+  
+  const displayPrice = typeof product.price === 'string' 
+    ? product.price 
+    : (product.price ? `₹${Number(product.price).toLocaleString()}` : 'N/A');
 
   const handleQuantityChange = (delta: number) => {
     setQuantity(prev => {
@@ -45,9 +86,9 @@ export default function ProductDetail({ productId }: { productId: number }) {
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: displayPrice,
       priceNum: priceNum,
-      image: product.images ? product.images[0] : product.image,
+      image: (product.images && product.images.length > 0) ? product.images[0] : (product.image || 'https://via.placeholder.com/600'),
       shortDescription: product.shortDescription,
     }, quantity);
 
@@ -59,19 +100,6 @@ export default function ProductDetail({ productId }: { productId: number }) {
     // UI only - no backend logic
     alert(`Buy Now: ${quantity} x ${product.name}`);
   };
-
-  // Logic for Related Products:
-  // 1. Filter out current product
-  // 2. Match Category OR Tags
-  // 3. Limit to 4 suggestions
-  const relatedProducts = products
-    .filter(p => {
-      if (p.id === product.id) return false;
-      const sameCategory = p.category === product.category;
-      const matchingTags = p.tags?.some(tag => product.tags?.includes(tag));
-      return sameCategory || matchingTags;
-    })
-    .slice(0, 4);
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8">
@@ -101,10 +129,11 @@ export default function ProductDetail({ productId }: { productId: number }) {
             <div className="mb-6 rounded-2xl overflow-hidden border relative group shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,240,255,0.1)]" style={{ borderColor: 'var(--card-border)' }}>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05),_transparent_70%)] z-0 pointer-events-none"></div>
               <div className="aspect-square bg-black relative z-10">
-                <img
-                  src={product.images ? product.images[selectedImageIndex] : product.image}
+                <Image
+                  src={(product.images && product.images.length > 0) ? product.images[selectedImageIndex] : (product.image || 'https://via.placeholder.com/600')}
                   alt={`${product.name} - View ${selectedImageIndex + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
             </div>
@@ -131,10 +160,11 @@ export default function ProductDetail({ productId }: { productId: number }) {
 
                 >
                   <div className="w-20 h-20 sm:w-24 sm:h-24">
-                    <img
-                      src={image}
+                    <Image
+                      src={image || 'https://via.placeholder.com/600'}
                       alt={`${product.name} thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   </div>
                 </button>
@@ -152,22 +182,26 @@ export default function ProductDetail({ productId }: { productId: number }) {
             <div className="mb-6">
               <div className="flex items-center gap-4 mb-2">
                 <span className="text-3xl font-bold" style={{ color: 'var(--text)' }}>
-                  {product.price}
+                  {displayPrice}
                 </span>
-                <span className="text-xl line-through" style={{ color: 'var(--text-muted)' }}>
-                  {product.originalPrice}
-                </span>
-                <span
-                  className="px-3 py-1 rounded text-sm font-bold bg-[var(--accent-green)] text-black shadow-[0_0_10px_rgba(0,255,148,0.4)]"
-                >
-                  {product.discount}% OFF
-                </span>
+                {product.originalPrice && (
+                  <span className="text-xl line-through" style={{ color: 'var(--text-muted)' }}>
+                    {typeof product.originalPrice === 'string' ? product.originalPrice : `₹${Number(product.originalPrice).toLocaleString()}`}
+                  </span>
+                )}
+                {product.discount && (
+                  <span
+                    className="px-3 py-1 rounded text-sm font-bold bg-[var(--accent-green)] text-black shadow-[0_0_10px_rgba(0,255,148,0.4)]"
+                  >
+                    {product.discount}% OFF
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Short Description */}
             <p className="text-lg mb-6" style={{ color: 'var(--text-muted)' }}>
-              {product.shortDescription}
+              {product.shortDescription || product.description}
             </p>
 
             {/* Quantity Selector */}

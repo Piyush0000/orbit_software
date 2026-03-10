@@ -53,7 +53,7 @@ const data = {
   ],
   navMain: [
     {
-      title: "Dashboard",
+      title: "Summary",
       url: "#",
       icon: LayoutDashboard,
       isActive: true,
@@ -175,7 +175,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [activeTeam, setActiveTeam] = React.useState(data.teams[0]);
   const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({
-    Dashboard: true,
+    Summary: true,
   });
 
   const toggleItem = (title: string) => {

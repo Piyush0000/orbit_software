@@ -2,13 +2,14 @@
 
 import { useCart } from '@/store/cartStore';
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatINR } from '@/lib/utils';
 
 export default function Cart() {
   const { cartItems, updateQuantity, removeFromCart, getSubtotal, discount, promoCode, applyPromoCode, removePromoCode } = useCart();
   const subtotal = getSubtotal();
 
-  const handleQuantityChange = (id: number, delta: number) => {
+  const handleQuantityChange = (id: string | number, delta: number) => {
     const item = cartItems.find((item) => item.id === id);
     if (item) {
       const newQuantity = item.quantity + delta;
@@ -104,10 +105,11 @@ export default function Cart() {
                     {/* Left: Product Image */}
                     <Link href={`/products/${item.id}`} className="flex-shrink-0">
                       <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden border bg-gray-100">
-                        <img
-                          src={item.image}
+                        <Image
+                          src={item.image || 'https://via.placeholder.com/600'}
                           alt={item.name}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          fill
+                          className="object-cover hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     </Link>

@@ -54,7 +54,7 @@ const data = {
   ],
   navMain: [
     {
-      title: "Dashboard",
+      title: "Summary",
       url: "/",
       icon: LayoutDashboard,
       isActive: true,
@@ -71,6 +71,10 @@ const data = {
         {
           title: "Navigation",
           url: "/storefront/navigation",
+        },
+        {
+          title: "Coupons & Discounts",
+          url: "/storefront/coupons",
         },
         {
           title: "Preview Store",
@@ -124,6 +128,14 @@ const data = {
         {
           title: "Tracking",
           url: "/logistics/tracking",
+        },
+        {
+          title: "Rate Calculator",
+          url: "/logistics/rate-calculator",
+        },
+        {
+          title: "Pincode Check",
+          url: "/logistics/pincode",
         },
         {
           title: "Returns",

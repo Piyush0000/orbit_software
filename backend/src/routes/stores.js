@@ -49,7 +49,7 @@ router.get('/:id/analytics', auth, rbac([ROLES.MERCHANT, ROLES.ADMIN]), storeAna
 router.get('/:id/activity', auth, rbac([ROLES.MERCHANT, ROLES.ADMIN]), getActivityLogs);
 router.get('/:id/customers', auth, rbac([ROLES.MERCHANT, ROLES.ADMIN]), getCustomers);
 router.get('/:id/settings', auth, getSettings);
-router.put('/:id/settings', auth, updateSettings);
+router.patch('/:id/settings', auth, updateSettings);
 
 // Customization Routes
 const { getCustomization, updateCustomization } = require('../controllers/storeController');
