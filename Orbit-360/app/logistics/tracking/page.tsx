@@ -52,31 +52,40 @@ export default function TrackingPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-8 p-6 lg:p-10 max-w-5xl mx-auto w-full">
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">Shipment Tracking</h1>
-        <p className="text-muted-foreground">
-          Track the real-time status of your forward and reverse orders.
-        </p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-sky-500/10 rounded-xl">
+            <Search className="size-5 text-sky-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Shipment Tracking</h1>
+            <p className="text-sm text-muted-foreground">Track the real-time status of your forward and reverse orders.</p>
+          </div>
+        </div>
       </div>
 
-      <Card className="border-primary/10 shadow-sm">
-        <CardHeader className="bg-primary/5 pb-6 border-b border-primary/10">
+      <Card className="overflow-hidden border-none shadow-xl bg-card/50 backdrop-blur-sm ring-1 ring-border mt-2">
+        <div className="h-1.5 w-full bg-gradient-to-r from-sky-400 to-blue-600" />
+        <CardHeader className="pb-4">
           <CardTitle className="text-xl flex items-center gap-2">
-            <Search className="size-5 text-primary" /> Track by AWB
+            Track by AWB
           </CardTitle>
           <CardDescription>
             Enter your FShip Waybill Number to get the complete tracking timeline.
           </CardDescription>
         </CardHeader>
-        <CardContent className="pt-6">
-          <form onSubmit={handleTrack} className="flex gap-4">
-            <Input
-              value={waybill}
-              onChange={(e) => setWaybill(e.target.value)}
-              placeholder="e.g. 143455210101006"
-              className="max-w-md font-mono text-lg py-6"
-            />
-            <Button type="submit" size="lg" className="px-8 h-auto" disabled={loading}>
+        <CardContent className="pb-8">
+          <form onSubmit={handleTrack} className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Input
+                value={waybill}
+                onChange={(e) => setWaybill(e.target.value)}
+                placeholder="e.g. 143455210101006"
+                className="pl-10 font-mono text-lg py-6 bg-background/50 border-input transition-all focus:ring-2 focus:ring-sky-500/20"
+              />
+            </div>
+            <Button type="submit" size="lg" className="px-8 h-auto font-bold bg-sky-600 hover:bg-sky-700 shadow-lg shadow-sky-600/20 transition-all active:scale-95" disabled={loading}>
               {loading ? <Loader2 className="size-5 animate-spin mr-2" /> : <Truck className="size-5 mr-2" />}
               Track Order
             </Button>

@@ -1,21 +1,14 @@
+import React from "react";
 import {
-  IconTrendingDown,
-  IconTrendingUp,
-  IconShoppingCart,
-  IconPackage,
-  IconTruckDelivery,
-  IconCreditCardRefund,
-} from "@tabler/icons-react";
-
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  ShoppingCart,
+  Package,
+  Truck,
+  XCircle,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  CheckCircle2,
+} from "lucide-react";
 
 interface OrdersCardsProps {
   orders?: any[];
@@ -23,99 +16,86 @@ interface OrdersCardsProps {
 
 export const OrdersCards: React.FC<OrdersCardsProps> = ({ orders = [] }) => {
   const safeOrders = Array.isArray(orders) ? orders : [];
-  
+
   const totalOrders = safeOrders.length;
-  const pendingOrders = safeOrders.filter(o => o.status === 'PENDING' || o.status === 'PROCESSING').length;
+  const pendingOrders = safeOrders.filter(o => o.status === "PENDING" || o.status === "PROCESSING").length;
   const shippedToday = safeOrders.filter(o => {
-    const today = new Date().toISOString().split('T')[0];
-    return o.status === 'SHIPPED' && o.createdAt?.startsWith(today);
+    const today = new Date().toISOString().split("T")[0];
+    return o.status === "SHIPPED" && o.createdAt?.startsWith(today);
   }).length;
-  const refunds = safeOrders.filter(o => o.status === 'REFUNDED' || o.status === 'CANCELLED').length;
+  const refunds = safeOrders.filter(o => o.status === "REFUNDED" || o.status === "CANCELLED").length;
+  const confirmed = safeOrders.filter(o => o.status === "CONFIRMED" || o.status === "DELIVERED").length;
+
+  const metrics = [
+    {
+      label: "Total Orders",
+      value: totalOrders,
+      sub: "All time volume",
+      icon: ShoppingCart,
+      iconBg: "bg-blue-500/10",
+      iconColor: "text-blue-600",
+      topStrip: "bg-gradient-to-r from-blue-400 to-cyan-500",
+      trend: <span className="flex items-center gap-1 text-emerald-600 text-[11px] font-semibold"><TrendingUp className="size-3" /> Lifetime</span>,
+    },
+    {
+      label: "Pending Fulfillment",
+      value: pendingOrders,
+      sub: "Awaiting dispatch",
+      icon: Clock,
+      iconBg: "bg-amber-500/10",
+      iconColor: "text-amber-600",
+      topStrip: "bg-gradient-to-r from-amber-400 to-orange-500",
+      trend: pendingOrders > 0
+        ? <span className="flex items-center gap-1 text-amber-600 text-[11px] font-semibold"><TrendingDown className="size-3" /> Needs action</span>
+        : <span className="flex items-center gap-1 text-emerald-600 text-[11px] font-semibold"><CheckCircle2 className="size-3" /> All clear</span>,
+    },
+    {
+      label: "Shipped Today",
+      value: shippedToday,
+      sub: "Dispatched from facility",
+      icon: Truck,
+      iconBg: "bg-indigo-500/10",
+      iconColor: "text-indigo-600",
+      topStrip: "bg-gradient-to-r from-indigo-400 to-violet-500",
+      trend: <span className="flex items-center gap-1 text-indigo-600 text-[11px] font-semibold"><TrendingUp className="size-3" /> In transit</span>,
+    },
+    {
+      label: "Returns / Cancelled",
+      value: refunds,
+      sub: "Impact on net revenue",
+      icon: XCircle,
+      iconBg: "bg-rose-500/10",
+      iconColor: "text-rose-600",
+      topStrip: "bg-gradient-to-r from-rose-400 to-red-500",
+      trend: refunds > 0
+        ? <span className="flex items-center gap-1 text-rose-600 text-[11px] font-semibold"><TrendingDown className="size-3" /> Monitor</span>
+        : <span className="flex items-center gap-1 text-emerald-600 text-[11px] font-semibold"><CheckCircle2 className="size-3" /> No issues</span>,
+    },
+  ];
 
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Total Orders</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {totalOrders}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              Lifetime
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Overall volume <IconTrendingUp className="size-4" />
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 px-4 lg:px-6">
+      {metrics.map((m) => {
+        const Icon = m.icon;
+        return (
+          <div key={m.label} className="rounded-xl border bg-card overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+            <div className={`h-1 w-full ${m.topStrip}`} />
+            <div className="p-5 flex flex-col gap-4">
+              <div className="flex items-start justify-between">
+                <div className={`p-2.5 rounded-xl ${m.iconBg}`}>
+                  <Icon className={`size-5 ${m.iconColor}`} />
+                </div>
+                {m.trend}
+              </div>
+              <div>
+                <div className="text-3xl font-black tabular-nums">{m.value}</div>
+                <div className="text-sm font-semibold text-foreground mt-0.5">{m.label}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">{m.sub}</div>
+              </div>
+            </div>
           </div>
-          <div className="text-muted-foreground">Across all time</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Pending Fulfillment</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {pendingOrders}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconPackage />
-              To do
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Needs processing <IconTrendingDown className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Orders waiting to be packed
-          </div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Shipped Today</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {shippedToday}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTruckDelivery />
-              Today
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Logistics moving <IconTrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Dispatched from facility</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Returns / Cancelled</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {refunds}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-red-500 border-red-200">
-              <IconCreditCardRefund />
-              Issues
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Cancelled/Refunded <IconTrendingDown className="size-4" />
-          </div>
-          <div className="text-muted-foreground">Impact on net revenue</div>
-        </CardFooter>
-      </Card>
+        );
+      })}
     </div>
   );
-}
+};

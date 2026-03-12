@@ -140,48 +140,52 @@ export default function WarehousesPage() {
     <div className="flex flex-1 flex-col gap-8 p-6 lg:p-10 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">Pickup Locations</h1>
-          <p className="text-muted-foreground">
-            Manage warehouses and dispatch centers. FShip uses these for pickup registration.
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-indigo-500/10 rounded-xl">
+            <Building2 className="size-5 text-indigo-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Pickup Locations</h1>
+            <p className="text-sm text-muted-foreground">Manage warehouses and dispatch centers for FShip pickups.</p>
+          </div>
         </div>
-        <Button onClick={openAdd} className="shrink-0 gap-2 shadow-sm font-semibold px-6">
-          <Plus className="size-5" />
-          Add Warehouse
-        </Button>
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="text-xs font-semibold">{warehouses.length} Location{warehouses.length !== 1 ? "s" : ""}</Badge>
+          <Button onClick={openAdd} className="shrink-0 gap-2 font-semibold">
+            <Plus className="size-4" /> Add Warehouse
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
-      <div className="relative max-w-md">
+      <div className="relative max-w-sm">
         <Input
-          placeholder="Search by name, city, or pincode..."
-          className="pl-4 bg-background py-5"
+          placeholder="Search by name, city or pincode..."
+          className="bg-background pl-4 py-5"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filtered.map((wh) => (
-          <Card key={wh.warehouseId} className="flex flex-col border-primary/10 shadow-sm relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-1 h-full bg-primary/80" />
-            <CardHeader className="flex flex-row items-start justify-between pb-2">
-              <div className="space-y-1">
+          <Card key={wh.warehouseId} className="flex flex-col overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 p-0">
+            <div className="h-1.5 w-full bg-gradient-to-r from-indigo-400 to-violet-500" />
+            <CardHeader className="flex flex-row items-start justify-between pb-2 pt-4 px-5">
+              <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-xl leading-none">{wh.warehouseName}</h3>
+                  <h3 className="font-bold text-base leading-tight">{wh.warehouseName}</h3>
                   {wh.isDefault && (
-                    <Badge variant="default" className="text-[10px] h-5 px-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 shadow-none border-green-200">
+                    <Badge className="text-[10px] h-4 px-1.5 bg-emerald-500/10 text-emerald-600 border-emerald-200 shadow-none">
                       Default
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground font-mono">ID: WH-{wh.warehouseId}</p>
+                <p className="text-xs text-muted-foreground font-mono">WH-{wh.warehouseId}</p>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="-mr-2 -mt-2 opacity-50 hover:opacity-100">
+                  <Button variant="ghost" size="icon" className="-mr-1 -mt-1 size-8 opacity-50 hover:opacity-100">
                     <MoreVertical className="size-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -192,30 +196,33 @@ export default function WarehousesPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </CardHeader>
-            <CardContent className="space-y-4 pt-4 flex-1">
-              <div className="flex items-start gap-3">
-                <MapPin className="size-4 text-muted-foreground shrink-0 mt-0.5" />
-                <p className="text-sm leading-relaxed text-foreground/80">
-                  {wh.addressLine1}{wh.addressLine2 ? `, ${wh.addressLine2}` : ""}<br />
-                  {wh.city} — {wh.pincode}
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Building2 className="size-4 text-muted-foreground shrink-0" />
-                <p className="text-sm text-foreground/80 font-medium">{wh.contactName}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="size-4 text-muted-foreground shrink-0" />
-                <p className="text-sm text-foreground/80 font-mono">{wh.phoneNumber}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Mail className="size-4 text-muted-foreground shrink-0" />
-                <p className="text-sm text-foreground/80 font-mono">{wh.email}</p>
+
+            <CardContent className="space-y-3 px-5 pb-4 flex-1">
+              <div className="rounded-lg bg-muted/40 p-3 space-y-2.5">
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="size-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                  <p className="text-xs leading-relaxed text-foreground/80">
+                    {wh.addressLine1}{wh.addressLine2 ? `, ${wh.addressLine2}` : ""}, {wh.city} — {wh.pincode}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Building2 className="size-3.5 text-muted-foreground shrink-0" />
+                  <p className="text-xs text-foreground/80 font-medium">{wh.contactName}</p>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Phone className="size-3.5 text-muted-foreground shrink-0" />
+                  <p className="text-xs text-foreground/80 font-mono">{wh.phoneNumber}</p>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Mail className="size-3.5 text-muted-foreground shrink-0" />
+                  <p className="text-xs text-foreground/80 font-mono truncate">{wh.email}</p>
+                </div>
               </div>
             </CardContent>
-            <CardFooter className="bg-secondary/20 pt-4 flex justify-between border-t border-border/50">
+
+            <CardFooter className="px-5 pb-4 pt-0">
               <Button variant="outline" size="sm" className="w-full" onClick={() => openEdit(wh)}>
-                Edit Location
+                <Pencil className="size-3.5 mr-2" /> Edit Location
               </Button>
             </CardFooter>
           </Card>
@@ -224,14 +231,14 @@ export default function WarehousesPage() {
         {/* Add New Card */}
         <div
           onClick={openAdd}
-          className="flex h-full min-h-[300px] flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-xl bg-muted/20 hover:bg-muted/50 transition-colors cursor-pointer group"
+          className="flex h-full min-h-[280px] flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-xl hover:bg-muted/40 hover:border-indigo-300 transition-all cursor-pointer group"
         >
-          <div className="size-16 bg-background border shadow-sm rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <Plus className="size-8 text-primary/60 group-hover:text-primary" />
+          <div className="size-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <Plus className="size-7 text-indigo-500" />
           </div>
-          <p className="text-lg font-medium text-foreground/70 group-hover:text-foreground">Add New Warehouse</p>
-          <p className="text-sm text-muted-foreground text-center mt-2 max-w-[200px]">
-            Register a pickup center with FShip to start dispatching orders.
+          <p className="text-base font-semibold text-foreground/70 group-hover:text-foreground">Add New Location</p>
+          <p className="text-xs text-muted-foreground text-center mt-1.5 max-w-[180px]">
+            Register a pickup center with FShip for dispatch.
           </p>
         </div>
       </div>

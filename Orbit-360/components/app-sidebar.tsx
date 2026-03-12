@@ -62,16 +62,23 @@ const data = {
       url: "/",
       icon: LayoutDashboard,
       isActive: true,
+      color: "text-blue-500",
+      iconBg: "bg-blue-500/10",
     },
     {
       title: "Dashboard",
       url: "/dashboard",
       icon: Activity,
+      color: "text-emerald-500",
+      iconBg: "bg-emerald-500/10",
+      badge: "Live",
     },
     {
       title: "Storefront",
       url: "#",
       icon: Monitor,
+      color: "text-indigo-500",
+      iconBg: "bg-indigo-500/10",
       items: [
         {
           title: "Website Editor",
@@ -95,6 +102,8 @@ const data = {
       title: "Sales",
       url: "#",
       icon: ShoppingCart,
+      color: "text-rose-500",
+      iconBg: "bg-rose-500/10",
       items: [
         {
           title: "Orders",
@@ -114,6 +123,8 @@ const data = {
       title: "Marketing",
       url: "#",
       icon: Megaphone,
+      color: "text-amber-500",
+      iconBg: "bg-amber-500/10",
       items: [
         {
           title: "Performance",
@@ -133,6 +144,8 @@ const data = {
       title: "Logistics",
       url: "#",
       icon: Truck,
+      color: "text-sky-500",
+      iconBg: "bg-sky-500/10",
       items: [
         {
           title: "Tracking",
@@ -164,36 +177,51 @@ const data = {
       title: "Analytics",
       url: "/analytics",
       icon: BarChart3,
+      color: "text-cyan-500",
+      iconBg: "bg-cyan-500/10",
     },
     {
       title: "Automation",
       url: "/automation",
       icon: Zap,
+      color: "text-yellow-500",
+      iconBg: "bg-yellow-500/10",
+      badge: "Pro",
     },
     {
       title: "Integrations",
       url: "/integrations",
       icon: Plug,
+      color: "text-violet-500",
+      iconBg: "bg-violet-500/10",
     },
     {
       title: "Finance",
       url: "/finance",
       icon: CreditCard,
+      color: "text-emerald-500",
+      iconBg: "bg-emerald-500/10",
     },
     {
       title: "Settings",
       url: "/settings",
       icon: Settings,
+      color: "text-slate-500",
+      iconBg: "bg-slate-500/10",
     },
     {
       title: "Support",
       url: "/support",
       icon: LifeBuoy,
+      color: "text-blue-500",
+      iconBg: "bg-blue-500/10",
     },
     {
       title: "Feedback",
       url: "/feedback",
       icon: MessageSquare,
+      color: "text-pink-500",
+      iconBg: "bg-pink-500/10",
     },
   ],
 };
@@ -209,6 +237,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import { LogOut, ExternalLink } from "lucide-react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -290,27 +319,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-2 px-2 py-2 cursor-pointer hover:bg-sidebar-accent rounded-md transition-colors">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden bg-white">
+                <div className="flex items-center gap-3 px-2 py-2.5 cursor-pointer hover:bg-sidebar-accent/50 rounded-xl transition-all duration-200 group border border-transparent hover:border-sidebar-border/50">
+                  <div className="flex aspect-square size-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-sidebar-accent shadow-sm group-hover:shadow-md transition-all ring-1 ring-black/5 dark:ring-white/10">
                     <img
                       src={logoSrc}
                       alt="Orbit 360 Logo"
-                      width={32}
-                      height={32}
-                      className="object-contain"
+                      width={36}
+                      height={36}
+                      className="object-contain p-1.5"
                     />
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
+                    <span className="truncate font-bold text-foreground">
                       {activeStore?.name || activeTeam.name}
                     </span>
-                    <span className="truncate text-xs">
+                    <span className="truncate text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
                       {activeStore?.subdomain 
                         ? `${activeStore.subdomain}.orbit360.shop` 
                         : activeTeam.plan}
                     </span>
                   </div>
-                  <ChevronsUpDown className="ml-auto size-4" />
+                  <ChevronsUpDown className="ml-auto size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </div>
               </DropdownMenuTrigger>
               {user?.stores && user.stores.length > 0 && (
@@ -349,9 +378,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {data.navMain.map((item) => {
+              {data.navMain.map((item: any) => {
                 const isMainActive = item.items
-                  ? item.items.some((sub) => isActive(sub.url))
+                  ? item.items.some((sub: any) => isActive(sub.url))
                   : isActive(item.url);
 
                 return (
@@ -362,19 +391,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           tooltip={item.title}
                           onClick={() => toggleItem(item.title)}
                           isActive={isMainActive}
+                          className={`hover:bg-sidebar-accent/50 transition-all duration-200 py-5 rounded-xl ${isMainActive ? "bg-sidebar-accent/70 font-bold" : "font-medium"}`}
                         >
-                          {item.icon && <item.icon />}
-                          <span>{item.title}</span>
+                          {item.icon && (
+                            <div className={`p-1.5 rounded-lg transition-colors ${isMainActive ? item.iconBg + " " + item.color : "text-muted-foreground group-hover:text-foreground"}`}>
+                              <item.icon className="size-4.5" />
+                            </div>
+                          )}
+                          <span className="ml-1">{item.title}</span>
+                          {item.badge && (
+                            <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 h-4 bg-primary/10 text-primary border-none">
+                              {item.badge}
+                            </Badge>
+                          )}
                           <ChevronRight
-                            className={`ml-auto transition-transform duration-200 ${
-                              openItems[item.title] ? "rotate-90" : ""
+                            className={`ml-auto size-4 transition-transform duration-300 ${item.badge ? "ml-2" : ""} ${
+                              openItems[item.title] ? "rotate-90" : "text-muted-foreground/50"
                             }`}
                           />
                         </SidebarMenuButton>
 
                         {openItems[item.title] && (
                           <SidebarMenuSub>
-                            {item.items.map((subItem) => {
+                            {item.items.map((subItem: any) => {
                               const isPreview = subItem.title === "Preview Store";
                               
                               let previewUrl = subItem.url;
@@ -435,10 +474,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         tooltip={item.title}
                         isActive={isActive(item.url)}
                         asChild
+                        className={`hover:bg-sidebar-accent/50 transition-all duration-200 py-5 rounded-xl ${isActive(item.url) ? "bg-sidebar-accent/70 font-bold" : "font-medium"}`}
                       >
                         <Link href={item.url}>
-                          {item.icon && <item.icon />}
-                          <span>{item.title}</span>
+                          {item.icon && (
+                            <div className={`p-1.5 rounded-lg transition-colors ${isActive(item.url) ? item.iconBg + " " + item.color : "text-muted-foreground group-hover:text-foreground"}`}>
+                              <item.icon className="size-4.5" />
+                            </div>
+                          )}
+                          <span className="ml-1">{item.title}</span>
+                          {item.badge && (
+                            <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 h-4 bg-primary/10 text-primary border-none">
+                              {item.badge}
+                            </Badge>
+                          )}
                         </Link>
                       </SidebarMenuButton>
                     )}
@@ -454,23 +503,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
+              className="hover:bg-sidebar-accent/50 transition-all duration-200 rounded-xl"
               onClick={() =>
                 setTheme(resolvedTheme === "dark" ? "light" : "dark")
               }
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-accent text-sidebar-foreground">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-accent/80 text-sidebar-foreground border border-sidebar-border/50">
                 <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
+              <div className="grid flex-1 text-left text-sm leading-tight ml-1">
+                <span className="truncate font-bold">
                   {mounted && resolvedTheme === "dark"
                     ? "Dark Mode"
                     : "Light Mode"}
                 </span>
-                <span className="truncate text-xs">
-                  Switch to{" "}
-                  {mounted && resolvedTheme === "dark" ? "light" : "dark"}
+                <span className="truncate text-[10px] text-muted-foreground uppercase font-semibold">
+                  {mounted && resolvedTheme === "dark" ? "light" : "dark"} view
                 </span>
               </div>
             </SidebarMenuButton>
@@ -480,22 +529,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  className="data-[state=open]:bg-sidebar-accent/50 hover:bg-sidebar-accent/50 transition-all duration-200 rounded-xl"
                 >
-                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <span className="text-xs font-medium text-primary">
+                  <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm">
+                    <span className="text-xs font-bold text-primary">
                       {initials}
                     </span>
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
+                  <div className="grid flex-1 text-left text-sm leading-tight ml-1">
+                    <span className="truncate font-bold text-foreground">
                       {displayName}
                     </span>
-                    <span className="truncate text-xs uppercase text-muted-foreground font-medium tracking-wider">
+                    <span className="truncate text-[10px] uppercase text-muted-foreground font-black tracking-widest">
                       {user?.role || "MERCHANT"}
                     </span>
                   </div>
-                  <ChevronsUpDown className="ml-auto size-4" />
+                  <ChevronsUpDown className="ml-auto size-4 text-muted-foreground" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent

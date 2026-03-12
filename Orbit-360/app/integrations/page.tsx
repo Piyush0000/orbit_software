@@ -40,81 +40,93 @@ const INTEGRATIONS = [
     category: "Payment Gateways",
     icon: <IconCreditCard className="size-5 text-blue-500" />,
     apps: [
-      { id: "payu", name: "PayU", description: "Connect your PayU account to accept payments in India.", logo: "💳", color: "bg-blue-500/10 text-blue-500" },
-      { id: "cashfree", name: "Cashfree", description: "Connect your Cashfree account for fast and secure payments.", logo: "💰", color: "bg-green-500/10 text-green-500" },
-      { id: "razorpay", name: "Razorpay", description: "Connect your Razorpay account for seamless Indian payments.", logo: "⚡", color: "bg-purple-500/10 text-purple-500" },
-      { id: "phonepe", name: "PhonePe", description: "Connect your PhonePe account for UPI-based payments.", logo: "📱", color: "bg-orange-500/10 text-orange-500" }
+      { id: "payu",     name: "PayU",     description: "Accept payments seamlessly across India with UPI, cards, netbanking & more.", logo: "💳", color: "bg-blue-500/10 text-blue-500",   topBorder: "bg-gradient-to-r from-blue-400 to-cyan-500",   accentBg: "bg-blue-500" },
+      { id: "cashfree", name: "Cashfree", description: "Fast, reliable payouts and collections with Cashfree's payment infrastructure.", logo: "💰", color: "bg-green-500/10 text-green-500", topBorder: "bg-gradient-to-r from-green-400 to-teal-500",  accentBg: "bg-green-500" },
+      { id: "razorpay", name: "Razorpay", description: "India's most popular payment gateway with support for all payment modes.", logo: "⚡", color: "bg-purple-500/10 text-purple-500", topBorder: "bg-gradient-to-r from-purple-400 to-indigo-500", accentBg: "bg-purple-500" },
+      { id: "phonepe",  name: "PhonePe",  description: "Enable UPI-first payments through India's largest digital payments platform.", logo: "📱", color: "bg-orange-500/10 text-orange-500", topBorder: "bg-gradient-to-r from-orange-400 to-rose-500",  accentBg: "bg-orange-500" }
     ]
   },
   {
     category: "Marketing & Advertising",
     icon: <IconSpeakerphone className="size-5 text-indigo-500" />,
     apps: [
-      { id: "meta-ads", name: "Meta Ads Manager", description: "Sync your product catalog and run dynamic Facebook & Instagram ads.", logo: <IconBrandFacebook className="size-6" />, color: "bg-blue-600/10 text-blue-600" }
+      { id: "meta-ads", name: "Meta Ads Manager", description: "Sync your catalog and run high-ROI dynamic ads across Facebook & Instagram.", logo: <IconBrandFacebook className="size-6" />, color: "bg-blue-600/10 text-blue-600", topBorder: "bg-gradient-to-r from-blue-500 to-violet-600", accentBg: "bg-blue-600" }
     ]
   }
 ];
 
 const CREATORS = [
   {
-    id: 1,
-    name: "Priya Sharma",
-    handle: "@priyacreates",
-    avatar: "👩",
+    name: "Shambhavi Kestikar",
+    handle: "@shambhavi.creates",
+    initials: "SK",
+    avatarColor: "bg-gradient-to-br from-pink-400 to-rose-500",
     category: "Fashion & Lifestyle",
     platform: "instagram",
     followers: "128K",
+    engagement: "6.4%",
     rating: 4.9,
     reviews: 42,
     priceRange: "₹5,000 – ₹15,000",
     tags: ["Reels", "Photoshoots", "Stories"],
-    gradient: "from-pink-500/10 to-rose-500/5",
-    border: "border-pink-200 dark:border-pink-900",
+    accentColor: "text-pink-600",
+    accentBg: "bg-pink-500",
+    topBorder: "bg-gradient-to-r from-pink-400 to-rose-500",
+    verified: true,
   },
   {
-    id: 2,
     name: "Arjun Mehta",
     handle: "@arjunmakes",
-    avatar: "👨",
+    initials: "AM",
+    avatarColor: "bg-gradient-to-br from-red-400 to-orange-500",
     category: "Tech & Gadgets",
     platform: "youtube",
     followers: "320K",
+    engagement: "4.1%",
     rating: 4.7,
     reviews: 88,
     priceRange: "₹12,000 – ₹40,000",
     tags: ["Unboxing", "Reviews", "Shorts"],
-    gradient: "from-red-500/10 to-orange-500/5",
-    border: "border-red-200 dark:border-red-900",
+    accentColor: "text-red-600",
+    accentBg: "bg-red-500",
+    topBorder: "bg-gradient-to-r from-red-400 to-orange-500",
+    verified: true,
   },
   {
-    id: 3,
     name: "Sneha Rao",
     handle: "@snehacooks",
-    avatar: "🧑",
+    initials: "SR",
+    avatarColor: "bg-gradient-to-br from-amber-400 to-yellow-500",
     category: "Food & Beverage",
     platform: "instagram",
     followers: "72K",
+    engagement: "8.2%",
     rating: 4.8,
     reviews: 31,
     priceRange: "₹3,500 – ₹10,000",
     tags: ["Recipe Videos", "Reels", "Hauls"],
-    gradient: "from-amber-500/10 to-yellow-500/5",
-    border: "border-amber-200 dark:border-amber-900",
+    accentColor: "text-amber-600",
+    accentBg: "bg-amber-500",
+    topBorder: "bg-gradient-to-r from-amber-400 to-yellow-500",
+    verified: false,
   },
   {
-    id: 4,
     name: "Rohit Verma",
     handle: "@rofit_",
-    avatar: "🧔",
+    initials: "RV",
+    avatarColor: "bg-gradient-to-br from-emerald-400 to-green-600",
     category: "Fitness & Wellness",
     platform: "youtube",
     followers: "215K",
+    engagement: "5.3%",
     rating: 4.6,
     reviews: 67,
     priceRange: "₹8,000 – ₹25,000",
     tags: ["Workouts", "Reviews", "Vlogs"],
-    gradient: "from-emerald-500/10 to-green-500/5",
-    border: "border-emerald-200 dark:border-emerald-900",
+    accentColor: "text-emerald-600",
+    accentBg: "bg-emerald-500",
+    topBorder: "bg-gradient-to-r from-emerald-400 to-green-600",
+    verified: true,
   },
 ];
 
@@ -207,35 +219,53 @@ export default function IntegrationsPage() {
             {section.icon}
             {section.category}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {section.apps.map((app) => (
-              <Card key={app.id} className="relative overflow-hidden group hover:border-primary/50 transition-all duration-300">
-                <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                  <div className={`size-12 rounded-xl flex items-center justify-center text-2xl ${app.color}`}>
-                    {app.logo}
+              <Card key={app.id} className="relative overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 border group p-0">
+                {/* Colored top strip */}
+                <div className={`h-1.5 w-full ${app.topBorder}`} />
+
+                <CardContent className="p-5 flex flex-col gap-4 pt-4">
+                  {/* Logo + name + status */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`size-12 rounded-2xl flex items-center justify-center text-2xl ${app.color} shadow-sm shrink-0`}>
+                        {app.logo}
+                      </div>
+                      <div>
+                        <div className="font-bold text-base leading-tight">{app.name}</div>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          {isConnected(app.id) ? (
+                            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+                              Live
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-medium text-muted-foreground">Not connected</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-xl">{app.name}</CardTitle>
-                    <Badge variant={isConnected(app.id) ? "default" : "secondary"} className="mt-1">
-                      {isConnected(app.id) && <IconCheck className="size-3 mr-1" />}
-                      {isConnected(app.id) ? "Connected" : "Setup Required"}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-sm leading-relaxed min-h-[40px]">{app.description}</CardDescription>
-                </CardContent>
-                <CardFooter className="pt-0">
-                  <Button variant={isConnected(app.id) ? "outline" : "default"} className="w-full group" onClick={() => handleConnect(app)}>
-                    {isConnected(app.id) ? "Manage" : "Connect"}
-                    <IconPlus className="size-4 ml-2 group-hover:rotate-90 transition-transform" />
+
+                  {/* Description */}
+                  <p className="text-sm text-muted-foreground leading-relaxed">{app.description}</p>
+
+                  {/* CTA */}
+                  <Button
+                    variant={isConnected(app.id) ? "outline" : "default"}
+                    className={`w-full font-semibold mt-auto ${
+                      isConnected(app.id) ? "" : `${app.accentBg} hover:opacity-90 text-white border-0`
+                    }`}
+                    onClick={() => handleConnect(app)}
+                  >
+                    {isConnected(app.id) ? (
+                      <><IconCheck className="size-4 mr-2 text-emerald-500" />Manage Connection</>
+                    ) : (
+                      <><IconPlus className="size-4 mr-2 group-hover:rotate-90 transition-transform" />Connect</>                    
+                    )}
                   </Button>
-                </CardFooter>
-                {isConnected(app.id) && (
-                  <div className="absolute top-0 right-0 p-2">
-                    <div className="size-2 bg-green-500 rounded-full animate-pulse"></div>
-                  </div>
-                )}
+                </CardContent>
               </Card>
             ))}
           </div>
@@ -276,52 +306,70 @@ export default function IntegrationsPage() {
         {/* Creator Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {CREATORS.map((creator) => (
-            <Card key={creator.id} className={`relative overflow-hidden hover:shadow-md transition-all duration-300 bg-gradient-to-br ${creator.gradient} ${creator.border}`}>
-              <CardContent className="p-5 flex flex-col gap-4">
+            <Card key={creator.name} className="relative overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 border group p-0">
+              {/* Colored top accent strip */}
+              <div className={`h-1.5 w-full ${creator.topBorder}`} />
+
+              <CardContent className="p-5 flex flex-col gap-4 pt-4">
+                {/* Avatar + Name */}
                 <div className="flex items-center gap-3">
-                  <div className="size-12 rounded-full bg-background border-2 border-border flex items-center justify-center text-2xl shadow-sm">
-                    {creator.avatar}
+                  <div className={`size-12 rounded-2xl ${creator.avatarColor} flex items-center justify-center text-white text-base font-black shadow-md shrink-0`}>
+                    {creator.initials}
                   </div>
-                  <div>
-                    <div className="font-bold text-sm leading-tight">{creator.name}</div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-sm leading-tight truncate">{creator.name}</span>
+                      {creator.verified && (
+                        <span title="Verified" className="size-4 rounded-full bg-blue-500 flex items-center justify-center shrink-0">
+                          <IconCheck className="size-2.5 text-white stroke-[3]" />
+                        </span>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                       <PlatformIcon platform={creator.platform} />
-                      {creator.handle}
+                      <span className="capitalize">{creator.platform}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs">
-                  <div className="flex items-center gap-1 font-semibold">
-                    <IconUsers className="size-3 text-muted-foreground" />
-                    {creator.followers}
+                {/* Stats grid */}
+                <div className="grid grid-cols-3 gap-1 rounded-xl bg-muted/40 p-2 text-center">
+                  <div>
+                    <div className="text-[11px] font-black">{creator.followers}</div>
+                    <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Followers</div>
                   </div>
-                  <div className="flex items-center gap-1 font-semibold text-amber-500">
-                    <IconStar className="size-3 fill-amber-400 stroke-amber-400" />
-                    {creator.rating}
-                    <span className="text-muted-foreground font-normal">({creator.reviews})</span>
+                  <div className="border-x border-border/50">
+                    <div className={`text-[11px] font-black ${creator.accentColor}`}>{creator.engagement}</div>
+                    <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Engage</div>
+                  </div>
+                  <div>
+                    <div className="text-[11px] font-black text-amber-500">{creator.rating}★</div>
+                    <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{creator.reviews} rev.</div>
                   </div>
                 </div>
 
-                <Badge variant="secondary" className="text-[10px] font-medium w-fit">{creator.category}</Badge>
+                {/* Category */}
+                <Badge variant="outline" className={`text-[10px] font-semibold w-fit ${creator.accentColor} border-current`}>{creator.category}</Badge>
 
+                {/* Content tags */}
                 <div className="flex flex-wrap gap-1">
                   {creator.tags.map(t => (
-                    <span key={t} className="text-[10px] px-2 py-0.5 bg-background/70 rounded-full border text-muted-foreground">{t}</span>
+                    <span key={t} className="text-[10px] px-2 py-0.5 bg-muted rounded-full text-muted-foreground font-medium">{t}</span>
                   ))}
                 </div>
 
-                <div className="border-t pt-3 flex items-center justify-between gap-2">
+                {/* Price + CTA */}
+                <div className="mt-auto border-t pt-4 flex items-center justify-between gap-2">
                   <div>
-                    <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Starting at</div>
-                    <div className="text-sm font-bold leading-tight">{creator.priceRange}</div>
+                    <div className="text-[9px] text-muted-foreground uppercase tracking-wider">Per Campaign</div>
+                    <div className="text-sm font-black">{creator.priceRange}</div>
                   </div>
                   <Button
                     size="sm"
-                    className="shrink-0 bg-violet-600 hover:bg-violet-700 text-white"
+                    className={`shrink-0 text-white text-xs font-semibold shadow-sm ${creator.accentBg} hover:opacity-90`}
                     onClick={() => setHireForm({ open: true, creator })}
                   >
-                    Hire
+                    Hire Now
                   </Button>
                 </div>
               </CardContent>
