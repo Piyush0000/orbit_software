@@ -8,10 +8,33 @@ const {
   resetPassword,
   verifyEmail
 } = require('../controllers/authController');
+const passport = require('../services/passportService');
+const jwt = require('jsonwebtoken');
+const env = require('../config/env');
 const auth = require('../middleware/auth');
 const { withValidation } = require('../middleware/validation');
 
 const router = express.Router();
+
+// Google OAuth
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+  // Generate JWT for the frontend
+  const token = jwt.sign(
+    { id: req.user.id, role: req.user.role, email: req.user.email },
+    env.jwt.secret,
+    { expiresIn: env.jwt.expire }
+  );
+  
+  // Redirect back to frontend with token
+  res.redirect(`${env.frontendUrl}/login-success?token=${token}&user=${encodeURIComponent(JSON.stringify({
+    id: req.user.id,
+    email: req.user.email,
+    fullName: req.user.fullName,
+    role: req.user.role
+  }))}`);
+});
 
 router.post(
   '/register',

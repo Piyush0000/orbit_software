@@ -8,8 +8,9 @@ const { publicLimiter, dashboardLimiter } = require('./middleware/rateLimit');
 const env = require('./config/env');
 const { connectMongo } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
+const session = require('express-session');
+const passport = require('./services/passportService');
 const WebSocketService = require('./services/websocketService');
-
 const authRoutes = require('./routes/auth');
 const appAuthRoutes = require('./routes/appAuth');
 const userRoutes = require('./routes/users');
@@ -37,6 +38,14 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(session({
+  secret: env.sessionSecret,
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/api/storefront/public', publicLimiter);
 app.use('/api/public', publicLimiter);
 app.use('/api/products', dashboardLimiter);
@@ -53,6 +62,7 @@ app.use('/api/storefront', storefrontRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/auth/meta', metaOAuthRoutes);
 app.use('/api/auth/meta', metaOAuthRoutes);
+app.use('/api/marketing/meta', metaOAuthRoutes); // Fallback for existing Meta App Configs
 app.use('/api/meta', metaRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/provisioning', provisioningRoutes);

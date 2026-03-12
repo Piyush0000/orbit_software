@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -42,13 +43,16 @@ export function SiteHeader() {
           className="mx-2 data-[orientation=vertical]:h-4"
         />
         <h1 className="text-base font-medium">{getTitle(pathname)}</h1>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-3">
+          <Button variant="outline" asChild size="sm" className="hidden sm:flex rounded-full">
+            <Link href="/request-call">Request a Call</Link>
+          </Button>
           <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
             <a
               href="https://www.evoclabs.com/"
               rel="noopener noreferrer"
               target="_blank"
-              className="dark:text-foreground"
+              className="dark:text-foreground font-semibold"
             >
               Evoc Labs.
             </a>

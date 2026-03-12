@@ -22,6 +22,10 @@ import {
   Sun,
   Truck,
   Zap,
+  CreditCard,
+  LifeBuoy,
+  MessageSquare,
+  Activity,
 } from "lucide-react";
 
 import {
@@ -58,6 +62,11 @@ const data = {
       url: "/",
       icon: LayoutDashboard,
       isActive: true,
+    },
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: Activity,
     },
     {
       title: "Storefront",
@@ -167,9 +176,24 @@ const data = {
       icon: Plug,
     },
     {
+      title: "Finance",
+      url: "/finance",
+      icon: CreditCard,
+    },
+    {
       title: "Settings",
       url: "/settings",
       icon: Settings,
+    },
+    {
+      title: "Support",
+      url: "/support",
+      icon: LifeBuoy,
+    },
+    {
+      title: "Feedback",
+      url: "/feedback",
+      icon: MessageSquare,
     },
   ],
 };

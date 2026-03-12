@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const env = require('../config/env');
-const User = require('../models/User');
+const { prisma } = require('../config/database');
 
 const metaAuth = async (req, res, next) => {
   try {
@@ -9,47 +9,35 @@ const metaAuth = async (req, res, next) => {
     const queryToken = req.query.token;
     const token = headerToken || queryToken;
     
-    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+    if (!token) {
+      return res.status(401).json({ message: 'Unauthorized: No token provided' });
+    }
+
     const decoded = jwt.verify(token, env.jwt.secret);
     
-    if (decoded.id) {
-      const mongoose = require('mongoose');
-      let user = null;
-      
-      // Try finding by ObjectId if it's valid
-      if (mongoose.Types.ObjectId.isValid(decoded.id)) {
-        user = await User.findById(decoded.id);
-      }
-      
-      // Fallback to email if not found by ID or ID wasn't a valid ObjectId
-      if (!user && decoded.email) {
-        const lowerEmail = decoded.email.toLowerCase();
-        user = await User.findOne({ email: lowerEmail });
-        
-        // If still not found, create a placeholder record in Mongoose to store Meta data
-        // This is safe because the JWT has already been verified
-        if (!user) {
-          user = new User({
-            email: lowerEmail,
-            passwordHash: 'LINKED_FROM_POSTGRES' // Placeholder
-          });
-          await user.save();
-        }
-      }
-      
-      if (!user) return res.status(401).json({ message: 'User not found' });
-      req.user = user;
-    } else {
+    // Support both 'id' (from Google/email login) and 'userId' (historical)
+    const userId = decoded.id || decoded.userId;
+    
+    if (!userId) {
       return res.status(401).json({ message: 'Invalid token payload' });
     }
-    
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user || !user.isActive) {
+      return res.status(401).json({ message: 'User not found or inactive' });
+    }
+
+    req.user = user;
     next();
   } catch (err) {
-    console.error(' [META AUTH ERROR] ', err.message);
-    return res.status(401).json({ 
-      message: 'Invalid or expired token',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined 
-    });
+    if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+    console.error('Meta Auth Middleware Error:', err);
+    res.status(500).json({ message: 'Internal server error during authentication' });
   }
 };
 

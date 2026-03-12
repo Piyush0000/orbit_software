@@ -4,6 +4,8 @@ const env = require('../config/env');
 const {
   getAdAccounts,
   getCampaigns,
+  getAdSets,
+  getAds,
   createCampaign,
   pauseCampaign,
   resumeCampaign,
@@ -39,6 +41,8 @@ if (env.meta.publicAccessToken) {
 router.get('/status', getStatus);
 router.get('/ad-accounts', getAdAccounts);
 router.get('/campaigns', getCampaigns);
+router.get('/ad-sets', getAdSets);
+router.get('/ads', getAds);
 router.post('/campaigns', createCampaign);
 router.patch('/campaigns/:id/pause', pauseCampaign);
 router.patch('/campaigns/:id/resume', resumeCampaign);

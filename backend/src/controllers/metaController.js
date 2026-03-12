@@ -277,6 +277,34 @@ const getCreativePreview = async (req, res, next) => {
   }
 };
 
+const getAdSets = async (req, res, next) => {
+  try {
+    const adAccountId = normalizeAdAccountId(req.query.adAccountId);
+    if (!adAccountId) return res.status(400).json({ message: 'adAccountId required' });
+    const service = withService(req);
+    const hasAccess = await service.hasAccess(adAccountId);
+    if (!hasAccess) return respondNoPermission(res);
+    const data = await service.getAdSets(adAccountId);
+    res.json({ adSets: data.data });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getAds = async (req, res, next) => {
+  try {
+    const adAccountId = normalizeAdAccountId(req.query.adAccountId);
+    if (!adAccountId) return res.status(400).json({ message: 'adAccountId required' });
+    const service = withService(req);
+    const hasAccess = await service.hasAccess(adAccountId);
+    if (!hasAccess) return respondNoPermission(res);
+    const data = await service.getAds(adAccountId);
+    res.json({ ads: data.data });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getStatus = async (req, res, next) => {
   try {
     const actor = req.user;
@@ -298,6 +326,8 @@ const getStatus = async (req, res, next) => {
 module.exports = {
   getAdAccounts,
   getCampaigns,
+  getAdSets,
+  getAds,
   createCampaign,
   pauseCampaign,
   resumeCampaign,

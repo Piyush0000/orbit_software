@@ -30,8 +30,26 @@ export async function getStoreSettings(storeId: string) {
   return fetcher(`/stores/${storeId}/settings`);
 }
 
+// ─── Meta Ads ─────────────────────────────────────────────────────────────
+
 export async function getMetaStatus() {
   return fetcher(`/meta/status`);
+}
+
+export async function getMetaAdAccounts() {
+  return fetcher(`/meta/ad-accounts`);
+}
+
+export async function getMetaCampaigns(adAccountId: string) {
+  return fetcher(`/meta/campaigns?adAccountId=${adAccountId}`);
+}
+
+export async function getMetaInsights(adAccountId: string, datePreset: string = 'last_30d') {
+  return fetcher(`/meta/insights?adAccountId=${adAccountId}&datePreset=${datePreset}`);
+}
+
+export async function getMetaCreativeInsights(adAccountId: string) {
+  return fetcher(`/meta/creatives/insights?adAccountId=${adAccountId}`);
 }
 
 export async function updateStoreSettings(storeId: string, settings: any) {

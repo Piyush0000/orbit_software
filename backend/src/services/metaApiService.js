@@ -54,13 +54,11 @@ class MetaApiService {
 
   async getCampaigns(adAccountId) {
     const actId = this.formatAdAccountId(adAccountId);
-    // Request specific fields including insights
-    // Note: If insights.data is empty, it means no data for the date range
     return this.request({ 
       url: `${actId}/campaigns`, 
       method: 'GET',
       params: {
-        fields: 'id,name,status,objective,daily_budget,lifetime_budget,insights.date_preset(last_30d){spend,impressions,clicks,ctr,cpc,actions,action_values,purchase_roas}',
+        fields: 'id,name,status,objective,daily_budget,lifetime_budget,start_time,stop_time,insights{spend,impressions,clicks,ctr,cpc}',
         limit: 100
       }
     });
@@ -83,15 +81,40 @@ class MetaApiService {
     });
   }
 
-  async getInsights(adAccountId, metrics, options = {}) {
+  async getAdSets(adAccountId) {
     const actId = this.formatAdAccountId(adAccountId);
+    return this.request({ 
+      url: `${actId}/adsets`, 
+      method: 'GET',
+      params: {
+        fields: 'id,name,status,billing_event,bid_amount,daily_budget,lifetime_budget,insights{spend,impressions,clicks,ctr}',
+        limit: 100
+      }
+    });
+  }
+
+  async getAds(adAccountId) {
+    const actId = this.formatAdAccountId(adAccountId);
+    return this.request({ 
+      url: `${actId}/ads`, 
+      method: 'GET',
+      params: {
+        fields: 'id,name,status,creative{id,name,thumbnail_url},insights{spend,impressions,clicks,ctr}',
+        limit: 100
+      }
+    });
+  }
+
+  async getInsights(adAccountId, options = {}) {
+    const actId = this.formatAdAccountId(adAccountId);
+    const fields = ['spend', 'impressions', 'clicks', 'ctr', 'cpc', 'reach', 'frequency', 'actions', 'action_values'];
     return this.request({
       url: `${actId}/insights`,
       method: 'GET',
       params: {
-        fields: metrics.join(','),
-        date_preset: options.datePreset,
-        time_increment: options.timeIncrement
+        fields: fields.join(','),
+        date_preset: options.datePreset || 'last_30d',
+        time_increment: options.timeIncrement || '1'
       }
     });
   }

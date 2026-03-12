@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SectionCards } from "@/components/section-cards";
-import { DashboardCharts } from "@/components/dashboard-charts";
-import { DataTable } from "@/components/data-table";
 import { useAuth } from "@/contexts/AuthContext";
 import { getStoreAnalytics, getStoreOrders } from "@/lib/api";
 import { toast } from "sonner";
 import { IconLoader } from "@tabler/icons-react";
+import { SummaryDashboard } from "@/components/summary-dashboard";
 
 export default function Home() {
   const { user, loading: authLoading } = useAuth();
@@ -47,16 +45,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-6 py-4 md:py-6">
-          <SectionCards analytics={analytics?.overview} />
-          <DashboardCharts
-            salesTrend={analytics?.salesTrend}
-            logistics={analytics?.logistics}
-            products={analytics?.products}
-          />
-          <DataTable orders={orders} />
-        </div>
+      <div className="@container/main flex flex-1 flex-col">
+          <SummaryDashboard analytics={analytics} />
       </div>
     </div>
   );
