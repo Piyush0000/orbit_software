@@ -105,19 +105,6 @@ const data = {
       icon: ClipboardListIcon,
     },
   ],
-  marketing: [
-    {
-      title: "Marketing",
-      url: "#",
-      icon: RocketIcon,
-      items: [
-        {
-          title: "Email Campaigns",
-          url: "/dashboard/marketing/email",
-        },
-      ],
-    },
-  ],
   setup: [
     {
       title: "Provisioning",
@@ -256,11 +243,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           Inventory
         </div>
         <NavMain items={data.inventory} />
-
-        <div className="mt-6 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-          Growth & Marketing
-        </div>
-        <NavMain items={data.marketing} />
 
         <div className="mt-6 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
           System Setup

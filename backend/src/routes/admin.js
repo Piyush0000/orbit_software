@@ -16,7 +16,8 @@ const {
   createTemplate,
   updateTemplate,
   deleteTemplate,
-  getLogs
+  getLogs,
+  deleteCommunication
 } = require('../controllers/adminController');
 const { login, me } = require('../controllers/adminAuthController');
 const {
@@ -109,7 +110,7 @@ router.post('/templates', guard, createTemplate);
 router.put('/templates/:id', guard, updateTemplate);
 router.delete('/templates/:id', guard, deleteTemplate);
 router.get('/logs', guard, getLogs);
-
+router.delete('/communications/:id', guard, deleteCommunication);
 router.get('/brands', guard, listAllBrands);
 router.get('/brands/:id', guard, getBrand);
 router.put(
@@ -173,15 +174,8 @@ router.get('/brands/:id/communications', guard, listCommunications);
 router.post(
   '/brands/:id/communications',
   guard,
-  withValidation([body('channel').notEmpty(), body('summary').notEmpty()]),
+  withValidation([body('channel').notEmpty(), body('summary').notEmpty(), body('direction').notEmpty()]),
   createCommunication
-);
-router.get('/brands/:id/calls', guard, listCalls);
-router.post(
-  '/brands/:id/calls',
-  guard,
-  withValidation([body('channel').notEmpty(), body('notes').notEmpty()]),
-  createCall
 );
 
 router.get('/themes', guard, getThemes);

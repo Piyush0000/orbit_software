@@ -214,6 +214,7 @@ model CommunicationLog {
   ticket     SupportTicket?         @relation(fields: [ticketId], references: [id])
   channel    CommunicationChannel
   direction  CommunicationDirection @default(OUTBOUND)
+  subject    String? 
   summary    String
   metadata   Json?
   occurredAt DateTime               @default(now())

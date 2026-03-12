@@ -127,6 +127,26 @@ const getLogs = async (_req, res) => {
   res.json({ logs: [] });
 };
 
+const deleteCommunication = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await prisma.communicationLog.deleteMany({
+      where: { id }
+    });
+
+    if (result.count === 0) {
+      return res.status(200).json({ message: "Communication already deleted" });
+    }
+
+    res.json({ message: "Communication deleted successfully" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to delete communication" });
+  }
+};
+
 module.exports = {
   listUsers,
   getUser,
@@ -139,5 +159,6 @@ module.exports = {
   createTemplate,
   updateTemplate,
   deleteTemplate,
-  getLogs
+  getLogs,
+  deleteCommunication
 };

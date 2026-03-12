@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const { PrismaClient } = require('@prisma/client');
 const env = require('./env');
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ["query", "info", "warn", "error"],
+});
 
 const connectMongo = async () => {
   if (!env.mongodbUri) {

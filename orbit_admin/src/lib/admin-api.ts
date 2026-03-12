@@ -17,9 +17,13 @@ const getAdminToken = () => {
 };
 
 type ApiOptions = {
-  method?: "GET" | "POST" | "PUT";
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   body?: Record<string, unknown>;
+
 };
+type CommunicationResponse = {
+  logs: any[]
+}
 
 async function adminRequest<T>(path: string, options: ApiOptions = {}) {
   const { method = "GET", body } = options;
@@ -147,6 +151,7 @@ export type CommunicationLog = {
   id: string;
   channel: string;
   direction: string;
+  subject: string;
   summary: string;
   occurredAt: string;
   createdAt: string;
@@ -346,17 +351,16 @@ export const resolveTicket = (ticketId: string) =>
     },
   );
 
-export const getBrandCommunications = (brandId: string) =>
-  adminRequest<{ communications: CommunicationLog[] }>(
-    `/api/admin/brands/${brandId}/communications`,
-  );
+export const getBrandCommunications = async (
+  brandId: string
+): Promise<CommunicationResponse> => {
+  return adminRequest(`/api/admin/brands/${brandId}/communications`)
+}
 
-export const getBrandCalls = (brandId: string) =>
-  adminRequest<{ calls: CallLog[] }>(`/api/admin/brands/${brandId}/calls`);
 
 export const createBrandCommunication = (
   brandId: string,
-  payload: { channel: string; summary: string },
+  payload: { channel: string; subject?: string; summary: string; direction: string },
 ) =>
   adminRequest<{ communication: CommunicationLog }>(
     `/api/admin/brands/${brandId}/communications`,
@@ -366,14 +370,6 @@ export const createBrandCommunication = (
     },
   );
 
-export const createBrandCall = (
-  brandId: string,
-  payload: { channel: string; notes: string },
-) =>
-  adminRequest<{ call: CallLog }>(`/api/admin/brands/${brandId}/calls`, {
-    method: "POST",
-    body: payload,
-  });
 
 export const provisionBrand = (
   brandId: string,
@@ -663,6 +659,9 @@ export const getMetaInsights = (adAccountId: string, params: any) => {
   return adminRequest<{ insights: any[] }>(`/api/meta/ad-accounts/${adAccountId}/insights?${search.toString()}`);
 };
 
-
+export const deleteCommunication = (id: string) =>
+  adminRequest(`/api/admin/communications/${id}`, {
+    method: "DELETE",
+  });
 
 // Case fix commit 
