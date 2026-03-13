@@ -24,6 +24,8 @@ model User {
   stores             Store[]
   activityLogs       BrandActivityLog[]
   createdTickets     SupportTicket[]
+  feedbacks          Feedback[]
+  callRequests       CallRequest[]
 }
 
 model Store {
@@ -63,6 +65,8 @@ model Store {
   tickets            SupportTicket[]
   communicationLogs  CommunicationLog[]
   callLogs           SupportCallLog[]
+  feedbacks          Feedback[]
+  callRequests       CallRequest[]
   provisioning       MerchantProvisioning?
   deployment         DeploymentMetadata?
 
@@ -203,6 +207,30 @@ model SupportCallLog {
   notes       String
   occurredAt  DateTime       @default(now())
   createdAt   DateTime       @default(now())
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  rating    Int?
+  feedback  String
+  createdAt DateTime @default(now())
+}
+
+model CallRequest {
+  id          String            @id @default(uuid())
+  storeId     String
+  store       Store             @relation(fields: [storeId], references: [id])
+  userId      String
+  user        User              @relation(fields: [userId], references: [id])
+  phone       String
+  preferredTime String?
+  status      CallRequestStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
 
 model CommunicationLog {
@@ -428,6 +456,13 @@ enum ProvisioningStatus {
   COMPLETED
   FAILED
   ROLLBACK
+}
+
+enum CallRequestStatus {
+  PENDING
+  SCHEDULED
+  COMPLETED
+  CANCELLED
 }
 
 enum ThemeCategory {

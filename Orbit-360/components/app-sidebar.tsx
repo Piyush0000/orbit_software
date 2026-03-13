@@ -26,6 +26,9 @@ import {
   LifeBuoy,
   MessageSquare,
   Activity,
+  Facebook,
+  Search,
+  Globe,
 } from "lucide-react";
 
 import {
@@ -127,16 +130,32 @@ const data = {
       iconBg: "bg-amber-500/10",
       items: [
         {
+          title: "Meta Ads",
+          isCategory: true,
+        },
+        {
           title: "Performance",
-          url: "/marketing/performance",
+          url: "/marketing/meta/performance",
         },
         {
           title: "Campaigns",
-          url: "/marketing/campaigns",
+          url: "/marketing/meta/campaigns",
         },
         {
           title: "Creatives",
-          url: "/marketing/creatives",
+          url: "/marketing/meta/creatives",
+        },
+        {
+          title: "Google Ads",
+          isCategory: true,
+        },
+        {
+          title: "Ad Manager",
+          url: "/marketing/google/manager",
+        },
+        {
+          title: "Performance",
+          url: "/marketing/google/performance",
         },
       ],
     },
@@ -262,7 +281,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, []);
 
   // Determine active state helper
-  const isActive = (url: string) => {
+  const isActive = (url: string | undefined | null) => {
+    if (!url) return false;
     if (url === "/" && pathname === "/") return true;
     if (url === "/") return false;
 
@@ -449,8 +469,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 }
                               }
                               
+                              if (subItem.isCategory) {
+                                return (
+                                  <div key={subItem.title} className="px-2 py-2 mt-2 first:mt-0">
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 flex items-center gap-2">
+                                      <div className="h-[1px] flex-1 bg-border/40" />
+                                      {subItem.title}
+                                      <div className="h-[1px] flex-1 bg-border/40" />
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              
                               return (
-                                <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubItem key={subItem.url}>
                                   <SidebarMenuSubButton
                                     asChild
                                     isActive={!isPreview && isActive(subItem.url)}

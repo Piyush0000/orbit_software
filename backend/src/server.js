@@ -30,6 +30,7 @@ const storefrontPublicRoutes = require('./routes/storefrontPublic');
 const logisticsRoutes = require('./routes/logistics');
 const leadRoutes = require('./routes/leads');
 const couponRoutes = require('./routes/coupons');
+const supportRoutes = require('./routes/support');
 
 
 const app = express();
@@ -72,6 +73,7 @@ app.use('/api/storefront/public', storefrontPublicRoutes);
 app.use('/api/logistics', logisticsRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/support', supportRoutes);
 
 app.use('/uploads', express.static(env.upload.path));
 
